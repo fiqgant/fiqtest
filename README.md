@@ -14,12 +14,14 @@ Integrated with Judge0 as the code execution engine. Built with Laravel 13 and d
 - **Grade Reports** — Per-class grade reports with per-question breakdown and CSV export
 - **Admin Panel** — Full dashboard for managing all entities
 - **Judge0 Settings** — Configure URL, API key, and test the connection directly from the admin panel
+- **Markdown Question Editor** — Write problem descriptions in Markdown with live preview (EasyMDE)
+- **Rich Rendering for Students** — Question descriptions rendered with full Markdown, LaTeX (KaTeX), and Mermaid.js diagram support
 
 ## Tech Stack
 
 - **Backend**: Laravel 13, PHP 8.4
 - **Database**: MySQL 8
-- **Frontend**: Blade, Tailwind CSS (CDN), Font Awesome 6 (CDN)
+- **Frontend**: Blade, Tailwind CSS (CDN), Font Awesome 6 (CDN), EasyMDE, KaTeX, Mermaid.js
 - **Code Execution**: Judge0 CE
 - **Web Server**: Nginx
 - **Containerization**: Docker + Docker Compose
