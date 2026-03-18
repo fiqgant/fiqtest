@@ -2,6 +2,7 @@
 
 @section('content')
     <x-admin.page-header title="Question Bank" subtitle="Build a balanced pool of easy, medium, and hard coding problems.">
+        <a href="{{ route('admin.questions.bulk.import') }}" class="btn-secondary"><i class="fas fa-file-import"></i> Bulk Import</a>
         <a href="{{ route('admin.questions.create') }}" class="btn-primary"><i class="fas fa-plus"></i> Add Question</a>
     </x-admin.page-header>
 
