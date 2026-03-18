@@ -54,11 +54,11 @@ Route::prefix('admin')->group(function () {
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
         Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
 
-        Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
         Route::get('questions/bulk/import', [BulkQuestionController::class, 'showImport'])->name('admin.questions.bulk.import');
         Route::get('questions/bulk/template', [BulkQuestionController::class, 'downloadTemplate'])->name('admin.questions.bulk.template');
         Route::post('questions/bulk/preview', [BulkQuestionController::class, 'preview'])->name('admin.questions.bulk.preview');
         Route::post('questions/bulk/import', [BulkQuestionController::class, 'import'])->name('admin.questions.bulk.store');
+        Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
 
         Route::get('settings/judge0', [SystemSettingController::class, 'editJudge0'])->name('admin.settings.judge0.edit');
         Route::put('settings/judge0', [SystemSettingController::class, 'updateJudge0'])->name('admin.settings.judge0.update');
