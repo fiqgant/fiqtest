@@ -82,12 +82,14 @@
                 @endif
 
                 {{-- Reference solution --}}
-                @if(!empty($question->reference_solution))
-                    <div>
-                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
+                <div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
+                    @if(!empty($question->reference_solution))
                         <pre class="bg-indigo-950 text-indigo-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $question->reference_solution }}</pre>
-                    </div>
-                @endif
+                    @else
+                        <div class="text-sm text-slate-400 italic px-1">No reference solution provided. <a href="{{ route('admin.questions.edit', $question) }}" class="text-indigo-500 hover:underline">Add one →</a></div>
+                    @endif
+                </div>
 
                 {{-- Student's code --}}
                 <div>
