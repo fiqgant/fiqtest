@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\CourseOffering;
+use App\Models\Exam;
+use App\Models\Question;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class ExamController extends Controller
+{
+    public function index(): View
+    {
+        $exams = Exam::with('courseOffering.course', 'courseOffering.academicPeriod')
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.exams.index', compact('exams'));
+    }
+
+    public function create(): View
+    {
+        $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+
+        return view('admin.exams.form', [
+            'exam' => new Exam(),
+            'offerings' => $offerings,
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $this->validatePayload($request);
+        $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(6));
+
+        Exam::create($data);
+
+        return redirect()->route('admin.exams.index')->with('success', 'Exam created.');
+    }
+
+    public function edit(Exam $exam): View
+    {
+        $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+
+        return view('admin.exams.form', compact('exam', 'offerings'));
+    }
+
+    public function update(Request $request, Exam $exam): RedirectResponse
+    {
+        $data = $this->validatePayload($request);
+        $exam->update($data);
+
+        return redirect()->route('admin.exams.index')->with('success', 'Exam updated.');
+    }
+
+    public function destroy(Exam $exam): RedirectResponse
+    {
+        $exam->delete();
+
+        return redirect()->route('admin.exams.index')->with('success', 'Exam deleted.');
+    }
+
+    public function publish(Exam $exam): RedirectResponse
+    {
+        if (!$this->hasEnoughQuestionsByDifficulty($exam)) {
+            return back()->withErrors(['publish' => 'Question bank per difficulty does not satisfy this exam distribution.']);
+        }
+
+        $exam->update(['status' => 'published']);
+
+        return back()->with('success', 'Exam published.');
+    }
+
+    public function close(Exam $exam): RedirectResponse
+    {
+        $exam->update(['status' => 'closed']);
+
+        return back()->with('success', 'Exam closed.');
+    }
+
+    public function attempts(Exam $exam): View
+    {
+        $attempts = $exam->attempts()->with('student')->latest()->paginate(30);
+
+        return view('admin.exams.attempts', compact('exam', 'attempts'));
+    }
+
+    private function validatePayload(Request $request): array
+    {
+        $data = $request->validate([
+            'course_offering_id' => ['required', 'exists:course_offerings,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'opens_at' => ['required', 'date'],
+            'closes_at' => ['required', 'date', 'after:opens_at'],
+            'duration_minutes' => ['required', 'integer', 'min:1', 'max:600'],
+            'status' => ['required', 'in:draft,published,closed'],
+            'show_score_immediately' => ['nullable', 'boolean'],
+            'max_tab_switches' => ['required', 'integer', 'min:0', 'max:20'],
+            'tab_switch_warning_count' => ['required', 'integer', 'min:0', 'max:20'],
+            'inactivity_limit_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
+            'inactivity_warning_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
+            'easy_count' => ['required', 'integer', 'min:0'],
+            'medium_count' => ['required', 'integer', 'min:0'],
+            'hard_count' => ['required', 'integer', 'min:0'],
+            'easy_weight' => ['required', 'numeric', 'min:0'],
+            'medium_weight' => ['required', 'numeric', 'min:0'],
+            'hard_weight' => ['required', 'numeric', 'min:0'],
+        ]);
+
+        $data['show_score_immediately'] = (bool) ($data['show_score_immediately'] ?? false);
+
+        if ((int) $data['max_tab_switches'] === 0) {
+            $data['tab_switch_warning_count'] = 0;
+        } else {
+            $data['tab_switch_warning_count'] = max(1, min((int) $data['tab_switch_warning_count'], (int) $data['max_tab_switches']));
+        }
+
+        if ((int) $data['inactivity_limit_seconds'] === 0) {
+            $data['inactivity_warning_seconds'] = 0;
+        } else {
+            $data['inactivity_warning_seconds'] = max(1, min((int) $data['inactivity_warning_seconds'], (int) $data['inactivity_limit_seconds']));
+        }
+
+        return $data;
+    }
+
+    private function hasEnoughQuestionsByDifficulty(Exam $exam): bool
+    {
+        $counts = Question::where('course_offering_id', $exam->course_offering_id)
+            ->selectRaw('difficulty, COUNT(*) as total')
+            ->groupBy('difficulty')
+            ->pluck('total', 'difficulty');
+
+        $easyAvailable = (int) ($counts['easy'] ?? 0);
+        $mediumAvailable = (int) ($counts['medium'] ?? 0);
+        $hardAvailable = (int) ($counts['hard'] ?? 0);
+
+        return $easyAvailable >= $exam->easy_count
+            && $mediumAvailable >= $exam->medium_count
+            && $hardAvailable >= $exam->hard_count;
+    }
+}
