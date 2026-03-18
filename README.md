@@ -17,7 +17,7 @@ Integrated with Judge0 as the code execution engine. Built with Laravel 13 and d
 
 ## Tech Stack
 
-- **Backend**: Laravel 13, PHP 8.3
+- **Backend**: Laravel 13, PHP 8.4
 - **Database**: MySQL 8
 - **Frontend**: Blade, Tailwind CSS (CDN), Font Awesome 6 (CDN)
 - **Code Execution**: Judge0 CE
@@ -30,7 +30,7 @@ Integrated with Judge0 as the code execution engine. Built with Laravel 13 and d
 
 ### Requirements
 
-- PHP 8.3+
+- PHP 8.4+
 - Composer
 - Node.js 18+
 - MySQL 8
@@ -41,7 +41,7 @@ Integrated with Judge0 as the code execution engine. Built with Laravel 13 and d
 **1. Clone the repository**
 ```bash
 git clone https://github.com/fiqgant/fiqtest.git
-cd repo
+cd fiqtest
 ```
 
 **2. Install dependencies**
@@ -82,7 +82,9 @@ php artisan serve
 
 Access the admin panel at `http://localhost:8000/admin`
 
-> Default admin credentials are defined in the database seeder.
+**Default admin credentials:**
+- Email: `admin@example.com`
+- Password: `password`
 
 ---
 
@@ -92,17 +94,23 @@ Access the admin panel at `http://localhost:8000/admin`
 
 - Docker Engine 24+
 - Docker Compose v2
-- Ports 80 and 443 open
+- Port 80 open
 
 ### Steps
 
-**1. Clone the repository on the VPS**
+**1. Install Docker on the VPS**
 ```bash
-git clone https://github.com/fiqgant/fiqtest.git
-cd repo
+curl -fsSL https://get.docker.com | sh
+apt install -y docker-compose-plugin
 ```
 
-**2. Create the production `.env` file**
+**2. Clone the repository**
+```bash
+git clone https://github.com/fiqgant/fiqtest.git
+cd fiqtest
+```
+
+**3. Create the production `.env` file**
 ```bash
 cp .env.example .env
 nano .env
@@ -112,47 +120,55 @@ Update the following values:
 ```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://your-domain.com
+APP_URL=http://your-server-ip
 
 DB_HOST=mysql
 DB_DATABASE=coding_exam_platform
 DB_USERNAME=appuser
 DB_PASSWORD=use_a_strong_password
+DB_ROOT_PASSWORD=use_a_strong_root_password
 
 JUDGE0_URL=http://judge0:2358
 JUDGE0_TIMEOUT=30
 ```
 
-**3. Start Docker Compose**
+> `DB_USERNAME` must NOT be `root` — use any other username.
+
+**4. Start all services**
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
-**4. Initialize the application (first time only)**
+This will automatically:
+- Build the Laravel app image
+- Pull MySQL, Nginx, Judge0, Redis, and Postgres images
+- Run all database migrations
+- Cache config, routes, and views
+- Start PHP-FPM
+
+**5. Seed the admin account (first time only)**
 ```bash
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan db:seed
-docker compose exec app npm run build
-docker compose exec app php artisan storage:link
-docker compose exec app chmod -R 775 storage bootstrap/cache
+docker compose exec app php artisan db:seed --class=AdminSeeder --force
 ```
 
-**5. Verify Judge0 connection**
+**6. Open the app**
 
-Open the admin panel → Settings → Judge0 → click **Test Connection**. You should see "Connected successfully".
+Visit `http://your-server-ip` in your browser.
+
+**Default admin credentials:**
+- Email: `admin@example.com`
+- Password: `password`
+
+**7. Configure Judge0**
+
+Go to Admin Panel → Settings → Judge0, set the Base URL to `http://judge0:2358`, then click **Test Connection**.
 
 ### Updating the Application
 
-When there are changes in the repository:
 ```bash
 git pull
-docker compose exec app composer install --no-dev --optimize-autoloader
+docker compose up -d --build app
 docker compose exec app php artisan migrate --force
-docker compose exec app npm run build
-docker compose exec app php artisan config:cache
-docker compose exec app php artisan route:cache
-docker compose exec app php artisan view:cache
 ```
 
 ---
@@ -172,9 +188,12 @@ resources/views/
 │   ├── dashboard.blade.php
 │   ├── settings/judge0.blade.php
 │   └── reports/offering.blade.php
-└── student/                  # Student-facing views
+└── exam/                     # Student-facing exam views
 
 database/migrations/          # All migrations
+docker/
+├── entrypoint.sh             # Container startup script
+└── nginx.conf                # Nginx configuration
 ```
 
 ---
@@ -207,6 +226,7 @@ After filling in the fields, click **Test Connection** to verify.
 | `APP_TIMEZONE` | `Asia/Jakarta` | Application timezone |
 | `DB_CONNECTION` | `mysql` | Database driver |
 | `DB_HOST` | `127.0.0.1` | Database host (use `mysql` with Docker) |
+| `DB_USERNAME` | — | Must not be `root` when using Docker |
 | `DB_DATABASE` | `coding_exam_platform` | Database name |
 | `JUDGE0_URL` | `http://localhost:2358` | Default Judge0 URL (can be changed from admin) |
 | `JUDGE0_TIMEOUT` | `30` | Default Judge0 timeout |
