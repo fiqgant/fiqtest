@@ -51,6 +51,7 @@ Route::prefix('admin')->group(function () {
         Route::post('exams/{exam}/publish', [ExamController::class, 'publish'])->name('admin.exams.publish');
         Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('admin.exams.close');
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
+        Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
 
         Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
 

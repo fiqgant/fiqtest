@@ -14,6 +14,7 @@
                     <th>Submitted</th>
                     <th>Status</th>
                     <th>Score</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -38,9 +39,14 @@
                                 <div class="h-1.5 rounded-full {{ $pct >= 75 ? 'bg-emerald-500' : ($pct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}" style="width: {{ $pct }}%"></div>
                             </div>
                         </td>
+                        <td>
+                            <a href="{{ route('admin.exams.attempts.detail', [$exam, $attempt]) }}" class="btn-secondary text-xs py-1 px-3">
+                                <i class="fas fa-eye"></i> Review
+                            </a>
+                        </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-pencil-alt text-2xl"></i><span>No attempts yet.</span></div></td></tr>
+                    <tr><td colspan="6" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-pencil-alt text-2xl"></i><span>No attempts yet.</span></div></td></tr>
                 @endforelse
             </tbody>
         </table>

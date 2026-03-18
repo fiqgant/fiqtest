@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attempt;
 use App\Models\CourseOffering;
 use App\Models\Exam;
 use App\Models\Question;
@@ -87,6 +88,17 @@ class ExamController extends Controller
         $attempts = $exam->attempts()->with('student')->latest()->paginate(30);
 
         return view('admin.exams.attempts', compact('exam', 'attempts'));
+    }
+
+    public function attemptDetail(Exam $exam, Attempt $attempt): View
+    {
+        $attempt->load([
+            'student',
+            'attemptQuestions.question',
+            'attemptQuestions.submissions' => fn($q) => $q->where('is_final', true)->latest()->limit(1),
+        ]);
+
+        return view('admin.exams.attempt-detail', compact('exam', 'attempt'));
     }
 
     private function validatePayload(Request $request): array
