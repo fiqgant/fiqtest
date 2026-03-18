@@ -2,6 +2,7 @@
 
 @section('content')
     <x-admin.page-header title="Students" subtitle="Manage student identity records used for NIM-based exam access.">
+        <a href="{{ route('admin.students.bulk.import') }}" class="btn-secondary"><i class="fas fa-file-import"></i> Bulk Import</a>
         <a href="{{ route('admin.students.create') }}" class="btn-primary"><i class="fas fa-plus"></i> Add Student</a>
     </x-admin.page-header>
 

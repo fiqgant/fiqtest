@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AcademicPeriodController;
 use App\Http\Controllers\Admin\BulkQuestionController;
+use App\Http\Controllers\Admin\BulkStudentController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CourseOfferingController;
@@ -47,6 +48,9 @@ Route::prefix('admin')->group(function () {
         Route::get('course-offerings/{courseOffering}/enrollment', [CourseOfferingController::class, 'enrollment'])->name('admin.course-offerings.enrollment');
         Route::post('course-offerings/{courseOffering}/enrollment', [CourseOfferingController::class, 'syncEnrollment'])->name('admin.course-offerings.enrollment.sync');
 
+        Route::get('students/bulk/import', [BulkStudentController::class, 'showImport'])->name('admin.students.bulk.import');
+        Route::post('students/bulk/preview', [BulkStudentController::class, 'preview'])->name('admin.students.bulk.preview');
+        Route::post('students/bulk/import', [BulkStudentController::class, 'import'])->name('admin.students.bulk.store');
         Route::resource('students', StudentController::class)->except('show')->names('admin.students');
 
         Route::resource('exams', ExamController::class)->except('show')->names('admin.exams');
