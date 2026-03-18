@@ -8,14 +8,8 @@ use App\Models\Question;
 use App\Services\Judge0Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class BulkQuestionController extends Controller
@@ -30,94 +24,11 @@ class BulkQuestionController extends Controller
 
     public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Questions');
+        $path = public_path('questions-template.xlsx');
 
-        // Headers
-        $headers = [
-            'A' => 'title',
-            'B' => 'difficulty',
-            'C' => 'description',
-            'D' => 'default_weight',
-            'E' => 'starter_code',
-            'F' => 'hint',
-            'G' => 'reference_solution',
-            'H' => 'test_cases',
-        ];
-
-        foreach ($headers as $col => $header) {
-            $sheet->setCellValue("{$col}1", $header);
-        }
-
-        // Style headers
-        $sheet->getStyle('A1:H1')->applyFromArray([
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F46E5']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ]);
-
-        // Column widths
-        $widths = ['A' => 30, 'B' => 12, 'C' => 60, 'D' => 16, 'E' => 40, 'F' => 40, 'G' => 40, 'H' => 50];
-        foreach ($widths as $col => $width) {
-            $sheet->getColumnDimension($col)->setWidth($width);
-        }
-
-        // Wrap text for description/code columns
-        $sheet->getStyle('C:G')->getAlignment()->setWrapText(true);
-
-        // Example row
-        $sheet->setCellValue('A2', 'Kuadrat Sebuah Angka');
-        $sheet->setCellValue('B2', 'easy');
-        $sheet->setCellValue('C2', "Diberikan sebuah bilangan bulat **n**, hitung nilai kuadratnya.\n\n**Contoh:**\n- Input: `5`\n- Output: `25`");
-        $sheet->setCellValue('D2', 20);
-        $sheet->setCellValue('E2', "n = int(input())\n# Tulis kode di bawah ini");
-        $sheet->setCellValue('F2', "Gunakan operator perkalian `*`.\nKuadrat = n × n.");
-        $sheet->setCellValue('G2', "n = int(input())\nprint(n * n)");
-        $sheet->setCellValue('H2', "5||25||0;-3||9||1;0||0||0");
-
-        // Style example row
-        $sheet->getStyle('A2:H2')->applyFromArray([
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F0F4FF']],
-        ]);
-        $sheet->getRowDimension(2)->setRowHeight(80);
-
-        // Notes sheet
-        $notes = $spreadsheet->createSheet();
-        $notes->setTitle('Notes');
-        $notesData = [
-            ['Column', 'Required', 'Notes'],
-            ['title', 'Yes', 'Question title, max 255 characters'],
-            ['difficulty', 'Yes', 'Must be: easy, medium, or hard'],
-            ['description', 'Yes', 'Markdown supported. LaTeX: $$...$$ Diagram: ```mermaid'],
-            ['default_weight', 'Yes', 'Numeric score weight (e.g. 10, 20.5)'],
-            ['starter_code', 'No', 'Starter code shown to students. Leave blank if none.'],
-            ['hint', 'No', 'Hint shown when student requests. Leave blank if none.'],
-            ['reference_solution', 'No', 'Correct solution for admin reference. Leave blank if none.'],
-            ['test_cases', 'Yes', "Format: input||expected_output||is_hidden(0/1)\nMultiple test cases separated by semicolon ;\nExample: 5||25||0;-3||9||1"],
-        ];
-
-        foreach ($notesData as $rowIdx => $row) {
-            $notes->fromArray($row, null, "A" . ($rowIdx + 1));
-        }
-        $notes->getStyle('A1:C1')->applyFromArray([
-            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F46E5']],
-        ]);
-        $notes->getColumnDimension('A')->setWidth(20);
-        $notes->getColumnDimension('B')->setWidth(10);
-        $notes->getColumnDimension('C')->setWidth(70);
-        $notes->getStyle('C2:C9')->getAlignment()->setWrapText(true);
-
-        $spreadsheet->setActiveSheetIndex(0);
-
-        $tmpFile = tempnam(sys_get_temp_dir(), 'qtemplate_') . '.xlsx';
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($tmpFile);
-
-        return response()->download($tmpFile, 'questions-template.xlsx', [
+        return response()->download($path, 'questions-template.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ])->deleteFileAfterSend(true);
+        ]);
     }
 
     public function preview(Request $request): View
