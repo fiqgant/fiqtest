@@ -40,7 +40,7 @@ Integrated with Judge0 as the code execution engine. Built with Laravel 13 and d
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/username/repo.git
+git clone https://github.com/fiqgant/fiqtest.git
 cd repo
 ```
 
@@ -98,7 +98,7 @@ Access the admin panel at `http://localhost:8000/admin`
 
 **1. Clone the repository on the VPS**
 ```bash
-git clone https://github.com/username/repo.git
+git clone https://github.com/fiqgant/fiqtest.git
 cd repo
 ```
 
