@@ -51,6 +51,7 @@ Route::prefix('admin')->group(function () {
         Route::get('students/bulk/import', [BulkStudentController::class, 'showImport'])->name('admin.students.bulk.import');
         Route::post('students/bulk/preview', [BulkStudentController::class, 'preview'])->name('admin.students.bulk.preview');
         Route::post('students/bulk/import', [BulkStudentController::class, 'import'])->name('admin.students.bulk.store');
+        Route::delete('students/bulk-destroy', [StudentController::class, 'bulkDestroy'])->name('admin.students.bulk-destroy');
         Route::resource('students', StudentController::class)->except('show')->names('admin.students');
 
         Route::resource('exams', ExamController::class)->except('show')->names('admin.exams');

@@ -59,4 +59,11 @@ class StudentController extends Controller
 
         return redirect()->route('admin.students.index')->with('success', 'Student deleted.');
     }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $count = Student::whereIn('id', $request->input('ids', []))->delete();
+
+        return redirect()->route('admin.students.index')->with('success', "{$count} student(s) deleted.");
+    }
 }
