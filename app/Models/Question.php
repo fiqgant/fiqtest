@@ -17,6 +17,7 @@ class Question extends Model
         'default_weight',
         'test_cases',
         'starter_code',
+        'reference_solution',
         'hint',
         'language',
     ];
