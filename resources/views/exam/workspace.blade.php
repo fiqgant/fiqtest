@@ -305,6 +305,23 @@
                                 <span x-show="!saving"><i class="fas fa-save"></i> Save Now</span>
                                 <span x-show="saving"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                             </button>
+
+                            <!-- Hint button: shown only when hints enabled and question has a hint -->
+                            <template x-if="hintsEnabled && currentQuestion?.has_hint">
+                                <button @click="requestHint()"
+                                        :disabled="hintLoading || hintLimitReached"
+                                        class="bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:opacity-50 px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+                                        :title="hintLimitReached ? 'Hint limit reached for this question' : 'Show hint'">
+                                    <span x-show="!hintLoading">
+                                        <i class="fas fa-lightbulb"></i>
+                                        Hint
+                                        <template x-if="maxHintsPerQuestion > 0">
+                                            <span class="text-xs opacity-75" x-text="'(' + hintUsedCount + '/' + maxHintsPerQuestion + ')'"></span>
+                                        </template>
+                                    </span>
+                                    <span x-show="hintLoading"><i class="fas fa-spinner fa-spin"></i></span>
+                                </button>
+                            </template>
                         </div>
 
                         <button @click="resetCode()"
@@ -393,6 +410,33 @@
                 <button @click="submitExam()"
                         class="flex-1 bg-indigo-600 hover:bg-indigo-700 py-2 rounded-lg font-medium transition-colors">
                     Confirm Submit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hint Modal -->
+    <div x-show="showHintModal"
+         x-cloak
+         class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+         @keydown.escape.window="showHintModal = false">
+        <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-amber-500/40"
+             @click.outside="showHintModal = false">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2 text-amber-400">
+                    <i class="fas fa-lightbulb text-xl"></i>
+                    <h3 class="text-lg font-bold">Hint</h3>
+                </div>
+                <template x-if="maxHintsPerQuestion > 0">
+                    <span class="text-xs text-gray-400" x-text="'Used ' + hintUsedCount + ' of ' + maxHintsPerQuestion + ' hint(s)'"></span>
+                </template>
+            </div>
+            <div class="prose prose-invert prose-sm max-w-none text-gray-200 bg-gray-900 rounded-lg p-4 mb-5"
+                 x-ref="hintContentEl"></div>
+            <div class="flex justify-end">
+                <button @click="showHintModal = false"
+                        class="px-5 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg font-medium transition-colors">
+                    Close
                 </button>
             </div>
         </div>
@@ -522,6 +566,9 @@
             'examClosesAtIso' => optional($exam->closes_at)->toIso8601String(),
             'examDurationMinutes' => (int) $exam->duration_minutes,
             'initialRemainingSeconds' => (int) $remainingSeconds,
+            'hintsEnabled' => (bool) $exam->hints_enabled,
+            'maxHintsPerQuestion' => (int) ($exam->max_hints_per_question ?? 1),
+            'hintBaseUrl' => route('exam.hint', ['attempt' => $attempt->id, 'attemptQuestion' => 0]),
             'allQuestions' => $attempt->attemptQuestions->map(fn($aq) => [
                 'id' => $aq->id,
                 'question_id' => $aq->question_id,
@@ -534,6 +581,8 @@
                 'code' => $aq->code ?? '',
                 'test_cases' => $aq->question->getVisibleTestCases(),
                 'has_code' => $aq->code && strlen($aq->code) > strlen($aq->question->starter_code ?? ''),
+                'has_hint' => !empty($aq->question->hint),
+                'hint_used_count' => (int) $aq->hint_used_count,
             ])->values()->toArray(),
         ];
     @endphp
@@ -806,6 +855,14 @@
                 showTabWarningModal: false,
                 showInactivityWarningModal: false,
                 showDisqualificationModal: false,
+                showHintModal: false,
+                hintLoading: false,
+                hintUsedCount: 0,
+                hintsEnabled: workspaceConfig.hintsEnabled || false,
+                maxHintsPerQuestion: Number(workspaceConfig.maxHintsPerQuestion || 1),
+                get hintLimitReached() {
+                    return this.maxHintsPerQuestion > 0 && this.hintUsedCount >= this.maxHintsPerQuestion;
+                },
                 tabWarningModalMessage: '',
                 disqualificationMessage: '',
                 disqualificationRedirectUrl: '',
@@ -843,6 +900,10 @@
 
                     this.monitoringInitialized = true;
                     examAppInstance = this;
+
+                    // Init hint count for first question
+                    const firstQ = this.allQuestions.find(q => q.id === this.currentAttemptQuestionId);
+                    if (firstQ) this.hintUsedCount = firstQ.hint_used_count || 0;
                     this.setupActivityMonitoring();
 
                     
@@ -1067,8 +1128,10 @@
                     // Switch to new question
                     this.currentAttemptQuestionId = aqId;
                     currentAttemptQuestionId = aqId;
+                    this.showHintModal = false;
 
                     const next = this.allQuestions.find(q => q.id === aqId);
+                    if (next) this.hintUsedCount = next.hint_used_count || 0;
                     if (next) {
                         const nextCode = next.code || next.starter_code || '';
                         setCodeValue(nextCode);
@@ -1262,6 +1325,47 @@
                     }
                 },
                 
+                async requestHint() {
+                    if (this.hintLoading || this.hintLimitReached || !this.currentQuestion) return;
+
+                    this.hintLoading = true;
+                    try {
+                        const baseUrl = workspaceConfig.hintBaseUrl || '';
+                        const url = baseUrl.replace('/0', '/' + this.currentAttemptQuestionId);
+
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': workspaceConfig.csrfToken,
+                                'Accept': 'application/json',
+                            },
+                        });
+
+                        const data = await res.json();
+
+                        if (!res.ok) {
+                            alert(data.error || 'Failed to load hint.');
+                            return;
+                        }
+
+                        // Update count in local cache
+                        this.hintUsedCount = data.used;
+                        const q = this.allQuestions.find(q => q.id === this.currentAttemptQuestionId);
+                        if (q) q.hint_used_count = data.used;
+
+                        // Render hint markdown into modal element
+                        const el = this.$refs.hintContentEl;
+                        if (el) {
+                            renderMarkdown(el, data.hint);
+                        }
+                        this.showHintModal = true;
+                    } catch (e) {
+                        alert('Failed to load hint. Please try again.');
+                    } finally {
+                        this.hintLoading = false;
+                    }
+                },
+
                 async submitExam() {
                     this.isPageNavigating = true;
                     document.getElementById('submit-exam-form').submit();

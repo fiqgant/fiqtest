@@ -91,6 +91,7 @@ class QuestionController extends Controller
             'default_weight' => ['required', 'numeric', 'min:0'],
             'starter_code' => ['nullable', 'string'],
             'reference_solution' => ['nullable', 'string'],
+            'hint' => ['nullable', 'string'],
             'language' => ['required', 'string', 'max:50'],
             'test_cases_text' => ['required', 'string'],
         ]);

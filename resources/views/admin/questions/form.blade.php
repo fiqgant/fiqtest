@@ -90,6 +90,11 @@
                 <textarea name="reference_solution" rows="6" class="form-textarea font-mono text-sm" placeholder="// Correct/working solution">{{ old('reference_solution', $question->reference_solution) }}</textarea>
                 <p class="text-xs text-slate-400 mt-1">Shown to admin when reviewing student answers.</p>
             </div>
+            <div>
+                <label class="form-label">Hint <span class="font-normal text-slate-400">(optional)</span></label>
+                <textarea name="hint" rows="3" class="form-textarea" placeholder="Hint shown to students when they request it during the exam…">{{ old('hint', $question->hint) }}</textarea>
+                <p class="text-xs text-slate-400 mt-1">Leave blank if no hint for this question. Markdown supported.</p>
+            </div>
         </div>
 
         <div class="form-section">

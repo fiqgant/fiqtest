@@ -18,6 +18,7 @@ class AttemptQuestion extends Model
         'is_correct',
         'passed_tests',
         'total_tests',
+        'hint_used_count',
     ];
 
     protected $casts = [
@@ -27,6 +28,7 @@ class AttemptQuestion extends Model
         'is_correct' => 'boolean',
         'passed_tests' => 'integer',
         'total_tests' => 'integer',
+        'hint_used_count' => 'integer',
     ];
 
     public function attempt(): BelongsTo

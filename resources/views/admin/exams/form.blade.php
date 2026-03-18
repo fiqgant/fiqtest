@@ -91,6 +91,24 @@
         </div>
 
         <div class="form-section">
+            <div class="form-section-title"><i class="fas fa-lightbulb mr-1.5"></i> Hint System</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <input type="checkbox" id="hints_enabled" name="hints_enabled" value="1" class="mt-1 w-4 h-4 rounded accent-indigo-600" {{ old('hints_enabled', $exam->hints_enabled ?? false) ? 'checked' : '' }}>
+                    <div>
+                        <label for="hints_enabled" class="form-label cursor-pointer">Enable Hints</label>
+                        <p class="text-xs text-slate-400">Students can request hints for questions that have one.</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Max Hints per Question</label>
+                    <input type="number" min="0" max="10" name="max_hints_per_question" value="{{ old('max_hints_per_question', $exam->max_hints_per_question ?? 1) }}" class="form-input">
+                    <p class="text-xs text-slate-400 mt-1">Set 0 for unlimited. Only applies when hints are enabled.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
             <div class="form-section-title"><i class="fas fa-sliders-h mr-1.5"></i> Question Distribution & Weights</div>
             <div class="grid grid-cols-3 gap-4 mb-4">
                 <div>

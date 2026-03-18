@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SystemSettingController;
 use App\Http\Controllers\Exam\ExamAccessController;
 use App\Http\Controllers\Exam\ExamWorkspaceController;
+use App\Http\Controllers\Exam\HintController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -77,6 +78,7 @@ Route::prefix('attempt/{attempt}')->group(function () {
     Route::post('/autosave', [ExamWorkspaceController::class, 'autosave'])->name('exam.autosave');
     Route::post('/activity', [ExamWorkspaceController::class, 'trackActivity'])->name('exam.activity');
     Route::post('/submit', [ExamWorkspaceController::class, 'finalSubmit'])->name('exam.submit');
+    Route::post('/hint/{attemptQuestion}', [HintController::class, 'use'])->name('exam.hint');
     Route::get('/submitted', [ExamWorkspaceController::class, 'submitted'])->name('exam.submitted');
     Route::get('/result', [ExamWorkspaceController::class, 'result'])->name('exam.result');
 });

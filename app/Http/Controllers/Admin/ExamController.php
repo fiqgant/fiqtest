@@ -100,6 +100,8 @@ class ExamController extends Controller
             'duration_minutes' => ['required', 'integer', 'min:1', 'max:600'],
             'status' => ['required', 'in:draft,published,closed'],
             'show_score_immediately' => ['nullable', 'boolean'],
+            'hints_enabled' => ['nullable', 'boolean'],
+            'max_hints_per_question' => ['required', 'integer', 'min:0', 'max:10'],
             'max_tab_switches' => ['required', 'integer', 'min:0', 'max:20'],
             'tab_switch_warning_count' => ['required', 'integer', 'min:0', 'max:20'],
             'inactivity_limit_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
@@ -113,6 +115,7 @@ class ExamController extends Controller
         ]);
 
         $data['show_score_immediately'] = (bool) ($data['show_score_immediately'] ?? false);
+        $data['hints_enabled'] = (bool) ($data['hints_enabled'] ?? false);
 
         if ((int) $data['max_tab_switches'] === 0) {
             $data['tab_switch_warning_count'] = 0;
