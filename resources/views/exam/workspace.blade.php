@@ -12,8 +12,8 @@
 
     <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 
     <!-- marked.js -->
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
@@ -1312,7 +1312,37 @@
         // Initialize Mermaid
         mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
 
-        // Markdown + LaTeX + Mermaid renderer — called via Alpine x-effect
+        // Protect LaTeX blocks from being mangled by marked
+        function extractLatex(raw) {
+            const store = [];
+            const placeholder = (i) => `LATEX_PLACEHOLDER_${i}_END`;
+
+            // Replace $$...$$ and $...$ with placeholders
+            let out = raw
+                .replace(/\$\$([\s\S]+?)\$\$/g, (_, math) => {
+                    store.push({ display: true, math });
+                    return placeholder(store.length - 1);
+                })
+                .replace(/\$([^\n$]+?)\$/g, (_, math) => {
+                    store.push({ display: false, math });
+                    return placeholder(store.length - 1);
+                });
+
+            return { out, store };
+        }
+
+        function restoreLatex(html, store) {
+            return html.replace(/LATEX_PLACEHOLDER_(\d+)_END/g, (_, i) => {
+                const { display, math } = store[Number(i)];
+                try {
+                    return katex.renderToString(math, { displayMode: display, throwOnError: false });
+                } catch {
+                    return display ? `$$${math}$$` : `$${math}$`;
+                }
+            });
+        }
+
+        // Markdown + LaTeX + Mermaid renderer
         function renderMarkdown(el, raw) {
             if (!el) return;
 
@@ -1321,33 +1351,32 @@
                 return;
             }
 
-            // marked v12 uses walkTokens / extensions
-            const renderer = {
-                code({ text, lang }) {
-                    if (lang === 'mermaid') {
-                        return `<div class="mermaid">${text}</div>`;
+            // Step 1: extract LaTeX before marked touches it
+            const { out: safeRaw, store } = extractLatex(raw);
+
+            // Step 2: configure marked for mermaid
+            marked.use({
+                breaks: true,
+                gfm: true,
+                renderer: {
+                    code({ text, lang }) {
+                        if (lang === 'mermaid') {
+                            return `<div class="mermaid">${text}</div>`;
+                        }
+                        return false;
                     }
-                    return false; // use default
                 }
-            };
+            });
 
-            marked.use({ renderer, breaks: true, gfm: true });
-            el.innerHTML = marked.parse(raw);
+            // Step 3: parse markdown
+            let html = marked.parse(safeRaw);
 
-            // KaTeX
-            if (window.renderMathInElement) {
-                renderMathInElement(el, {
-                    delimiters: [
-                        { left: '$$', right: '$$', display: true },
-                        { left: '$',  right: '$',  display: false },
-                        { left: '\\(', right: '\\)', display: false },
-                        { left: '\\[', right: '\\]', display: true },
-                    ],
-                    throwOnError: false,
-                });
-            }
+            // Step 4: restore LaTeX as rendered KaTeX HTML
+            html = restoreLatex(html, store);
 
-            // Mermaid
+            el.innerHTML = html;
+
+            // Step 5: Mermaid
             const mermaidNodes = el.querySelectorAll('.mermaid');
             if (mermaidNodes.length) {
                 mermaid.run({ nodes: mermaidNodes });
