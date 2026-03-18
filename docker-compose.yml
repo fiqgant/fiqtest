@@ -90,6 +90,10 @@ services:
       POSTGRES_DB: judge0
       POSTGRES_USER: judge0
       POSTGRES_PASSWORD: judge0pass
+      PARALLEL_WORKERS: 8
+      CPU_TIME_LIMIT: 5
+      WALL_TIME_LIMIT: 10
+      MEMORY_LIMIT: 131072
     privileged: true
     depends_on:
       - judge0
