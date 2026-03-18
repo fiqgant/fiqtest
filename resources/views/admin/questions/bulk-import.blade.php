@@ -3,7 +3,7 @@
 @section('content')
     <x-admin.page-header title="Bulk Import Questions" subtitle="Upload an Excel file to create multiple questions at once.">
         <a href="{{ route('admin.questions.index') }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Questions</a>
-        <a href="{{ route('admin.questions.bulk.template') }}" class="btn-primary"><i class="fas fa-download"></i> Download Template</a>
+        <a href="/questions-template.xlsx" download="questions-template.xlsx" class="btn-primary"><i class="fas fa-download"></i> Download Template</a>
     </x-admin.page-header>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
