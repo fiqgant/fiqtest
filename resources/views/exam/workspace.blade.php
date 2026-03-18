@@ -244,7 +244,10 @@
                                 </span>
                             </h2>
 
-                            <div class="md-body" id="question-description"></div>
+                            <div class="md-body"
+                                x-ref="descEl"
+                                x-effect="renderMarkdown($refs.descEl, currentQuestion?.description || '')">
+                            </div>
 
                             <template x-if="currentQuestion.test_cases && currentQuestion.test_cases.length > 0">
                                 <div class="mt-6">
@@ -837,11 +840,6 @@
                     examAppInstance = this;
                     this.setupActivityMonitoring();
 
-                    // Render markdown description when question changes
-                    this.$watch('currentAttemptQuestionId', () => {
-                        this.$nextTick(() => renderQuestionDescription(this.currentQuestion));
-                    });
-                    this.$nextTick(() => renderQuestionDescription(this.currentQuestion));
                     
                     // Track fullscreen state changes
                     const handleFullscreenChange = () => {
@@ -1314,32 +1312,34 @@
         // Initialize Mermaid
         mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
 
-        // Markdown + LaTeX + Mermaid renderer
-        function renderQuestionDescription(question) {
-            const el = document.getElementById('question-description');
-            if (!el || !question) return;
+        // Markdown + LaTeX + Mermaid renderer — called via Alpine x-effect
+        function renderMarkdown(el, raw) {
+            if (!el) return;
 
-            // Configure marked
-            const renderer = new marked.Renderer();
-            const originalCode = renderer.code.bind(renderer);
-            renderer.code = function(code, lang) {
-                if (lang === 'mermaid') {
-                    return `<div class="mermaid">${typeof code === 'object' ? code.text : code}</div>`;
+            if (!raw || !raw.trim()) {
+                el.innerHTML = '';
+                return;
+            }
+
+            // marked v12 uses walkTokens / extensions
+            const renderer = {
+                code({ text, lang }) {
+                    if (lang === 'mermaid') {
+                        return `<div class="mermaid">${text}</div>`;
+                    }
+                    return false; // use default
                 }
-                return originalCode(code, lang);
             };
 
-            marked.setOptions({ renderer, breaks: true, gfm: true });
-
-            const raw = question.description || '';
+            marked.use({ renderer, breaks: true, gfm: true });
             el.innerHTML = marked.parse(raw);
 
-            // Render KaTeX
+            // KaTeX
             if (window.renderMathInElement) {
                 renderMathInElement(el, {
                     delimiters: [
                         { left: '$$', right: '$$', display: true },
-                        { left: '$', right: '$', display: false },
+                        { left: '$',  right: '$',  display: false },
                         { left: '\\(', right: '\\)', display: false },
                         { left: '\\[', right: '\\]', display: true },
                     ],
@@ -1347,9 +1347,17 @@
                 });
             }
 
-            // Render Mermaid
-            mermaid.run({ nodes: el.querySelectorAll('.mermaid') });
+            // Mermaid
+            const mermaidNodes = el.querySelectorAll('.mermaid');
+            if (mermaidNodes.length) {
+                mermaid.run({ nodes: mermaidNodes });
+            }
         }
+
+        // Expose to Alpine scope
+        document.addEventListener('alpine:init', () => {
+            Alpine.magic('renderMarkdown', () => renderMarkdown);
+        });
     </script>
 </body>
 </html>
