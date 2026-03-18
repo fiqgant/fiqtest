@@ -2,7 +2,7 @@
 set -e
 
 echo "==> Waiting for MySQL..."
-until mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --ssl=0 -e "SELECT 1" &>/dev/null; do
+until php -r "new PDO('mysql:host=$DB_HOST;port=$DB_PORT;dbname=$DB_DATABASE', '$DB_USERNAME', '$DB_PASSWORD');" &>/dev/null; do
     sleep 2
 done
 echo "==> MySQL is ready."
