@@ -2,7 +2,7 @@
 set -e
 
 echo "==> Waiting for MySQL..."
-until mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" -e "SELECT 1" &>/dev/null; do
+until mysql -h "$DB_HOST" -u "$DB_USERNAME" -p"$DB_PASSWORD" --ssl=0 -e "SELECT 1" &>/dev/null; do
     sleep 2
 done
 echo "==> MySQL is ready."
