@@ -1,21 +1,22 @@
 FROM php:8.4-fpm-alpine
 
-# Install system dependencies
+# Install system dependencies + PHP extension deps
 RUN apk add --no-cache \
     bash \
     curl \
     git \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
     zip \
     unzip \
     nodejs \
     npm \
-    mysql-client
+    mysql-client \
+    libpng-dev \
+    oniguruma-dev \
+    libxml2-dev
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql gd opcache bcmath
+# Install PHP extensions (pdo_mysql, bcmath, opcache — no gd needed)
+RUN docker-php-ext-install pdo pdo_mysql bcmath mbstring xml \
+    && docker-php-ext-enable opcache
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -37,7 +38,7 @@ COPY . .
 # Build frontend assets
 RUN npm run build
 
-# Run composer scripts (post-autoload-dump etc)
+# Run composer scripts
 RUN composer dump-autoload --optimize
 
 # Set permissions
