@@ -456,10 +456,9 @@
     </div>
 
     <!-- Inactivity Warning Modal -->
-    <div x-show="showInactivityWarningModal" 
+    <div x-show="showInactivityWarningModal"
          x-cloak
-         class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-         @keydown.escape.window="showInactivityWarningModal = false">
+         class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-rose-500/50">
             <div class="flex items-center justify-center mb-4">
                 <div class="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center">
@@ -467,13 +466,18 @@
                 </div>
             </div>
             <h3 class="text-xl font-bold text-center text-rose-400 mb-2">Inactivity Warning</h3>
-            <p class="text-gray-300 text-center mb-4">No mouse/keyboard activity detected.</p>
+            <p class="text-gray-300 text-center mb-4">No activity detected. You will be disqualified soon.</p>
             <p class="text-center text-rose-300 mb-6">
-                Auto-disqualification in 
+                Auto-disqualification in
                 <span class="font-mono font-bold text-2xl" x-text="inactivityWarningRemainingSeconds"></span>
-                seconds unless you interact now.
+                seconds.
             </p>
-            <p class="text-center text-gray-400 text-sm mb-4">Move your mouse or press any key to dismiss.</p>
+            <div class="flex justify-center">
+                <button @click="dismissInactivityWarning()"
+                    class="px-6 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-lg transition-colors">
+                    I'm here — dismiss warning
+                </button>
+            </div>
         </div>
     </div>
 
@@ -820,6 +824,7 @@
                 inactivityWarningRemainingSeconds: 0,
                 inactivityWarningTickHandle: null,
                 inactivityWarningShown: false,
+                inactivityWarningPending: false,
                 disqualified: false,
                 activityTimeoutHandle: null,
                 tabSwitchDebounceHandle: null,
@@ -947,12 +952,13 @@
                         // Start/stop warning loop
                         if (shouldShow && !this.inactivityWarningShown) {
                             this.inactivityWarningShown = true;
+                            this.inactivityWarningPending = true;
                             startWarningLoop();
                         } else if (!shouldShow && this.inactivityWarningShown) {
                             this.inactivityWarningShown = false;
                             stopWarningLoop();
                         }
-                        
+
                         this.showInactivityWarningModal = shouldShow;
                     }, 1000);
                 },
@@ -986,8 +992,12 @@
                         return;
                     }
 
+                    // If inactivity warning is showing, ignore activity until user manually dismisses
+                    if (this.inactivityWarningPending) {
+                        return;
+                    }
+
                     this.lastUserActivityAtMs = Date.now();
-                    this.showInactivityWarningModal = false;
 
                     this.scheduleInactivityTimeout();
 
@@ -996,6 +1006,15 @@
                         this.lastActivitySyncAt = nowMs;
                         this.reportActivityEvent('activity');
                     }
+                },
+
+                dismissInactivityWarning() {
+                    this.inactivityWarningPending = false;
+                    this.inactivityWarningShown = false;
+                    this.showInactivityWarningModal = false;
+                    stopWarningLoop();
+                    this.lastUserActivityAtMs = Date.now();
+                    this.scheduleInactivityTimeout();
                 },
 
                 scheduleInactivityTimeout() {
@@ -1141,6 +1160,7 @@
                     this.showSubmitModal = false;
                     this.showTabWarningModal = false;
                     this.showInactivityWarningModal = false;
+                    this.inactivityWarningPending = false;
                     clearTimeout(this.activityTimeoutHandle);
                     if (this.inactivityWarningTickHandle) {
                         clearInterval(this.inactivityWarningTickHandle);
