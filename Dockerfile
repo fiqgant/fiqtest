@@ -15,8 +15,9 @@ RUN apk add --no-cache \
     libxml2-dev
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd \
-    && docker-php-ext-install pdo pdo_mysql bcmath mbstring xml gd \
+RUN apk add --no-cache libzip-dev \
+    && docker-php-ext-configure gd \
+    && docker-php-ext-install pdo pdo_mysql bcmath mbstring xml gd zip \
     && docker-php-ext-enable opcache
 
 # Install Composer
