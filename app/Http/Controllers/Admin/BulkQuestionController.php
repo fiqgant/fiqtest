@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Services\Judge0Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -16,7 +17,6 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class BulkQuestionController extends Controller
 {
@@ -28,7 +28,7 @@ class BulkQuestionController extends Controller
         return view('admin.questions.bulk-import', compact('offerings', 'judge0Languages'));
     }
 
-    public function downloadTemplate(): StreamedResponse
+    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -111,12 +111,13 @@ class BulkQuestionController extends Controller
 
         $spreadsheet->setActiveSheetIndex(0);
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, 'questions-template.xlsx', [
+        $tmpFile = tempnam(sys_get_temp_dir(), 'qtemplate_') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tmpFile);
+
+        return response()->download($tmpFile, 'questions-template.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        ])->deleteFileAfterSend(true);
     }
 
     public function preview(Request $request): View
