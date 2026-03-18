@@ -6,6 +6,7 @@
 .phpactor.json
 .phpunit.result.cache
 /.claude
+.sisyphus
 /docker/entrypoint.sh.bak
 /.fleet
 /.idea
