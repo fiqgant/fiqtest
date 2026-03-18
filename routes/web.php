@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\QuestionController;
+use App\Http\Controllers\Admin\QuestionTagController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\SystemSettingController;
@@ -53,6 +54,10 @@ Route::prefix('admin')->group(function () {
         Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('admin.exams.close');
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
         Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
+
+        Route::get('question-tags', [QuestionTagController::class, 'index'])->name('admin.question-tags.index');
+        Route::post('question-tags', [QuestionTagController::class, 'store'])->name('admin.question-tags.store');
+        Route::delete('question-tags/{questionTag}', [QuestionTagController::class, 'destroy'])->name('admin.question-tags.destroy');
 
         Route::get('questions/bulk/import', [BulkQuestionController::class, 'showImport'])->name('admin.questions.bulk.import');
         Route::get('questions/bulk/template', [BulkQuestionController::class, 'downloadTemplate'])->name('admin.questions.bulk.template');

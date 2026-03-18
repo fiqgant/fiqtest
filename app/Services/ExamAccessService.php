@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Attempt;
 use App\Models\Exam;
+use App\Models\Question;
 use App\Models\Student;
 
 class ExamAccessService
@@ -31,10 +32,18 @@ class ExamAccessService
             return [false, 'You have already submitted this exam.'];
         }
 
-        $counts = $exam->questions()
-            ->selectRaw('difficulty, COUNT(*) as total')
-            ->groupBy('difficulty')
-            ->pluck('total', 'difficulty');
+        $filterTags = $exam->question_filter_tags ?? [];
+
+        $counts = collect(['easy', 'medium', 'hard'])->mapWithKeys(function (string $diff) use ($exam, $filterTags) {
+            $query = Question::where('course_offering_id', $exam->course_offering_id)
+                ->where('difficulty', $diff);
+
+            if (!empty($filterTags)) {
+                $query->whereHas('tags', fn($q) => $q->whereIn('question_tags.id', $filterTags));
+            }
+
+            return [$diff => $query->count()];
+        });
 
         $easyAvailable = (int) ($counts['easy'] ?? 0);
         $mediumAvailable = (int) ($counts['medium'] ?? 0);

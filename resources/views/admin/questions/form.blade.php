@@ -95,6 +95,22 @@
                 <textarea name="hint" rows="3" class="form-textarea" placeholder="Hint shown to students when they request it during the exam…">{{ old('hint', $question->hint) }}</textarea>
                 <p class="text-xs text-slate-400 mt-1">Leave blank if no hint for this question. Markdown supported.</p>
             </div>
+            <div class="mt-4">
+                <label class="form-label">Tags</label>
+                <div class="flex flex-wrap gap-2">
+                    @foreach($tags as $tag)
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" name="tag_ids[]" value="{{ $tag->id }}"
+                            class="w-4 h-4 accent-indigo-600"
+                            {{ in_array($tag->id, $selectedTagIds ?? []) ? 'checked' : '' }}>
+                        <span class="text-sm text-slate-600">{{ $tag->name }}</span>
+                    </label>
+                    @endforeach
+                    @if($tags->isEmpty())
+                        <p class="text-sm text-slate-400">No tags yet. <a href="{{ route('admin.question-tags.index') }}" class="text-indigo-500">Create tags first.</a></p>
+                    @endif
+                </div>
+            </div>
         </div>
 
         <div class="form-section">

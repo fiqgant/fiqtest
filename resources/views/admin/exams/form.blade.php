@@ -141,53 +141,23 @@
         </div>
 
         <div class="form-section">
-            <div class="form-section-title"><i class="fas fa-list-check mr-1.5"></i> Question Pool</div>
-            <p class="text-sm text-slate-500 mb-4">Select which questions are available for this exam. The system will randomly pick from this pool based on the counts above.</p>
-
-            @php
-                $offeringId = old('course_offering_id', $exam->course_offering_id ?? $selectedOfferingId ?? null);
-                $poolQuestions = ($offeringId && isset($questions)) ? ($questions->get($offeringId) ?? collect()) : collect();
-                $easyPool   = $poolQuestions->where('difficulty', 'easy');
-                $mediumPool = $poolQuestions->where('difficulty', 'medium');
-                $hardPool   = $poolQuestions->where('difficulty', 'hard');
-            @endphp
-
-            @if($offeringId && $poolQuestions->isNotEmpty())
-                @foreach([['easy', $easyPool, 'emerald'], ['medium', $mediumPool, 'amber'], ['hard', $hardPool, 'rose']] as [$diff, $pool, $color])
-                    @if($pool->isNotEmpty())
-                    <div class="mb-4">
-                        <div class="text-xs font-bold uppercase tracking-wider text-{{ $color }}-600 mb-2">{{ ucfirst($diff) }} ({{ $pool->count() }} available)</div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            @foreach($pool as $q)
-                            <label class="flex items-start gap-2 p-3 rounded-xl border border-slate-200 bg-white cursor-pointer hover:border-indigo-300 has-[:checked]:border-indigo-400 has-[:checked]:bg-indigo-50">
-                                <input type="checkbox" name="question_ids[]" value="{{ $q->id }}"
-                                    class="mt-0.5 w-4 h-4 accent-indigo-600"
-                                    {{ in_array($q->id, $selectedQuestionIds ?? []) ? 'checked' : '' }}>
-                                <div>
-                                    <div class="text-sm font-medium text-slate-700">{{ $q->title }}</div>
-                                    <div class="text-xs text-slate-400">{{ $q->default_weight }} pts</div>
-                                </div>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endif
+            <div class="form-section-title"><i class="fas fa-tags mr-1.5"></i> Question Pool Filter</div>
+            <p class="text-sm text-slate-500 mb-4">Leave empty to use all questions from the course offering. Select tags to limit the pool to questions with those tags (OR logic).</p>
+            <div class="flex flex-wrap gap-2">
+                @foreach($allTags as $tag)
+                <label class="flex items-center gap-1.5 cursor-pointer bg-white border border-slate-200 rounded-xl px-3 py-2 hover:border-indigo-300 has-[:checked]:border-indigo-400 has-[:checked]:bg-indigo-50">
+                    <input type="checkbox" name="question_filter_tags[]" value="{{ $tag->id }}"
+                        class="w-4 h-4 accent-indigo-600"
+                        {{ in_array($tag->id, old('question_filter_tags', $exam->question_filter_tags ?? [])) ? 'checked' : '' }}>
+                    <span class="text-sm font-medium text-slate-700">{{ $tag->name }}</span>
+                </label>
                 @endforeach
-            @else
-                <div class="text-sm text-slate-400 py-4 text-center border border-dashed border-slate-200 rounded-xl">
-                    Select a course offering above to see available questions.
-                </div>
-            @endif
+                @if($allTags->isEmpty())
+                    <p class="text-sm text-slate-400">No tags created yet. <a href="{{ route('admin.question-tags.index') }}" class="text-indigo-500">Create tags first.</a></p>
+                @endif
+            </div>
         </div>
 
         <x-admin.form-actions :cancel="route('admin.exams.index')" />
     </form>
-
-    <script>
-        document.querySelector('select[name="course_offering_id"]')?.addEventListener('change', function () {
-            const url = new URL(window.location.href);
-            url.searchParams.set('offering_id', this.value);
-            window.location.href = url.toString();
-        });
-    </script>
 @endsection

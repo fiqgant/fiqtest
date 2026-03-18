@@ -7,6 +7,7 @@ use App\Models\Attempt;
 use App\Models\CourseOffering;
 use App\Models\Exam;
 use App\Models\Question;
+use App\Models\QuestionTag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,22 +27,12 @@ class ExamController extends Controller
     public function create(Request $request): View
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
-
-        $questions = Question::with('courseOffering')
-            ->orderBy('course_offering_id')
-            ->orderBy('difficulty')
-            ->orderBy('title')
-            ->get()
-            ->groupBy('course_offering_id');
-
-        $selectedOfferingId = $request->get('offering_id');
+        $allTags = QuestionTag::orderBy('name')->get();
 
         return view('admin.exams.form', [
             'exam' => new Exam(),
             'offerings' => $offerings,
-            'questions' => $questions,
-            'selectedQuestionIds' => [],
-            'selectedOfferingId' => $selectedOfferingId,
+            'allTags' => $allTags,
         ]);
     }
 
@@ -50,8 +41,7 @@ class ExamController extends Controller
         $data = $this->validatePayload($request);
         $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(6));
 
-        $exam = Exam::create($data);
-        $exam->questions()->sync($request->input('question_ids', []));
+        Exam::create($data);
 
         return redirect()->route('admin.exams.index')->with('success', 'Exam created.');
     }
@@ -59,24 +49,15 @@ class ExamController extends Controller
     public function edit(Exam $exam): View
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+        $allTags = QuestionTag::orderBy('name')->get();
 
-        $questions = Question::with('courseOffering')
-            ->orderBy('course_offering_id')
-            ->orderBy('difficulty')
-            ->orderBy('title')
-            ->get()
-            ->groupBy('course_offering_id');
-
-        $selectedQuestionIds = $exam->questions()->pluck('questions.id')->toArray();
-
-        return view('admin.exams.form', compact('exam', 'offerings', 'questions', 'selectedQuestionIds'));
+        return view('admin.exams.form', compact('exam', 'offerings', 'allTags'));
     }
 
     public function update(Request $request, Exam $exam): RedirectResponse
     {
         $data = $this->validatePayload($request);
         $exam->update($data);
-        $exam->questions()->sync($request->input('question_ids', []));
 
         return redirect()->route('admin.exams.index')->with('success', 'Exam updated.');
     }
@@ -147,6 +128,8 @@ class ExamController extends Controller
             'easy_weight' => ['required', 'numeric', 'min:0'],
             'medium_weight' => ['required', 'numeric', 'min:0'],
             'hard_weight' => ['required', 'numeric', 'min:0'],
+            'question_filter_tags' => ['nullable', 'array'],
+            'question_filter_tags.*' => ['integer', 'exists:question_tags,id'],
         ]);
 
         $data['show_score_immediately'] = (bool) ($data['show_score_immediately'] ?? false);
@@ -169,10 +152,18 @@ class ExamController extends Controller
 
     private function hasEnoughQuestionsByDifficulty(Exam $exam): bool
     {
-        $counts = $exam->questions()
-            ->selectRaw('difficulty, COUNT(*) as total')
-            ->groupBy('difficulty')
-            ->pluck('total', 'difficulty');
+        $filterTags = $exam->question_filter_tags ?? [];
+
+        $counts = collect(['easy', 'medium', 'hard'])->mapWithKeys(function (string $diff) use ($exam, $filterTags) {
+            $query = Question::where('course_offering_id', $exam->course_offering_id)
+                ->where('difficulty', $diff);
+
+            if (!empty($filterTags)) {
+                $query->whereHas('tags', fn($q) => $q->whereIn('question_tags.id', $filterTags));
+            }
+
+            return [$diff => $query->count()];
+        });
 
         $easyAvailable = (int) ($counts['easy'] ?? 0);
         $mediumAvailable = (int) ($counts['medium'] ?? 0);

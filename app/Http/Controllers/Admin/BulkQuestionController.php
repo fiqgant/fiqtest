@@ -71,7 +71,7 @@ class BulkQuestionController extends Controller
         $count = 0;
 
         foreach ($valid as $row) {
-            Question::create([
+            $question = Question::create([
                 'course_offering_id' => $request->course_offering_id,
                 'title' => $row['title'],
                 'slug' => Str::slug($row['title']) . '-' . Str::lower(Str::random(6)),
@@ -84,6 +84,14 @@ class BulkQuestionController extends Controller
                 'language' => $request->language,
                 'test_cases' => $row['test_cases'],
             ]);
+
+            $tagIds = [];
+            foreach ($row['tags'] ?? [] as $tagName) {
+                $tag = \App\Models\QuestionTag::firstOrCreate(['name' => $tagName]);
+                $tagIds[] = $tag->id;
+            }
+            $question->tags()->sync($tagIds);
+
             $count++;
         }
 
@@ -113,7 +121,7 @@ class BulkQuestionController extends Controller
                 continue;
             }
 
-            [$title, $difficulty, $description, $defaultWeight, $starterCode, $hint, $referenceSolution, $testCasesRaw] = array_pad($row, 8, null);
+            [$title, $difficulty, $description, $defaultWeight, $starterCode, $hint, $referenceSolution, $tagsRaw, $testCasesRaw] = array_pad($row, 9, null);
 
             $errors = [];
 
@@ -124,6 +132,8 @@ class BulkQuestionController extends Controller
             $starterCode = trim((string) ($starterCode ?? ''));
             $hint = trim((string) ($hint ?? ''));
             $referenceSolution = trim((string) ($referenceSolution ?? ''));
+            $tagsRaw = trim((string) ($tagsRaw ?? ''));
+            $tagNames = $tagsRaw !== '' ? array_filter(array_map('trim', explode(',', $tagsRaw))) : [];
             $testCasesRaw = trim((string) ($testCasesRaw ?? ''));
 
             if ($title === '') $errors[] = 'Title is required.';
@@ -157,6 +167,7 @@ class BulkQuestionController extends Controller
                 'starter_code' => $starterCode,
                 'hint' => $hint,
                 'reference_solution' => $referenceSolution,
+                'tags' => $tagNames,
                 'test_cases' => $testCases,
                 'errors' => $errors,
             ];

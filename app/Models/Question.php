@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Question extends Model
@@ -33,9 +32,9 @@ class Question extends Model
         return $this->belongsTo(CourseOffering::class);
     }
 
-    public function exams(): BelongsToMany
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Exam::class, 'exam_questions');
+        return $this->belongsToMany(QuestionTag::class, 'question_tag', 'question_id', 'question_tag_id');
     }
 
     public function attemptQuestions(): HasMany

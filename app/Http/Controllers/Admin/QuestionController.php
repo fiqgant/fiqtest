@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CourseOffering;
 use App\Models\Question;
+use App\Models\QuestionTag;
 use App\Services\Judge0Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,12 +33,15 @@ class QuestionController extends Controller
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
         $judge0Languages = app(Judge0Service::class)->getSupportedLanguages();
+        $tags = QuestionTag::orderBy('name')->get();
 
         return view('admin.questions.form', [
             'question' => new Question(),
             'offerings' => $offerings,
             'testCasesText' => '',
             'judge0Languages' => $judge0Languages,
+            'tags' => $tags,
+            'selectedTagIds' => [],
         ]);
     }
 
@@ -46,7 +50,8 @@ class QuestionController extends Controller
         $data = $this->validatePayload($request);
         $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(6));
 
-        Question::create($data);
+        $question = Question::create($data);
+        $question->tags()->sync($request->input('tag_ids', []));
 
         return redirect()->route('admin.questions.index')->with('success', 'Question created.');
     }
@@ -55,6 +60,8 @@ class QuestionController extends Controller
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
         $judge0Languages = app(Judge0Service::class)->getSupportedLanguages();
+        $tags = QuestionTag::orderBy('name')->get();
+        $selectedTagIds = $question->tags()->pluck('question_tags.id')->toArray();
         $testCasesText = collect($question->test_cases)->map(function (array $tc): string {
             $input = str_replace("\n", '\\n', (string) ($tc['input'] ?? ''));
             $output = str_replace("\n", '\\n', (string) ($tc['expected_output'] ?? ''));
@@ -63,13 +70,14 @@ class QuestionController extends Controller
             return $input . '||' . $output . '||' . $hidden;
         })->implode("\n");
 
-        return view('admin.questions.form', compact('question', 'offerings', 'testCasesText', 'judge0Languages'));
+        return view('admin.questions.form', compact('question', 'offerings', 'testCasesText', 'judge0Languages', 'tags', 'selectedTagIds'));
     }
 
     public function update(Request $request, Question $question): RedirectResponse
     {
         $data = $this->validatePayload($request);
         $question->update($data);
+        $question->tags()->sync($request->input('tag_ids', []));
 
         return redirect()->route('admin.questions.index')->with('success', 'Question updated.');
     }

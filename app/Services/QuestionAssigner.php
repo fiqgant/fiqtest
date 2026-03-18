@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Attempt;
 use App\Models\AttemptQuestion;
 use App\Models\Exam;
+use App\Models\Question;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
@@ -37,19 +38,22 @@ class QuestionAssigner
 
     private function selectRandomQuestions(Exam $exam): Collection
     {
+        $filterTags = $exam->question_filter_tags ?? [];
         $selected = collect();
 
-        if ($exam->easy_count > 0) {
-            $easy = $exam->questions()->where('difficulty', 'easy')->inRandomOrder()->limit($exam->easy_count)->get();
-            $selected = $selected->concat($easy);
-        }
-        if ($exam->medium_count > 0) {
-            $medium = $exam->questions()->where('difficulty', 'medium')->inRandomOrder()->limit($exam->medium_count)->get();
-            $selected = $selected->concat($medium);
-        }
-        if ($exam->hard_count > 0) {
-            $hard = $exam->questions()->where('difficulty', 'hard')->inRandomOrder()->limit($exam->hard_count)->get();
-            $selected = $selected->concat($hard);
+        foreach (['easy', 'medium', 'hard'] as $diff) {
+            $countKey = "{$diff}_count";
+            $count = (int) $exam->$countKey;
+            if ($count <= 0) continue;
+
+            $query = Question::where('course_offering_id', $exam->course_offering_id)
+                ->where('difficulty', $diff);
+
+            if (!empty($filterTags)) {
+                $query->whereHas('tags', fn($q) => $q->whereIn('question_tags.id', $filterTags));
+            }
+
+            $selected = $selected->concat($query->inRandomOrder()->limit($count)->get());
         }
 
         return $selected;

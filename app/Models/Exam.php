@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 
 class Exam extends Model
 {
@@ -31,6 +31,7 @@ class Exam extends Model
         'easy_weight',
         'medium_weight',
         'hard_weight',
+        'question_filter_tags',
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class Exam extends Model
         'tab_switch_warning_count' => 'integer',
         'inactivity_limit_seconds' => 'integer',
         'inactivity_warning_seconds' => 'integer',
+        'question_filter_tags' => 'array',
     ];
 
     public function courseOffering(): BelongsTo
@@ -53,11 +55,6 @@ class Exam extends Model
     public function attempts(): HasMany
     {
         return $this->hasMany(Attempt::class);
-    }
-
-    public function questions(): BelongsToMany
-    {
-        return $this->belongsToMany(Question::class, 'exam_questions');
     }
 
     public function isOpen(): bool
@@ -75,15 +72,30 @@ class Exam extends Model
 
     public function getAvailableQuestionsCount(): int
     {
-        return $this->questions()->count();
+        $filterTags = $this->question_filter_tags ?? [];
+        $query = Question::where('course_offering_id', $this->course_offering_id);
+
+        if (!empty($filterTags)) {
+            $query->whereHas('tags', fn($q) => $q->whereIn('question_tags.id', $filterTags));
+        }
+
+        return $query->count();
     }
 
     public function canPublish(): bool
     {
-        $counts = $this->questions()
-            ->selectRaw('difficulty, COUNT(*) as total')
-            ->groupBy('difficulty')
-            ->pluck('total', 'difficulty');
+        $filterTags = $this->question_filter_tags ?? [];
+
+        $counts = collect(['easy', 'medium', 'hard'])->mapWithKeys(function (string $diff) use ($filterTags) {
+            $query = Question::where('course_offering_id', $this->course_offering_id)
+                ->where('difficulty', $diff);
+
+            if (!empty($filterTags)) {
+                $query->whereHas('tags', fn($q) => $q->whereIn('question_tags.id', $filterTags));
+            }
+
+            return [$diff => $query->count()];
+        });
 
         return (int) ($counts['easy'] ?? 0) >= $this->easy_count
             && (int) ($counts['medium'] ?? 0) >= $this->medium_count
