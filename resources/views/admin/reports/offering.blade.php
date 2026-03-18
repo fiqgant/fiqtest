@@ -195,6 +195,15 @@
                         }).join('');
                     }
 
+                    const hintHtml = (q.hint_used_count > 0 && q.hint) ? `
+                        <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                            <div class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1.5">
+                                <i class="fas fa-lightbulb mr-1"></i> Hint (used ${q.hint_used_count}×)
+                            </div>
+                            <div class="text-sm text-amber-900 whitespace-pre-wrap">${escapeHtml(q.hint)}</div>
+                        </div>
+                    ` : '';
+
                     return `
                         <div class="border border-slate-200 rounded-xl overflow-hidden">
                             <div class="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
@@ -204,6 +213,7 @@
                                     <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${difficultyColor}">${q.difficulty}</span>
                                 </div>
                                 <div class="text-sm flex items-center gap-2">
+                                    ${q.hint_used_count > 0 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium"><i class="fas fa-lightbulb"></i> Hint ${q.hint_used_count}×</span>` : ''}
                                     <span class="${passedColor} font-semibold">${q.passed_tests}/${q.total_tests} passed</span>
                                     <span class="text-slate-400 text-xs">(${q.score}/${q.weight} pts)</span>
                                 </div>
@@ -212,16 +222,15 @@
                                 <div class="text-sm text-slate-600">${escapeHtml(q.description || '')}</div>
                                 <div class="text-xs text-slate-400 font-semibold">Language: <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">${q.language}</span></div>
                                 ${testResultsHtml}
+                                ${hintHtml}
+                                <div>
+                                    <div class="text-xs text-indigo-600 font-semibold uppercase tracking-wider mb-1.5">Reference Solution</div>
+                                    <pre class="bg-indigo-950 text-indigo-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.reference_solution || '// No reference solution provided')}</pre>
+                                </div>
                                 <div>
                                     <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
                                     <pre class="bg-slate-800 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.student_code || '(No answer submitted)')}</pre>
                                 </div>
-                                ${!q.is_correct ? `
-                                <div>
-                                    <div class="text-xs text-emerald-600 font-semibold uppercase tracking-wider mb-1.5">Reference Solution</div>
-                                    <pre class="bg-emerald-50 text-emerald-800 p-3 rounded-lg text-xs overflow-x-auto max-h-48 border border-emerald-200 leading-relaxed">${escapeHtml(q.reference_solution || '// No reference solution available')}</pre>
-                                </div>
-                                ` : ''}
                             </div>
                         </div>
                     `;

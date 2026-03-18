@@ -53,6 +53,8 @@ class GradeReportService
                                 'description' => $question->description,
                                 'starter_code' => $question->starter_code ?? '',
                                 'reference_solution' => $question->reference_solution ?? '',
+                                'hint' => $question->hint ?? '',
+                                'hint_used_count' => (int) ($aq->hint_used_count ?? 0),
                                 'weight' => $aq->weight,
                                 'student_code' => $aq->code ?? '',
                                 'passed_tests' => $aq->passed_tests ?? 0,
