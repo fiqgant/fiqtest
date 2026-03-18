@@ -8,7 +8,14 @@
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
     <div class="max-w-2xl w-full bg-gray-800 rounded-2xl p-8">
-        <h1 class="text-2xl font-bold mb-3">Exam Result</h1>
+        <div class="flex items-start justify-between mb-3">
+            <h1 class="text-2xl font-bold">Exam Result</h1>
+            <a href="{{ route('exam.result.pdf', $attempt) }}" target="_blank"
+               class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-xl transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Download PDF
+            </a>
+        </div>
         <p class="text-gray-300 mb-6">{{ $exam->title }}</p>
 
         @if($attempt->is_disqualified)

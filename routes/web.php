@@ -92,6 +92,7 @@ Route::prefix('attempt/{attempt}')->group(function () {
     Route::post('/hint/{attemptQuestion}', [HintController::class, 'use'])->name('exam.hint');
     Route::get('/submitted', [ExamWorkspaceController::class, 'submitted'])->name('exam.submitted');
     Route::get('/result', [ExamWorkspaceController::class, 'result'])->name('exam.result');
+    Route::get('/result/pdf', [ExamWorkspaceController::class, 'downloadPdf'])->name('exam.result.pdf');
 });
 
 Route::get('/exam', function () {

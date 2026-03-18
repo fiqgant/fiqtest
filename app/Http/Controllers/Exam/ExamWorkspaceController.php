@@ -8,6 +8,7 @@ use App\Models\AttemptQuestion;
 use App\Models\Submission;
 use App\Services\GradingService;
 use App\Services\Judge0Service;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -216,6 +217,28 @@ class ExamWorkspaceController extends Controller
         $attempt->load(['attemptQuestions.question', 'student']);
         
         return view('exam.result', compact('attempt', 'exam'));
+    }
+
+    public function downloadPdf(Attempt $attempt)
+    {
+        $exam = $attempt->exam;
+
+        if (!$exam->show_score_immediately) {
+            abort(403, 'PDF tidak tersedia untuk ujian ini.');
+        }
+
+        if ($attempt->status === 'in_progress') {
+            abort(403, 'Ujian belum selesai.');
+        }
+
+        $attempt->load(['attemptQuestions.question', 'student']);
+
+        $pdf = Pdf::loadView('exam.result-pdf', compact('attempt', 'exam'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'hasil-ujian-' . str_replace(' ', '-', strtolower($exam->title)) . '-' . $attempt->student->nim . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     private function ensureAttemptActive(Attempt $attempt): void
