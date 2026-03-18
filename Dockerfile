@@ -14,8 +14,9 @@ RUN apk add --no-cache \
     oniguruma-dev \
     libxml2-dev
 
-# Install PHP extensions (pdo_mysql, bcmath, opcache — no gd needed)
-RUN docker-php-ext-install pdo pdo_mysql bcmath mbstring xml \
+# Install PHP extensions
+RUN docker-php-ext-configure gd \
+    && docker-php-ext-install pdo pdo_mysql bcmath mbstring xml gd \
     && docker-php-ext-enable opcache
 
 # Install Composer
