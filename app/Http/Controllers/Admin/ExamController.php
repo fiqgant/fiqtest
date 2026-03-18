@@ -23,13 +23,25 @@ class ExamController extends Controller
         return view('admin.exams.index', compact('exams'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+
+        $questions = Question::with('courseOffering')
+            ->orderBy('course_offering_id')
+            ->orderBy('difficulty')
+            ->orderBy('title')
+            ->get()
+            ->groupBy('course_offering_id');
+
+        $selectedOfferingId = $request->get('offering_id');
 
         return view('admin.exams.form', [
             'exam' => new Exam(),
             'offerings' => $offerings,
+            'questions' => $questions,
+            'selectedQuestionIds' => [],
+            'selectedOfferingId' => $selectedOfferingId,
         ]);
     }
 
@@ -38,7 +50,8 @@ class ExamController extends Controller
         $data = $this->validatePayload($request);
         $data['slug'] = Str::slug($data['title']) . '-' . Str::lower(Str::random(6));
 
-        Exam::create($data);
+        $exam = Exam::create($data);
+        $exam->questions()->sync($request->input('question_ids', []));
 
         return redirect()->route('admin.exams.index')->with('success', 'Exam created.');
     }
@@ -47,13 +60,23 @@ class ExamController extends Controller
     {
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
 
-        return view('admin.exams.form', compact('exam', 'offerings'));
+        $questions = Question::with('courseOffering')
+            ->orderBy('course_offering_id')
+            ->orderBy('difficulty')
+            ->orderBy('title')
+            ->get()
+            ->groupBy('course_offering_id');
+
+        $selectedQuestionIds = $exam->questions()->pluck('questions.id')->toArray();
+
+        return view('admin.exams.form', compact('exam', 'offerings', 'questions', 'selectedQuestionIds'));
     }
 
     public function update(Request $request, Exam $exam): RedirectResponse
     {
         $data = $this->validatePayload($request);
         $exam->update($data);
+        $exam->questions()->sync($request->input('question_ids', []));
 
         return redirect()->route('admin.exams.index')->with('success', 'Exam updated.');
     }
@@ -146,7 +169,7 @@ class ExamController extends Controller
 
     private function hasEnoughQuestionsByDifficulty(Exam $exam): bool
     {
-        $counts = Question::where('course_offering_id', $exam->course_offering_id)
+        $counts = $exam->questions()
             ->selectRaw('difficulty, COUNT(*) as total')
             ->groupBy('difficulty')
             ->pluck('total', 'difficulty');

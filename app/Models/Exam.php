@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Exam extends Model
@@ -54,6 +55,11 @@ class Exam extends Model
         return $this->hasMany(Attempt::class);
     }
 
+    public function questions(): BelongsToMany
+    {
+        return $this->belongsToMany(Question::class, 'exam_questions');
+    }
+
     public function isOpen(): bool
     {
         $now = now();
@@ -69,11 +75,18 @@ class Exam extends Model
 
     public function getAvailableQuestionsCount(): int
     {
-        return Question::where('course_offering_id', $this->course_offering_id)->count();
+        return $this->questions()->count();
     }
 
     public function canPublish(): bool
     {
-        return $this->getTotalQuestionsNeeded() <= $this->getAvailableQuestionsCount();
+        $counts = $this->questions()
+            ->selectRaw('difficulty, COUNT(*) as total')
+            ->groupBy('difficulty')
+            ->pluck('total', 'difficulty');
+
+        return (int) ($counts['easy'] ?? 0) >= $this->easy_count
+            && (int) ($counts['medium'] ?? 0) >= $this->medium_count
+            && (int) ($counts['hard'] ?? 0) >= $this->hard_count;
     }
 }

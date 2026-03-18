@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Attempt;
 use App\Models\Exam;
-use App\Models\Question;
 use App\Models\Student;
 
 class ExamAccessService
@@ -32,7 +31,7 @@ class ExamAccessService
             return [false, 'You have already submitted this exam.'];
         }
 
-        $counts = Question::where('course_offering_id', $exam->course_offering_id)
+        $counts = $exam->questions()
             ->selectRaw('difficulty, COUNT(*) as total')
             ->groupBy('difficulty')
             ->pluck('total', 'difficulty');

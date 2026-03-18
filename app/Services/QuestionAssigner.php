@@ -5,9 +5,8 @@ namespace App\Services;
 use App\Models\Attempt;
 use App\Models\AttemptQuestion;
 use App\Models\Exam;
-use App\Models\Question;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
 
 class QuestionAssigner
 {
@@ -39,34 +38,20 @@ class QuestionAssigner
     private function selectRandomQuestions(Exam $exam): Collection
     {
         $selected = collect();
-        
+
         if ($exam->easy_count > 0) {
-            $easyQuestions = Question::where('course_offering_id', $exam->course_offering_id)
-                ->where('difficulty', 'easy')
-                ->inRandomOrder()
-                ->limit($exam->easy_count)
-                ->get();
-            $selected = $selected->concat($easyQuestions);
+            $easy = $exam->questions()->where('difficulty', 'easy')->inRandomOrder()->limit($exam->easy_count)->get();
+            $selected = $selected->concat($easy);
         }
-        
         if ($exam->medium_count > 0) {
-            $mediumQuestions = Question::where('course_offering_id', $exam->course_offering_id)
-                ->where('difficulty', 'medium')
-                ->inRandomOrder()
-                ->limit($exam->medium_count)
-                ->get();
-            $selected = $selected->concat($mediumQuestions);
+            $medium = $exam->questions()->where('difficulty', 'medium')->inRandomOrder()->limit($exam->medium_count)->get();
+            $selected = $selected->concat($medium);
         }
-        
         if ($exam->hard_count > 0) {
-            $hardQuestions = Question::where('course_offering_id', $exam->course_offering_id)
-                ->where('difficulty', 'hard')
-                ->inRandomOrder()
-                ->limit($exam->hard_count)
-                ->get();
-            $selected = $selected->concat($hardQuestions);
+            $hard = $exam->questions()->where('difficulty', 'hard')->inRandomOrder()->limit($exam->hard_count)->get();
+            $selected = $selected->concat($hard);
         }
-        
+
         return $selected;
     }
 
