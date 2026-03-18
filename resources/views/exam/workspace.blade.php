@@ -9,7 +9,18 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+    <!-- marked.js -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+
+    <!-- Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
     <style>
         [x-cloak] { display: none !important; }
         
@@ -32,11 +43,32 @@
             border-radius: 3px;
         }
         
-        .difficulty-easy { @apply text-green-400; }
-        .difficulty-medium { @apply text-yellow-400; }
-        .difficulty-hard { @apply text-red-400; }
+        .difficulty-easy { color: #4ade80; }
+        .difficulty-medium { color: #facc15; }
+        .difficulty-hard { color: #f87171; }
 
-        /* Audio context needs user interaction first */
+        /* Markdown prose dark */
+        .md-body { font-size: 0.875rem; line-height: 1.7; color: #cbd5e1; }
+        .md-body h1, .md-body h2, .md-body h3 { color: #f1f5f9; font-weight: 700; margin: 1rem 0 0.5rem; }
+        .md-body h1 { font-size: 1.25rem; }
+        .md-body h2 { font-size: 1.1rem; }
+        .md-body h3 { font-size: 1rem; }
+        .md-body p { margin: 0.5rem 0; }
+        .md-body ul, .md-body ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+        .md-body li { margin: 0.2rem 0; }
+        .md-body code { background: #1e293b; color: #a5f3fc; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.82em; font-family: 'JetBrains Mono', monospace; }
+        .md-body pre { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 0.875rem 1rem; overflow-x: auto; margin: 0.75rem 0; }
+        .md-body pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.8rem; }
+        .md-body blockquote { border-left: 3px solid #6366f1; padding-left: 1rem; color: #94a3b8; margin: 0.75rem 0; }
+        .md-body table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.82rem; }
+        .md-body th { background: #1e293b; color: #f1f5f9; padding: 0.5rem 0.75rem; border: 1px solid #334155; text-align: left; }
+        .md-body td { padding: 0.4rem 0.75rem; border: 1px solid #1e293b; }
+        .md-body tr:nth-child(even) td { background: #0f172a; }
+        .md-body strong { color: #f1f5f9; }
+        .md-body a { color: #818cf8; text-decoration: underline; }
+        .md-body .mermaid { background: #1e293b; border-radius: 8px; padding: 1rem; margin: 0.75rem 0; text-align: center; }
+        .md-body .katex { font-size: 1em; }
+        .md-body .katex-display { overflow-x: auto; margin: 0.75rem 0; }
     </style>
 </head>
 <body class="bg-gray-900 text-white h-screen overflow-hidden" x-data="examApp()">
@@ -212,7 +244,7 @@
                                 </span>
                             </h2>
 
-                            <div class="prose prose-invert max-w-none" x-html="currentQuestion.description"></div>
+                            <div class="md-body" id="question-description"></div>
 
                             <template x-if="currentQuestion.test_cases && currentQuestion.test_cases.length > 0">
                                 <div class="mt-6">
@@ -804,6 +836,12 @@
                     this.monitoringInitialized = true;
                     examAppInstance = this;
                     this.setupActivityMonitoring();
+
+                    // Render markdown description when question changes
+                    this.$watch('currentAttemptQuestionId', () => {
+                        this.$nextTick(() => renderQuestionDescription(this.currentQuestion));
+                    });
+                    this.$nextTick(() => renderQuestionDescription(this.currentQuestion));
                     
                     // Track fullscreen state changes
                     const handleFullscreenChange = () => {
@@ -1270,6 +1308,48 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('timer', timer);
         });
+    </script>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose' });
+
+        // Markdown + LaTeX + Mermaid renderer
+        function renderQuestionDescription(question) {
+            const el = document.getElementById('question-description');
+            if (!el || !question) return;
+
+            // Configure marked
+            const renderer = new marked.Renderer();
+            const originalCode = renderer.code.bind(renderer);
+            renderer.code = function(code, lang) {
+                if (lang === 'mermaid') {
+                    return `<div class="mermaid">${typeof code === 'object' ? code.text : code}</div>`;
+                }
+                return originalCode(code, lang);
+            };
+
+            marked.setOptions({ renderer, breaks: true, gfm: true });
+
+            const raw = question.description || '';
+            el.innerHTML = marked.parse(raw);
+
+            // Render KaTeX
+            if (window.renderMathInElement) {
+                renderMathInElement(el, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true },
+                    ],
+                    throwOnError: false,
+                });
+            }
+
+            // Render Mermaid
+            mermaid.run({ nodes: el.querySelectorAll('.mermaid') });
+        }
     </script>
 </body>
 </html>

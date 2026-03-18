@@ -75,8 +75,11 @@
         <div class="form-section">
             <div class="form-section-title"><i class="fas fa-align-left mr-1.5"></i> Content</div>
             <div class="mb-4">
-                <label class="form-label">Description</label>
-                <textarea name="description" rows="8" class="form-textarea" placeholder="Problem statement, constraints, and examples…" required>{{ old('description', $question->description) }}</textarea>
+                <label class="form-label">
+                    Description
+                    <span class="font-normal text-slate-400 text-xs ml-1">— Markdown supported. Use <code class="bg-slate-100 px-1 rounded">$$...$$</code> for LaTeX, <code class="bg-slate-100 px-1 rounded">```mermaid</code> for diagrams.</span>
+                </label>
+                <textarea id="description-editor" name="description" rows="8" class="form-textarea" placeholder="Problem statement, constraints, and examples…" required>{{ old('description', $question->description) }}</textarea>
             </div>
             <div class="mb-4">
                 <label class="form-label">Starter Code <span class="font-normal text-slate-400">(optional)</span></label>
@@ -100,6 +103,29 @@
 
         <x-admin.form-actions :cancel="route('admin.questions.index')" />
     </form>
+
+    <!-- EasyMDE Markdown Editor -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+    <script>
+        const easyMDE = new EasyMDE({
+            element: document.getElementById('description-editor'),
+            spellChecker: false,
+            autofocus: false,
+            placeholder: 'Problem statement, constraints, and examples…\n\nSupports **markdown**, `code`, $$LaTeX$$, and ```mermaid blocks.',
+            toolbar: [
+                'bold', 'italic', 'strikethrough', '|',
+                'heading-2', 'heading-3', '|',
+                'unordered-list', 'ordered-list', '|',
+                'code', 'table', '|',
+                'link', '|',
+                'preview', 'side-by-side', 'fullscreen', '|',
+                'guide',
+            ],
+            minHeight: '220px',
+            status: false,
+        });
+    </script>
 
     <script>
         (() => {
