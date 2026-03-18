@@ -23,39 +23,74 @@
         </form>
     </div>
 
-    <div class="card overflow-hidden">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Difficulty</th>
-                    <th>Offering</th>
-                    <th>Language</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($questions as $question)
+    <form method="POST" action="{{ route('admin.questions.bulk-destroy') }}" id="bulk-form">
+        @csrf @method('DELETE')
+
+        <div class="flex items-center justify-between mb-3" id="bulk-toolbar" style="display:none!important">
+            <span class="text-sm text-slate-600"><span id="selected-count">0</span> soal dipilih</span>
+            <button type="submit" class="btn-danger" onclick="return confirm('Hapus semua soal yang dipilih?')">
+                <i class="fas fa-trash mr-1.5"></i> Hapus yang Dipilih
+            </button>
+        </div>
+
+        <div class="card overflow-hidden">
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td class="font-semibold text-slate-800">{{ $question->title }}</td>
-                        <td><x-admin.status-badge :value="$question->difficulty" /></td>
-                        <td class="text-slate-500 text-xs">{{ $question->courseOffering->course->name }}<br><span class="text-slate-400">{{ $question->courseOffering->academicPeriod->name }} · {{ $question->courseOffering->class_name }}</span></td>
-                        <td><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold">{{ $question->language }}</span></td>
-                        <td class="text-right">
-                            <div class="flex items-center justify-end gap-1.5">
-                                <a href="{{ route('admin.questions.edit', $question) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form class="inline" method="POST" action="{{ route('admin.questions.destroy', $question) }}">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete question?')"><i class="fas fa-trash"></i> Delete</button>
-                                </form>
-                            </div>
-                        </td>
+                        <th class="w-8"><input type="checkbox" id="select-all" class="w-4 h-4 accent-indigo-600"></th>
+                        <th>Title</th>
+                        <th>Difficulty</th>
+                        <th>Offering</th>
+                        <th>Language</th>
+                        <th class="text-right">Actions</th>
                     </tr>
-                @empty
-                    <tr><td colspan="5" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-database text-2xl"></i><span>No questions yet.</span></div></td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @forelse($questions as $question)
+                        <tr>
+                            <td><input type="checkbox" name="ids[]" value="{{ $question->id }}" class="row-checkbox w-4 h-4 accent-indigo-600"></td>
+                            <td class="font-semibold text-slate-800">{{ $question->title }}</td>
+                            <td><x-admin.status-badge :value="$question->difficulty" /></td>
+                            <td class="text-slate-500 text-xs">{{ $question->courseOffering->course->name }}<br><span class="text-slate-400">{{ $question->courseOffering->academicPeriod->name }} · {{ $question->courseOffering->class_name }}</span></td>
+                            <td><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold">{{ $question->language }}</span></td>
+                            <td class="text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <a href="{{ route('admin.questions.edit', $question) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
+                                    <form class="inline" method="POST" action="{{ route('admin.questions.destroy', $question) }}">
+                                        @csrf @method('DELETE')
+                                        <button class="action-btn action-btn-danger" onclick="return confirm('Delete question?')"><i class="fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-database text-2xl"></i><span>No questions yet.</span></div></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </form>
+
     <div class="mt-4">{{ $questions->links() }}</div>
+
+    <script>
+        const selectAll = document.getElementById('select-all');
+        const toolbar = document.getElementById('bulk-toolbar');
+        const counter = document.getElementById('selected-count');
+
+        function updateToolbar() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            counter.textContent = checked.length;
+            toolbar.style.display = checked.length > 0 ? 'flex' : 'none';
+            selectAll.indeterminate = checked.length > 0 && checked.length < document.querySelectorAll('.row-checkbox').length;
+            selectAll.checked = checked.length === document.querySelectorAll('.row-checkbox').length && checked.length > 0;
+        }
+
+        selectAll.addEventListener('change', () => {
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = selectAll.checked);
+            updateToolbar();
+        });
+
+        document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', updateToolbar));
+    </script>
 @endsection

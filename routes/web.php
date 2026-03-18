@@ -63,6 +63,7 @@ Route::prefix('admin')->group(function () {
         Route::get('questions/bulk/template', [BulkQuestionController::class, 'downloadTemplate'])->name('admin.questions.bulk.template');
         Route::post('questions/bulk/preview', [BulkQuestionController::class, 'preview'])->name('admin.questions.bulk.preview');
         Route::post('questions/bulk/import', [BulkQuestionController::class, 'import'])->name('admin.questions.bulk.store');
+        Route::delete('questions/bulk-destroy', [QuestionController::class, 'bulkDestroy'])->name('admin.questions.bulk-destroy');
         Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
 
         Route::get('settings/judge0', [SystemSettingController::class, 'editJudge0'])->name('admin.settings.judge0.edit');

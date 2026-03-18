@@ -89,6 +89,14 @@ class QuestionController extends Controller
         return redirect()->route('admin.questions.index')->with('success', 'Question deleted.');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->input('ids', []);
+        $count = Question::whereIn('id', $ids)->delete();
+
+        return redirect()->route('admin.questions.index')->with('success', "{$count} question(s) deleted.");
+    }
+
     private function validatePayload(Request $request): array
     {
         $data = $request->validate([
