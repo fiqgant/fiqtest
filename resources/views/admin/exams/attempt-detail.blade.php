@@ -81,6 +81,14 @@
                     </div>
                 @endif
 
+                {{-- Reference solution --}}
+                @if(!empty($question->reference_solution))
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
+                        <pre class="bg-indigo-950 text-indigo-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $question->reference_solution }}</pre>
+                    </div>
+                @endif
+
                 {{-- Student's code --}}
                 <div>
                     <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Student's Answer</div>
@@ -112,14 +120,6 @@
                         @if($finalSubmission->execution_time_ms)
                             <span><i class="fas fa-clock mr-1"></i>{{ $finalSubmission->execution_time_ms }}ms</span>
                         @endif
-                    </div>
-                @endif
-
-                {{-- Reference solution --}}
-                @if(!empty($question->reference_solution))
-                    <div>
-                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
-                        <pre class="bg-indigo-950 text-indigo-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $question->reference_solution }}</pre>
                     </div>
                 @endif
 
