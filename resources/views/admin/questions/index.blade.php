@@ -42,6 +42,7 @@
                 <tr>
                     <th class="w-8"><input type="checkbox" id="select-all" class="w-4 h-4 accent-indigo-600"></th>
                     <th>Title</th>
+                    <th>Type</th>
                     <th>Difficulty</th>
                     <th>Offering</th>
                     <th>Language</th>
@@ -53,9 +54,10 @@
                     <tr>
                         <td><input type="checkbox" data-id="{{ $question->id }}" class="row-checkbox w-4 h-4 accent-indigo-600"></td>
                         <td class="font-semibold text-slate-800">{{ $question->title }}</td>
+                        <td><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium">{{ \App\Models\Question::TYPES[$question->type] ?? $question->type }}</span></td>
                         <td><x-admin.status-badge :value="$question->difficulty" /></td>
                         <td class="text-slate-500 text-xs">{{ $question->courseOffering->course->name }}<br><span class="text-slate-400">{{ $question->courseOffering->academicPeriod->name }} · {{ $question->courseOffering->class_name }}</span></td>
-                        <td><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold">{{ $question->language }}</span></td>
+                        <td>@if($question->language)<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold">{{ $question->language }}</span>@else<span class="text-slate-300">—</span>@endif</td>
                         <td class="text-right">
                             <div class="flex items-center justify-end gap-1.5">
                                 <a href="{{ route('admin.questions.edit', $question) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
@@ -64,7 +66,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-database text-2xl"></i><span>No questions yet.</span></div></td></tr>
+                    <tr><td colspan="7" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-database text-2xl"></i><span>No questions yet.</span></div></td></tr>
                 @endforelse
             </tbody>
         </table>

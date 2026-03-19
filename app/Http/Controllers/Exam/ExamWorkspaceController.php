@@ -231,11 +231,11 @@ class ExamWorkspaceController extends Controller
         $exam = $attempt->exam;
 
         if (!$exam->show_score_immediately) {
-            abort(403, 'PDF tidak tersedia untuk ujian ini.');
+            abort(403, 'PDF is not available for this exam.');
         }
 
         if ($attempt->status === 'in_progress') {
-            abort(403, 'Ujian belum selesai.');
+            abort(403, 'Exam is not yet completed.');
         }
 
         $attempt->load(['attemptQuestions.question.options', 'student']);
