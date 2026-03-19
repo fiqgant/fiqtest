@@ -369,6 +369,11 @@
                                 <div class="flex items-center space-x-2">
                                     <span x-show="saving" class="text-xs text-gray-400"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                                     <span x-show="saved && !saving" class="text-xs text-green-400"><i class="fas fa-check"></i> Saved</span>
+                                    <button @click="autosave(true)" :disabled="saving"
+                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
+                                        <span x-show="!saving"><i class="fas fa-save"></i> Save</span>
+                                        <span x-show="saving"><i class="fas fa-spinner fa-spin"></i></span>
+                                    </button>
                                     <template x-if="hintsEnabled && currentQuestion?.has_hint">
                                         <button @click="requestHint()" :disabled="hintLoading || hintLimitReached"
                                                 class="bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:opacity-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
