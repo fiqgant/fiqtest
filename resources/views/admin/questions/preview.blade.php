@@ -429,6 +429,7 @@
                             minimap: { enabled: false },
                             scrollBeyondLastLine: false,
                             padding: { top: 12, bottom: 12 },
+                            automaticLayout: true,
                         });
                     });
                 },
@@ -441,42 +442,72 @@
 
                 async runCode() {
                     if (this.running || !this.editor) return;
-                    this.running = true;
-                    this.output = '';
-                    this.error = '';
-                    this.lastTime = null;
-                    this.testResults = [];
-                    this.outputTab = 'tests';
 
-                    const code = this.editor.getValue();
+                    this.running    = true;
+                    this.output     = '';
+                    this.error      = '';
+                    this.lastTime   = null;
+                    this.testResults = [];
+                    this.outputTab  = 'tests';
+
+                    const code      = this.editor.getValue();
                     const testCases = @json($question->test_cases ?? []);
-                    const csrfToken = document.querySelector('meta[name=csrf-token]').content;
-                    const runUrl = '{{ route('admin.questions.preview.run', $question) }}';
+                    const metaTag   = document.querySelector('meta[name=csrf-token]');
+                    const csrfToken = metaTag ? metaTag.content : '';
+                    const runUrl    = '{{ route('admin.questions.preview.run', $question) }}';
+
+                    if (!testCases.length) {
+                        this.output     = 'No test cases defined for this question.';
+                        this.outputTab  = 'output';
+                        this.running    = false;
+                        return;
+                    }
 
                     try {
-                        for (const tc of testCases) {
-                            const res = await fetch(runUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                                body: JSON.stringify({ code, stdin: tc.input ?? '' }),
-                            });
-                            const data = await res.json();
+                        for (let i = 0; i < testCases.length; i++) {
+                            const tc = testCases[i];
+                            this.output = `Running test ${i + 1} / ${testCases.length}…`;
+
+                            const controller = new AbortController();
+                            const timeout    = setTimeout(() => controller.abort(), 30000);
+
+                            let data;
+                            try {
+                                const res = await fetch(runUrl, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                                    body:    JSON.stringify({ code, stdin: tc.input ?? '' }),
+                                    signal:  controller.signal,
+                                });
+                                clearTimeout(timeout);
+                                if (!res.ok) {
+                                    throw new Error(`HTTP ${res.status} — ${res.statusText}`);
+                                }
+                                data = await res.json();
+                            } catch (fetchErr) {
+                                clearTimeout(timeout);
+                                this.error     = fetchErr.name === 'AbortError'
+                                    ? `Test ${i + 1} timed out (30s limit).`
+                                    : 'Fetch error: ' + fetchErr.message;
+                                this.outputTab = 'output';
+                                break;
+                            }
+
                             const got      = (data.output ?? '').trimEnd();
                             const expected = (tc.expected_output ?? '').trimEnd();
-                            this.testResults.push({
-                                input: tc.input,
+                            this.testResults = [...this.testResults, {
+                                input:    tc.input,
                                 expected,
                                 got,
-                                passed: got === expected && !data.error,
-                                hidden: tc.is_hidden ?? false,
-                                time: data.time,
-                                error: data.error,
-                            });
+                                passed:   got === expected && !data.error,
+                                hidden:   tc.is_hidden ?? false,
+                                time:     data.time,
+                                error:    data.error,
+                            }];
                             this.lastTime = data.time ?? this.lastTime;
 
-                            // Stop early on runtime error
                             if (data.error) {
-                                this.error = data.error;
+                                this.error     = data.error;
                                 this.outputTab = 'output';
                                 break;
                             }
@@ -484,11 +515,10 @@
 
                         if (!this.error) {
                             const passed = this.testResults.filter(r => r.passed).length;
-                            const total  = this.testResults.length;
-                            this.output = `✓ ${passed}/${total} test cases passed`;
+                            this.output  = `✓ ${passed} / ${this.testResults.length} test cases passed`;
                         }
                     } catch (e) {
-                        this.error = 'Request failed: ' + e.message;
+                        this.error     = 'Unexpected error: ' + e.message;
                         this.outputTab = 'output';
                     } finally {
                         this.running = false;
