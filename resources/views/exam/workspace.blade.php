@@ -66,6 +66,7 @@
         .md-body tr:nth-child(even) td { background: #0f172a; }
         .md-body strong { color: #f1f5f9; }
         .md-body a { color: #818cf8; text-decoration: underline; }
+        .md-body img { max-width: 100%; height: auto; border-radius: 6px; margin: 0.75rem 0; display: block; border: 1px solid #334155; }
         .md-body .mermaid { background: #1e293b; border-radius: 8px; padding: 1rem; margin: 0.75rem 0; text-align: center; }
         .md-body .katex { font-size: 1em; }
         .md-body .katex-display { overflow-x: auto; margin: 0.75rem 0; }
@@ -272,7 +273,7 @@
                     </template>
                 </div>
 
-                <div class="w-1/2 flex flex-col">
+                <div class="w-1/2 flex flex-col min-h-0 overflow-hidden">
 
                     {{-- ── CODING: Monaco editor ─────────────────────────────── --}}
                     <div x-show="currentQuestion && currentQuestion.type === 'coding'" class="flex flex-col flex-1 min-h-0" style="display:none">
@@ -1620,6 +1621,24 @@
             });
         }
 
+        // Configure marked once (not inside render function)
+        marked.use({
+            breaks: true,
+            gfm: true,
+            renderer: {
+                code({ text, lang }) {
+                    if (lang === 'mermaid') {
+                        return `<div class="mermaid">${text}</div>`;
+                    }
+                    return false;
+                },
+                image({ href, title, text }) {
+                    const titleAttr = title ? ` title="${title}"` : '';
+                    return `<img src="${href}" alt="${text}"${titleAttr} loading="lazy">`;
+                }
+            }
+        });
+
         // Markdown + LaTeX + Mermaid renderer
         function renderMarkdown(el, raw) {
             if (!el) return;
@@ -1632,29 +1651,15 @@
             // Step 1: extract LaTeX before marked touches it
             const { out: safeRaw, store } = extractLatex(raw);
 
-            // Step 2: configure marked for mermaid
-            marked.use({
-                breaks: true,
-                gfm: true,
-                renderer: {
-                    code({ text, lang }) {
-                        if (lang === 'mermaid') {
-                            return `<div class="mermaid">${text}</div>`;
-                        }
-                        return false;
-                    }
-                }
-            });
-
-            // Step 3: parse markdown
+            // Step 2: parse markdown
             let html = marked.parse(safeRaw);
 
-            // Step 4: restore LaTeX as rendered KaTeX HTML
+            // Step 3: restore LaTeX as rendered KaTeX HTML
             html = restoreLatex(html, store);
 
             el.innerHTML = html;
 
-            // Step 5: Mermaid
+            // Step 4: Mermaid
             const mermaidNodes = el.querySelectorAll('.mermaid');
             if (mermaidNodes.length) {
                 mermaid.run({ nodes: mermaidNodes });
