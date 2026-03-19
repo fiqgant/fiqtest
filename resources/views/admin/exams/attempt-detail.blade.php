@@ -12,6 +12,40 @@
         <a href="{{ route('admin.exams.attempts', $exam) }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Attempts</a>
     </x-admin.page-header>
 
+    {{-- Anti-cheat log --}}
+    @if($attempt->tab_switch_count > 0 || $attempt->is_disqualified || $attempt->ip_address)
+    <div class="mb-6 bg-white rounded-2xl border {{ $attempt->is_disqualified ? 'border-rose-300' : 'border-amber-200' }} p-5 shadow-sm">
+        <div class="flex items-center gap-2 mb-4 {{ $attempt->is_disqualified ? 'text-rose-700' : 'text-amber-700' }} font-semibold text-sm">
+            <i class="fas fa-shield-alt"></i> Proctoring Log
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div>
+                <div class="text-xs text-slate-400 mb-1">Tab Switches</div>
+                <div class="font-bold {{ $attempt->tab_switch_count >= 3 ? 'text-rose-600' : ($attempt->tab_switch_count > 0 ? 'text-amber-600' : 'text-slate-600') }}">
+                    {{ $attempt->tab_switch_count }}×
+                </div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 mb-1">Disqualified</div>
+                <div class="font-bold {{ $attempt->is_disqualified ? 'text-rose-600' : 'text-emerald-600' }}">
+                    {{ $attempt->is_disqualified ? 'Yes' : 'No' }}
+                </div>
+                @if($attempt->disqualification_reason)
+                    <div class="text-xs text-rose-600 mt-0.5">{{ $attempt->disqualification_reason }}</div>
+                @endif
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 mb-1">IP Address</div>
+                <div class="font-mono text-slate-700">{{ $attempt->ip_address ?? '—' }}</div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 mb-1">Last Activity</div>
+                <div class="text-slate-700">{{ optional($attempt->last_activity_at)->format('d M H:i:s') ?? '—' }}</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Summary bar --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">

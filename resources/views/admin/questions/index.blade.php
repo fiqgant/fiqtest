@@ -60,9 +60,13 @@
                         <td>@if($question->language)<span class="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-mono font-semibold">{{ $question->language }}</span>@else<span class="text-slate-300">—</span>@endif</td>
                         <td class="text-right">
                             <div class="flex items-center justify-end gap-1.5">
-                                <a href="{{ route('admin.questions.preview', $question) }}" target="_blank" class="action-btn action-btn-neutral"><i class="fas fa-eye"></i> Preview</a>
+                                <a href="{{ route('admin.questions.stats', $question) }}" class="action-btn action-btn-neutral"><i class="fas fa-chart-bar"></i></a>
+                                <a href="{{ route('admin.questions.preview', $question) }}" target="_blank" class="action-btn action-btn-neutral"><i class="fas fa-eye"></i></a>
+                                <form method="POST" action="{{ route('admin.questions.duplicate', $question) }}" class="inline">@csrf
+                                    <button class="action-btn action-btn-neutral" title="Duplicate"><i class="fas fa-copy"></i></button>
+                                </form>
                                 <a href="{{ route('admin.questions.edit', $question) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/questions/{{ $question->id }}', 'Delete question?')"><i class="fas fa-trash"></i> Delete</button>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/questions/{{ $question->id }}', 'Delete question?')"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>

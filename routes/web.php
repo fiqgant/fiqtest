@@ -60,6 +60,10 @@ Route::prefix('admin')->group(function () {
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
         Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
         Route::post('exams/{exam}/attempts/{attempt}/grade/{attemptQuestion}', [ExamController::class, 'gradeEssay'])->name('admin.exams.attempts.grade-essay');
+        Route::get('exams/{exam}/export', [ExamController::class, 'exportExcel'])->name('admin.exams.export');
+        Route::get('exams/{exam}/question-pool', [ExamController::class, 'questionPool'])->name('admin.exams.question-pool');
+        Route::get('exams/{exam}/monitor', [ExamController::class, 'monitor'])->name('admin.exams.monitor');
+        Route::get('exams/{exam}/monitor/data', [ExamController::class, 'monitorData'])->name('admin.exams.monitor.data');
 
         Route::get('question-tags', [QuestionTagController::class, 'index'])->name('admin.question-tags.index');
         Route::post('question-tags', [QuestionTagController::class, 'store'])->name('admin.question-tags.store');
@@ -73,6 +77,8 @@ Route::prefix('admin')->group(function () {
         Route::post('questions/bulk/import', [BulkQuestionController::class, 'import'])->name('admin.questions.bulk.store');
         Route::delete('questions/bulk-destroy', [QuestionController::class, 'bulkDestroy'])->name('admin.questions.bulk-destroy');
         Route::get('questions/{question}/preview', [QuestionController::class, 'preview'])->name('admin.questions.preview');
+        Route::post('questions/{question}/duplicate', [QuestionController::class, 'duplicate'])->name('admin.questions.duplicate');
+        Route::get('questions/{question}/stats', [QuestionController::class, 'stats'])->name('admin.questions.stats');
         Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
 
         Route::get('settings/judge0', [SystemSettingController::class, 'editJudge0'])->name('admin.settings.judge0.edit');

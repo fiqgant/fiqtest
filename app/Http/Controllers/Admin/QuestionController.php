@@ -110,6 +110,39 @@ class QuestionController extends Controller
         return view('admin.questions.preview', compact('question'));
     }
 
+    public function duplicate(Question $question): RedirectResponse
+    {
+        $question->load('options');
+
+        $new = $question->replicate();
+        $new->title = $question->title . ' (Copy)';
+        $new->slug  = Str::slug($new->title) . '-' . Str::lower(Str::random(6));
+        $new->save();
+
+        foreach ($question->options as $option) {
+            $new->options()->create($option->only(['text', 'is_correct', 'order']));
+        }
+
+        $new->tags()->sync($question->tags()->pluck('question_tags.id'));
+
+        return redirect()->route('admin.questions.edit', $new)->with('success', 'Question duplicated. Review and save changes.');
+    }
+
+    public function stats(Question $question): View
+    {
+        $rows = $question->attemptQuestions()
+            ->whereHas('attempt', fn($q) => $q->whereIn('status', ['submitted', 'graded']))
+            ->with('attempt.student')
+            ->get();
+
+        $total      = $rows->count();
+        $correct    = $rows->where('is_correct', true)->count();
+        $avgScore   = $total > 0 ? round($rows->avg(fn($aq) => (float) $aq->effectiveScore()), 2) : 0;
+        $pctCorrect = $total > 0 ? round($correct / $total * 100) : 0;
+
+        return view('admin.questions.stats', compact('question', 'rows', 'total', 'correct', 'avgScore', 'pctCorrect'));
+    }
+
     public function uploadImage(Request $request): JsonResponse
     {
         $request->validate(['image' => ['required', 'image', 'max:4096']]);

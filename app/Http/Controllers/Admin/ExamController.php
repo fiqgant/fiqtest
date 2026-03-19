@@ -10,10 +10,14 @@ use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionTag;
 use App\Services\GradingService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExamController extends Controller
 {
@@ -126,6 +130,118 @@ class ExamController extends Controller
         app(GradingService::class)->updateAttemptTotal($attempt);
 
         return back()->with('success', 'Essay graded successfully.');
+    }
+
+    public function exportExcel(Exam $exam): Response
+    {
+        $attempts = $exam->attempts()
+            ->with(['student', 'attemptQuestions.question'])
+            ->whereIn('status', ['submitted', 'graded'])
+            ->orderBy('submitted_at')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Results');
+
+        // Header row
+        $headers = ['NIM', 'Name', 'Started', 'Submitted', 'Duration (min)', 'Score', 'Max Score', '%', 'Tab Switches', 'Disqualified', 'Disqualification Reason'];
+        foreach ($headers as $i => $h) {
+            $sheet->setCellValueByColumnAndRow($i + 1, 1, $h);
+        }
+
+        $row = 2;
+        foreach ($attempts as $attempt) {
+            $duration = $attempt->started_at && $attempt->submitted_at
+                ? round($attempt->started_at->diffInSeconds($attempt->submitted_at) / 60, 1)
+                : '';
+            $pct = $attempt->max_score > 0
+                ? round($attempt->total_score / $attempt->max_score * 100, 1)
+                : 0;
+
+            $sheet->setCellValueByColumnAndRow(1, $row, $attempt->student->nim);
+            $sheet->setCellValueByColumnAndRow(2, $row, $attempt->student->name);
+            $sheet->setCellValueByColumnAndRow(3, $row, optional($attempt->started_at)->format('d/m/Y H:i'));
+            $sheet->setCellValueByColumnAndRow(4, $row, optional($attempt->submitted_at)->format('d/m/Y H:i'));
+            $sheet->setCellValueByColumnAndRow(5, $row, $duration);
+            $sheet->setCellValueByColumnAndRow(6, $row, $attempt->total_score);
+            $sheet->setCellValueByColumnAndRow(7, $row, $attempt->max_score);
+            $sheet->setCellValueByColumnAndRow(8, $row, $pct . '%');
+            $sheet->setCellValueByColumnAndRow(9, $row, $attempt->tab_switch_count);
+            $sheet->setCellValueByColumnAndRow(10, $row, $attempt->is_disqualified ? 'Yes' : 'No');
+            $sheet->setCellValueByColumnAndRow(11, $row, $attempt->disqualification_reason ?? '');
+            $row++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'exam-results-' . Str::slug($exam->title) . '.xlsx';
+
+        ob_start();
+        $writer->save('php://output');
+        $content = ob_get_clean();
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    public function questionPool(Exam $exam): View
+    {
+        $filterTags = $exam->question_filter_tags ?? [];
+
+        $questions = Question::where('course_offering_id', $exam->course_offering_id)
+            ->with('tags')
+            ->when(!empty($filterTags), fn($q) => $q->whereHas('tags', fn($q2) => $q2->whereIn('question_tags.id', $filterTags)))
+            ->orderBy('difficulty')
+            ->orderBy('title')
+            ->get();
+
+        $counts = $questions->groupBy('difficulty')->map->count();
+
+        return view('admin.exams.question-pool', compact('exam', 'questions', 'counts'));
+    }
+
+    public function monitor(Exam $exam): View
+    {
+        return view('admin.exams.monitor', compact('exam'));
+    }
+
+    public function monitorData(Exam $exam): JsonResponse
+    {
+        $activeAttempts = $exam->attempts()
+            ->with('student')
+            ->where('status', 'in_progress')
+            ->get()
+            ->map(function (Attempt $attempt) {
+                $answeredCount = $attempt->attemptQuestions()
+                    ->where(fn($q) => $q->whereNotNull('code')->orWhereNotNull('student_answer'))
+                    ->count();
+
+                return [
+                    'id'              => $attempt->id,
+                    'nim'             => $attempt->student->nim,
+                    'name'            => $attempt->student->name,
+                    'started_at'      => optional($attempt->started_at)->format('H:i:s'),
+                    'remaining_sec'   => $attempt->getRemainingSeconds(),
+                    'answered'        => $answeredCount,
+                    'total_questions' => $attempt->attemptQuestions()->count(),
+                    'tab_switches'    => $attempt->tab_switch_count,
+                    'last_activity'   => optional($attempt->last_activity_at)->diffForHumans() ?? 'Unknown',
+                    'is_disqualified' => $attempt->is_disqualified,
+                    'ip_address'      => $attempt->ip_address,
+                ];
+            });
+
+        $submittedCount = $exam->attempts()->whereIn('status', ['submitted', 'graded'])->count();
+        $totalEnrolled  = $exam->courseOffering->students()->count();
+
+        return response()->json([
+            'active'    => $activeAttempts,
+            'submitted' => $submittedCount,
+            'enrolled'  => $totalEnrolled,
+            'timestamp' => now()->format('H:i:s'),
+        ]);
     }
 
     private function validatePayload(Request $request): array

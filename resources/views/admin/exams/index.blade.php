@@ -25,7 +25,10 @@
                         <td><x-admin.status-badge :value="$exam->status" /></td>
                         <td class="text-right">
                             <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                                <a href="{{ route('admin.exams.monitor', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-satellite-dish"></i> Monitor</a>
                                 <a href="{{ route('admin.exams.attempts', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-list"></i> Attempts</a>
+                                <a href="{{ route('admin.exams.question-pool', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-layer-group"></i> Pool</a>
+                                <a href="{{ route('admin.exams.export', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-file-excel"></i> Export</a>
                                 <a href="{{ route('admin.exams.edit', $exam) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
                                 <form class="inline" method="POST" action="{{ route('admin.exams.publish', $exam) }}">@csrf
                                     <button class="action-btn action-btn-success"><i class="fas fa-globe"></i> Publish</button>

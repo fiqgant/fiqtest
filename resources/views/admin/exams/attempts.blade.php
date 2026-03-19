@@ -2,6 +2,8 @@
 
 @section('content')
     <x-admin.page-header title="Exam Attempts" :subtitle="$exam->title">
+        <a href="{{ route('admin.exams.monitor', $exam) }}" class="btn-secondary"><i class="fas fa-satellite-dish"></i> Live Monitor</a>
+        <a href="{{ route('admin.exams.export', $exam) }}" class="btn-secondary"><i class="fas fa-file-excel"></i> Export Excel</a>
         <a href="{{ route('admin.exams.index') }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Exams</a>
     </x-admin.page-header>
 
@@ -14,6 +16,7 @@
                     <th>Submitted</th>
                     <th>Status</th>
                     <th>Score</th>
+                    <th>Tab Switches</th>
                     <th></th>
                 </tr>
             </thead>
@@ -38,6 +41,15 @@
                             <div class="w-24 bg-slate-100 rounded-full h-1.5 mt-1">
                                 <div class="h-1.5 rounded-full {{ $pct >= 75 ? 'bg-emerald-500' : ($pct >= 50 ? 'bg-amber-400' : 'bg-rose-400') }}" style="width: {{ $pct }}%"></div>
                             </div>
+                        </td>
+                        <td>
+                            @if($attempt->tab_switch_count > 0)
+                                <span class="font-semibold {{ $attempt->tab_switch_count >= 3 ? 'text-rose-600' : 'text-amber-600' }}">
+                                    {{ $attempt->tab_switch_count }}×
+                                </span>
+                            @else
+                                <span class="text-slate-300">—</span>
+                            @endif
                         </td>
                         <td>
                             <a href="{{ route('admin.exams.attempts.detail', [$exam, $attempt]) }}" class="btn-secondary text-xs py-1 px-3">
