@@ -18,16 +18,27 @@ class QuestionController extends Controller
     public function index(Request $request): View
     {
         $offeringId = $request->integer('course_offering_id');
+        $search     = $request->string('search')->trim()->toString();
+        $type       = $request->string('type')->trim()->toString();
+        $difficulty = $request->string('difficulty')->trim()->toString();
 
-        $questions = Question::with('courseOffering.course', 'courseOffering.academicPeriod')
+        $questions = Question::with('courseOffering.course', 'courseOffering.academicPeriod', 'tags')
             ->when($offeringId, fn($q) => $q->where('course_offering_id', $offeringId))
+            ->when($search,     fn($q) => $q->where('title', 'like', "%{$search}%"))
+            ->when($type,       fn($q) => $q->where('type', $type))
+            ->when($difficulty, fn($q) => $q->where('difficulty', $difficulty))
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
 
-        return view('admin.questions.index', compact('questions', 'offerings', 'offeringId'));
+        $stats = Question::selectRaw('difficulty, count(*) as total')
+            ->when($offeringId, fn($q) => $q->where('course_offering_id', $offeringId))
+            ->groupBy('difficulty')
+            ->pluck('total', 'difficulty');
+
+        return view('admin.questions.index', compact('questions', 'offerings', 'offeringId', 'search', 'type', 'difficulty', 'stats'));
     }
 
     public function create(): View
