@@ -153,7 +153,7 @@ class BulkQuestionController extends Controller
                 'starter_code'       => $row['starter_code'] ?: null,
                 'hint'               => $row['hint'] ?: null,
                 'reference_solution' => $row['reference_solution'] ?: null,
-                'language'           => $row['language'] ?: null,
+                'language'           => $row['language'] ?: null, // null for non-coding
                 'test_cases'         => $row['test_cases'] ?: null,
                 'fill_blank_answer'  => $row['fill_blank_answer'] ?: null,
                 'true_false_answer'  => $row['true_false_answer'],
@@ -238,7 +238,7 @@ class BulkQuestionController extends Controller
             $rawLanguage       = trim((string) ($language ?? ''));
             $language          = $type === 'coding'
                 ? $this->normalizeLanguage($rawLanguage ?: $defaultLanguage)
-                : null;
+                : '';
 
             // Validations
             if ($title === '') $errors[] = 'Title is required.';
