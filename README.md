@@ -1,64 +1,114 @@
 # fiqtest
 
-A personal side project — built so I don't have to manually grade my students' coding assignments anymore.
+A self-hosted online exam platform built so I don't have to manually grade my students' coding assignments anymore.
 
-Integrated with Judge0 as the code execution engine. Built with Laravel 13 and deployable via Docker.
-
-## Features
-
-- **Academic Management** — Academic periods, courses, and class offerings
-- **Student Management** — Student records identified by NIM (student ID)
-- **Coding Exams** — Create coding problems with test cases, scoring weights, and reference solutions
-- **Automated Code Execution** — Integrated with Judge0 to run and grade student code submissions
-- **Proctoring** — Tab switching detection, fullscreen enforcement, and configurable warning limits
-- **Grade Reports** — Per-class grade reports with per-question breakdown and CSV export
-- **Admin Panel** — Full dashboard for managing all entities
-- **Judge0 Settings** — Configure URL, API key, and test the connection directly from the admin panel
-- **Markdown Question Editor** — Write problem descriptions in Markdown with live preview (EasyMDE)
-- **Rich Rendering for Students** — Question descriptions rendered with full Markdown, LaTeX (KaTeX), and Mermaid.js diagram support
-
-## Tech Stack
-
-- **Backend**: Laravel 13, PHP 8.4
-- **Database**: MySQL 8
-- **Frontend**: Blade, Tailwind CSS (CDN), Font Awesome 6 (CDN), EasyMDE, KaTeX, Mermaid.js
-- **Code Execution**: Judge0 CE
-- **Web Server**: Nginx
-- **Containerization**: Docker + Docker Compose
+Supports multiple question types, automated grading via Judge0, real-time exam monitoring, and anti-cheat proctoring — all manageable from a single admin panel.
 
 ---
 
-## Local Installation (Development)
+## Features
+
+### Question Bank
+- **6 Question Types** — Coding, Multiple Choice, Multiple Select, True/False, Fill in the Blank, Essay
+- **Difficulty Levels** — Easy, Medium, Hard with configurable weights
+- **Rich Description Editor** — Markdown with live preview (EasyMDE), LaTeX (KaTeX), and Mermaid.js diagrams
+- **Image Upload** — Embed images directly in question descriptions
+- **Tagging System** — Tag questions for filtering and exam pool management
+- **Duplicate Question** — Clone any question as a starting point
+- **Question Stats** — Per-question analytics: % correct, average score, per-student breakdown
+- **Preview Mode** — Admin can preview exactly how a question looks to students
+- **Bulk Import** — Upload questions via Excel (.xlsx) for all question types
+- **Excel Template** — Downloadable template with example rows for every question type
+
+### Exam Management
+- **Question Pool** — Randomly assign questions per difficulty from the question bank
+- **Tag-based Filtering** — Restrict the pool to questions with specific tags
+- **Shuffle Options** — MC/MS answer options are shuffled differently per student (deterministic per session)
+- **Flexible Scheduling** — Set open/close times and duration in minutes
+- **Publish / Close Controls** — Validate question bank before publishing
+- **Copy Exam Link** — One-click copy with toast feedback
+
+### Automated Grading
+- **Coding** — Runs test cases via Judge0, scores by pass rate
+- **Multiple Choice / Multiple Select** — Exact match grading
+- **True/False** — Boolean comparison
+- **Fill in the Blank** — Case-insensitive string match
+- **Essay** — Manual grading by admin with score + feedback
+
+### Proctoring & Anti-Cheat
+- **Tab Switch Detection** — Count and warn on tab switches; auto-disqualify above threshold
+- **Inactivity Detection** — Warn and disqualify on prolonged inactivity
+- **Fullscreen Enforcement** — Warn students who exit fullscreen
+- **Disable DevTools / Inspect** — Optional per-exam setting
+- **IP Address Logging** — Track IP per attempt
+- **Disqualification Log** — Reason and timestamp recorded per attempt
+
+### Real-Time Monitoring
+- **Live Exam Monitor** — Per-exam view of all active students: progress, time remaining, tab switches, last activity, IP
+- **Live Dashboard Feed** — Global real-time feed across all ongoing exams: current question, answered count, time remaining
+- **Auto-refresh** — Polling every 5–10 seconds, pauses when tab is hidden
+
+### Reporting & Analytics
+- **Score Distribution Chart** — Bucketed bar chart per exam (0–49, 50–59, 60–69, 70–79, 80–89, 90–100)
+- **Grade Reports** — Per-offering and per-period grade tables (student × exam matrix)
+- **Student History** — Exam history across all courses per student
+- **Export to Excel** — Download attempt results with score, duration, tab switches, disqualification status
+- **Export to CSV** — Grade report export per course offering
+
+### Academic Management
+- **Academic Periods** — Manage semesters / academic years
+- **Courses** — Course catalog
+- **Course Offerings** — Bind courses to periods and class names
+- **Student Enrollment** — Enroll students per offering
+- **Bulk Student Import** — Upload students via Excel or CSV
+
+### Student Experience
+- **NIM-based Login** — No account needed; students enter their student ID to start
+- **Workspace** — Split-panel view: question on the left, editor/answer on the right
+- **Code Editor** — Syntax-highlighted editor with Run Code support
+- **Auto-save** — Answers saved periodically and on change
+- **Hint System** — Optional per-question hints with configurable per-exam limits
+- **Result Page** — Score summary with per-question breakdown after submission
+- **PDF Result** — Downloadable result PDF
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Laravel 13, PHP 8.4 |
+| Database | MySQL 8 |
+| Frontend | Blade, Tailwind CSS (CDN), Alpine.js v3, Font Awesome 6 |
+| Rich Text | EasyMDE (Markdown editor), KaTeX (LaTeX), Mermaid.js |
+| Code Execution | Judge0 CE (self-hosted) |
+| Web Server | Nginx |
+| Containerization | Docker + Docker Compose |
+
+---
+
+## Local Development
 
 ### Requirements
-
 - PHP 8.4+
 - Composer
 - Node.js 18+
 - MySQL 8
-- Judge0 (optional for development)
 
-### Steps
+### Setup
 
-**1. Clone the repository**
 ```bash
 git clone https://github.com/fiqgant/fiqtest.git
 cd fiqtest
-```
 
-**2. Install dependencies**
-```bash
 composer install
 npm install
-```
 
-**3. Set up environment**
-```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-**4. Configure database in `.env`**
+Configure `.env`:
 ```env
 DB_HOST=127.0.0.1
 DB_DATABASE=coding_exam_platform
@@ -66,25 +116,16 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-**5. Run migrations and seeders**
 ```bash
 php artisan migrate
 php artisan db:seed
-```
-
-**6. Build assets**
-```bash
 npm run build
-```
-
-**7. Start the development server**
-```bash
 php artisan serve
 ```
 
-Access the admin panel at `http://localhost:8000/admin`
+Admin panel: `http://localhost:8000/admin`
 
-**Default admin credentials:**
+**Default credentials:**
 - Email: `admin@example.com`
 - Password: `password`
 
@@ -93,32 +134,20 @@ Access the admin panel at `http://localhost:8000/admin`
 ## VPS Deployment (Docker)
 
 ### Requirements
-
 - Docker Engine 24+
 - Docker Compose v2
 - Port 80 open
 
 ### Steps
 
-**1. Install Docker on the VPS**
-```bash
-curl -fsSL https://get.docker.com | sh
-apt install -y docker-compose-plugin
-```
-
-**2. Clone the repository**
 ```bash
 git clone https://github.com/fiqgant/fiqtest.git
 cd fiqtest
-```
-
-**3. Create the production `.env` file**
-```bash
 cp .env.example .env
 nano .env
 ```
 
-Update the following values:
+Required `.env` values:
 ```env
 APP_ENV=production
 APP_DEBUG=false
@@ -134,38 +163,20 @@ JUDGE0_URL=http://judge0:2358
 JUDGE0_TIMEOUT=30
 ```
 
-> `DB_USERNAME` must NOT be `root` — use any other username.
+> `DB_USERNAME` must NOT be `root` when using Docker.
 
-**4. Start all services**
 ```bash
 docker compose up -d --build
-```
-
-This will automatically:
-- Build the Laravel app image
-- Pull MySQL, Nginx, Judge0, Redis, and Postgres images
-- Run all database migrations
-- Cache config, routes, and views
-- Start PHP-FPM
-
-**5. Seed the admin account (first time only)**
-```bash
 docker compose exec app php artisan db:seed --class=AdminSeeder --force
 ```
 
-**6. Open the app**
+Visit `http://your-server-ip` — admin panel at `/admin`.
 
-Visit `http://your-server-ip` in your browser.
-
-**Default admin credentials:**
+**Default credentials:**
 - Email: `admin@example.com`
 - Password: `password`
 
-**7. Configure Judge0**
-
-Go to Admin Panel → Settings → Judge0, set the Base URL to `http://judge0:2358`, then click **Test Connection**.
-
-### Updating the Application
+### Updating
 
 ```bash
 git pull
@@ -175,45 +186,84 @@ docker compose exec app php artisan migrate --force
 
 ---
 
+## Judge0 Configuration
+
+Configure Judge0 from **Admin Panel → Settings → Judge0** — not via `.env`.
+
+| Field | Description |
+|-------|-------------|
+| Base URL | URL of Judge0 instance, e.g. `http://judge0:2358` |
+| API Key | Leave blank for self-hosted; fill in for RapidAPI |
+| API Host | Leave blank for self-hosted; fill in for RapidAPI |
+| Timeout | Execution time limit in seconds (default: 30) |
+
+Click **Test Connection** to verify the setup.
+
+---
+
+## Bulk Question Import
+
+Download the Excel template from **Admin → Questions → Bulk Import → Download Template**.
+
+The template contains one sheet (`Questions`) with 14 columns and example rows for every question type:
+
+| Column | Description |
+|--------|-------------|
+| `title` | Short question title |
+| `type` | `coding` / `multiple_choice` / `multiple_select` / `true_false` / `fill_in_blank` / `essay` |
+| `difficulty` | `easy` / `medium` / `hard` |
+| `description` | Full question text (Markdown supported) |
+| `default_weight` | Numeric score weight |
+| `starter_code` | Coding only — initial code shown to student |
+| `hint` | Optional hint |
+| `reference_solution` | Coding only — correct solution |
+| `tags` | Comma-separated tags, e.g. `python,loops` |
+| `test_cases` | Coding only — format: `input\|\|output\|\|is_hidden`, separated by `;` |
+| `options` | MC/MS only — format: `*Correct\|Wrong\|Wrong`. Prefix correct with `*` |
+| `fill_blank_answer` | Fill in the blank only |
+| `true_false_answer` | `true` or `false` |
+| `language` | Coding only — e.g. `python3`, `javascript`, `cpp` |
+
+---
+
 ## Directory Structure
 
 ```
 app/
-├── Http/Controllers/Admin/   # All admin controllers
-├── Models/                   # Eloquent models
+├── Http/Controllers/Admin/
+│   ├── DashboardController.php      # Dashboard + live feed
+│   ├── ExamController.php           # Exam CRUD, monitor, export, attempts
+│   ├── QuestionController.php       # Question CRUD, preview, duplicate, stats
+│   ├── BulkQuestionController.php   # Bulk import via Excel
+│   ├── BulkStudentController.php    # Bulk import via Excel/CSV
+│   ├── CourseOfferingController.php # Offerings + enrollment
+│   ├── ReportController.php         # Grade reports + CSV export
+│   └── SystemSettingController.php  # Judge0 configuration
+├── Models/
+│   ├── Exam.php, Attempt.php, AttemptQuestion.php
+│   ├── Question.php, QuestionOption.php, QuestionTag.php
+│   ├── Student.php, Course.php, CourseOffering.php, AcademicPeriod.php
+│   └── Submission.php, SystemSetting.php
 └── Services/
-    └── Judge0Service.php     # Judge0 integration
+    ├── Judge0Service.php       # Code execution via Judge0
+    ├── GradingService.php      # Auto-grade all question types
+    ├── GradeReportService.php  # Grade aggregation + CSV export
+    ├── ExamAccessService.php   # Attempt creation + access validation
+    └── QuestionAssigner.php    # Random question selection by difficulty
 
 resources/views/
-├── admin/                    # Admin panel views
-│   ├── layouts/app.blade.php # Main layout
+├── admin/
 │   ├── dashboard.blade.php
-│   ├── settings/judge0.blade.php
-│   └── reports/offering.blade.php
-└── exam/                     # Student-facing exam views
-
-database/migrations/          # All migrations
-docker/
-├── entrypoint.sh             # Container startup script
-└── nginx.conf                # Nginx configuration
+│   ├── exams/          # index, form, attempts, attempt-detail, monitor, question-pool
+│   ├── questions/      # index, form, preview, stats, bulk-import, bulk-preview
+│   ├── reports/        # offering, period, student
+│   └── settings/       # judge0
+└── exam/
+    ├── instructions.blade.php
+    ├── workspace.blade.php
+    ├── result.blade.php
+    └── result-pdf.blade.php
 ```
-
----
-
-## Judge0 Configuration
-
-Judge0 is configured through the admin panel, not directly in `.env`.
-
-**Admin Panel → Settings → Judge0:**
-
-| Field | Description |
-|-------|-------------|
-| Base URL | URL of the Judge0 instance, e.g. `http://judge0:2358` |
-| API Host | Fill in if using a RapidAPI proxy, leave blank for self-hosted |
-| Timeout | Execution time limit in seconds, default 30 |
-| API Key | Fill in if using RapidAPI, leave blank for self-hosted |
-
-After filling in the fields, click **Test Connection** to verify.
 
 ---
 
@@ -221,17 +271,16 @@ After filling in the fields, click **Test Connection** to verify.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `APP_NAME` | `fiqtest` | Application name |
 | `APP_ENV` | `local` | Set to `production` on VPS |
 | `APP_DEBUG` | `true` | Set to `false` in production |
-| `APP_URL` | `http://localhost` | Public URL of the application |
+| `APP_URL` | `http://localhost` | Public URL |
 | `APP_TIMEZONE` | `Asia/Jakarta` | Application timezone |
 | `DB_CONNECTION` | `mysql` | Database driver |
-| `DB_HOST` | `127.0.0.1` | Database host (use `mysql` with Docker) |
-| `DB_USERNAME` | — | Must not be `root` when using Docker |
+| `DB_HOST` | `127.0.0.1` | Use `mysql` with Docker |
+| `DB_USERNAME` | — | Must not be `root` with Docker |
 | `DB_DATABASE` | `coding_exam_platform` | Database name |
-| `JUDGE0_URL` | `http://localhost:2358` | Default Judge0 URL (can be changed from admin) |
-| `JUDGE0_TIMEOUT` | `30` | Default Judge0 timeout |
+| `JUDGE0_URL` | `http://localhost:2358` | Judge0 base URL |
+| `JUDGE0_TIMEOUT` | `30` | Default execution timeout (seconds) |
 
 ---
 
