@@ -66,11 +66,11 @@ class Question extends Model
 
     public function getVisibleTestCases(): array
     {
-        return array_filter($this->test_cases ?? [], fn($tc) => !($tc['is_hidden'] ?? false));
+        return array_values(array_filter($this->test_cases ?? [], fn($tc) => !($tc['is_hidden'] ?? false)));
     }
 
     public function getHiddenTestCases(): array
     {
-        return array_filter($this->test_cases ?? [], fn($tc) => $tc['is_hidden'] ?? false);
+        return array_values(array_filter($this->test_cases ?? [], fn($tc) => $tc['is_hidden'] ?? false));
     }
 }
