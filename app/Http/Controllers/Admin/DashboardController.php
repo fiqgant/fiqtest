@@ -11,6 +11,7 @@ use App\Models\CourseOffering;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\Student;
+use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -73,5 +74,44 @@ class DashboardController extends Controller
             'stats', 'activeExams', 'liveCount', 'avgScore',
             'disqualifiedCount', 'pendingEssays', 'recentAttempts', 'upcomingExams'
         ));
+    }
+
+    public function liveFeed(): JsonResponse
+    {
+        $active = Attempt::with(['student', 'exam', 'attemptQuestions.question'])
+            ->where('status', 'in_progress')
+            ->get()
+            ->map(function (Attempt $attempt) {
+                $lastAq = $attempt->attemptQuestions
+                    ->sortByDesc('updated_at')
+                    ->first();
+
+                $answeredCount = $attempt->attemptQuestions->filter(
+                    fn($aq) => filled($aq->code) || filled($aq->student_answer)
+                )->count();
+
+                $total = $attempt->attemptQuestions->count();
+
+                return [
+                    'id'             => $attempt->id,
+                    'name'           => $attempt->student->name,
+                    'nim'            => $attempt->student->nim,
+                    'exam'           => $attempt->exam->title,
+                    'current_q'      => $lastAq?->question?->title ?? '—',
+                    'current_q_type' => $lastAq?->question?->type ?? '',
+                    'answered'       => $answeredCount,
+                    'total'          => $total,
+                    'remaining_sec'  => $attempt->getRemainingSeconds(),
+                    'tab_switches'   => $attempt->tab_switch_count,
+                    'last_active'    => optional($attempt->last_activity_at)->diffForHumans() ?? 'Unknown',
+                    'is_disqualified'=> $attempt->is_disqualified,
+                ];
+            });
+
+        return response()->json([
+            'students'  => $active,
+            'count'     => $active->count(),
+            'timestamp' => now()->format('H:i:s'),
+        ]);
     }
 }

@@ -159,6 +159,23 @@
         </div>
     </div>
 
+    {{-- Live student feed --}}
+    <div class="card overflow-hidden mb-6">
+        <div class="card-header">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
+                    <i class="fas fa-circle text-indigo-500 text-xs animate-pulse"></i>
+                </div>
+                <span class="font-semibold text-slate-700">Live — Students Online</span>
+                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full" id="live-count">—</span>
+            </div>
+            <span class="text-xs text-slate-400" id="live-timestamp">Refreshing every 5s</span>
+        </div>
+        <div id="live-body">
+            <div class="px-5 py-8 text-center text-slate-400 text-sm">Loading...</div>
+        </div>
+    </div>
+
     {{-- Recent submissions --}}
     <div class="card overflow-hidden">
         <div class="card-header">
@@ -211,4 +228,91 @@
         </table>
         @endif
     </div>
+    <script>
+        const liveFeedUrl = '{{ route('admin.live-feed') }}';
+        const typeLabels = {
+            coding: 'Coding', multiple_choice: 'MC', multiple_select: 'MS',
+            true_false: 'T/F', fill_in_blank: 'FITB', essay: 'Essay',
+        };
+
+        function formatTime(sec) {
+            if (sec <= 0) return '00:00';
+            return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+        }
+
+        async function refreshLiveFeed() {
+            try {
+                const res  = await fetch(liveFeedUrl);
+                const data = await res.json();
+
+                document.getElementById('live-count').textContent    = data.count;
+                document.getElementById('live-timestamp').textContent = 'Updated ' + data.timestamp;
+
+                const body = document.getElementById('live-body');
+
+                if (data.count === 0) {
+                    body.innerHTML = `<div class="px-5 py-8 text-center text-slate-400 text-sm"><i class="fas fa-moon text-2xl mb-2 block opacity-30"></i>No students online right now.</div>`;
+                    return;
+                }
+
+                body.innerHTML = `
+                <table class="data-table">
+                    <thead><tr>
+                        <th>Student</th>
+                        <th>Exam</th>
+                        <th>Currently Working On</th>
+                        <th>Progress</th>
+                        <th>Time Left</th>
+                        <th>Tab Switches</th>
+                        <th>Last Active</th>
+                    </tr></thead>
+                    <tbody>
+                        ${data.students.map(s => {
+                            const timeClass  = s.remaining_sec <= 300 ? 'text-rose-600 font-bold animate-pulse' : 'font-mono text-slate-700';
+                            const tabClass   = s.tab_switches >= 3 ? 'text-rose-600 font-bold' : (s.tab_switches > 0 ? 'text-amber-600' : 'text-slate-400');
+                            const disqBadge  = s.is_disqualified ? `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 text-xs ml-1"><i class="fas fa-ban"></i></span>` : '';
+                            const typeLabel  = typeLabels[s.current_q_type] || '';
+                            const typeBadge  = typeLabel ? `<span class="inline-flex items-center px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 text-xs font-medium mr-1.5">${typeLabel}</span>` : '';
+                            const pct        = s.total > 0 ? Math.round(s.answered / s.total * 100) : 0;
+
+                            return `<tr>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0 ${s.is_disqualified ? 'bg-rose-400' : 'animate-pulse'}"></span>
+                                        <div>
+                                            <div class="font-semibold text-slate-800">${s.name}${disqBadge}</div>
+                                            <div class="font-mono text-xs text-slate-400">${s.nim}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-sm text-slate-600">${s.exam}</td>
+                                <td class="text-sm text-slate-700">${typeBadge}<span class="truncate">${s.current_q}</span></td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium text-slate-700">${s.answered}/${s.total}</span>
+                                        <div class="w-16 bg-slate-100 rounded-full h-1.5">
+                                            <div class="h-1.5 rounded-full bg-indigo-500" style="width:${pct}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="${timeClass}">${formatTime(s.remaining_sec)}</td>
+                                <td class="${tabClass}">${s.tab_switches > 0 ? s.tab_switches + '×' : '—'}</td>
+                                <td class="text-xs text-slate-500">${s.last_active}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+            } catch(e) {
+                document.getElementById('live-timestamp').textContent = 'Error fetching data';
+            }
+        }
+
+        refreshLiveFeed();
+        const liveInterval = setInterval(refreshLiveFeed, 5000);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) clearInterval(liveInterval);
+            else { refreshLiveFeed(); setInterval(refreshLiveFeed, 5000); }
+        });
+    </script>
 @endsection

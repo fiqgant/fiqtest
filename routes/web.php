@@ -37,6 +37,7 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard', DashboardController::class)->name('admin.dashboard');
+        Route::get('/live-feed', [DashboardController::class, 'liveFeed'])->name('admin.live-feed');
 
         Route::resource('academic-periods', AcademicPeriodController::class)->except('show')->names('admin.academic-periods');
 
