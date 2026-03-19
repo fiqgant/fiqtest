@@ -3,7 +3,8 @@ FROM judge0/judge0:1.13.1
 USER root
 
 # Install ML libraries into Judge0's bundled Python 3.8.1
-RUN /usr/local/python-3.8.1/bin/pip3 install --no-cache-dir \
+RUN /usr/local/python-3.8.1/bin/pip3 install --no-cache-dir --upgrade pip && \
+    /usr/local/python-3.8.1/bin/pip3 install --no-cache-dir \
         numpy==1.21.6 \
         pandas==1.3.5 \
         scikit-learn==1.0.2
