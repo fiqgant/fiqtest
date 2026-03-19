@@ -63,7 +63,10 @@ services:
       - fiqtest
 
   judge0:
-    image: judge0/judge0:1.13.1
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.judge0
+    image: fiqtest-judge0:latest
     restart: unless-stopped
     environment:
       REDIS_HOST: judge0-redis
@@ -81,7 +84,7 @@ services:
       - fiqtest
 
   judge0-worker:
-    image: judge0/judge0:1.13.1
+    image: fiqtest-judge0:latest
     restart: unless-stopped
     command: ["./scripts/workers"]
     environment:
