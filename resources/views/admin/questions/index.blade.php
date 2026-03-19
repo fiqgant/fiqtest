@@ -12,11 +12,12 @@
         $diffColors = ['easy' => 'emerald', 'medium' => 'amber', 'hard' => 'rose'];
     @endphp
     <div class="flex items-center gap-3 mb-4 flex-wrap">
-        <span class="text-sm font-semibold text-slate-500">{{ number_format($total) }} question{{ $total !== 1 ? 's' : '' }}</span>
+        <span class="text-sm font-semibold text-slate-500 dark:text-slate-400">{{ number_format($total) }} question{{ $total !== 1 ? 's' : '' }}</span>
         @foreach(['easy','medium','hard'] as $d)
             @if(($stats[$d] ?? 0) > 0)
             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
-                bg-{{ $diffColors[$d] }}-100 text-{{ $diffColors[$d] }}-700 border border-{{ $diffColors[$d] }}-200">
+                bg-{{ $diffColors[$d] }}-100 text-{{ $diffColors[$d] }}-700 border border-{{ $diffColors[$d] }}-200
+                dark:bg-{{ $diffColors[$d] }}-900/40 dark:text-{{ $diffColors[$d] }}-300 dark:border-{{ $diffColors[$d] }}-700">
                 <span class="w-1.5 h-1.5 rounded-full bg-{{ $diffColors[$d] }}-500"></span>
                 {{ $stats[$d] }} {{ ucfirst($d) }}
             </span>
@@ -83,15 +84,15 @@
 
     {{-- Per-page + result count --}}
     <div class="flex items-center justify-between mb-3">
-        <span class="text-xs text-slate-400">
+        <span class="text-xs text-slate-400 dark:text-slate-500">
             Showing {{ $questions->firstItem() ?? 0 }}–{{ $questions->lastItem() ?? 0 }} of {{ $questions->total() }}
         </span>
         <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-500">Show</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Show</span>
             @foreach([20, 50, 100, 0] as $pp)
                 <a href="{{ request()->fullUrlWithQuery(['per_page' => $pp, 'page' => 1]) }}"
                    class="px-2.5 py-1 rounded text-xs font-semibold border transition-colors
-                       {{ $perPage === $pp ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400' }}">
+                       {{ $perPage === $pp ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:border-indigo-500' }}">
                     {{ $pp === 0 ? 'All' : $pp }}
                 </a>
             @endforeach
@@ -105,8 +106,8 @@
     </form>
 
     {{-- Bulk toolbar --}}
-    <div class="flex items-center justify-between mb-3 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5" id="bulk-toolbar" style="display:none">
-        <span class="text-sm font-semibold text-indigo-700"><span id="selected-count">0</span> selected</span>
+    <div class="flex items-center justify-between mb-3 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5 dark:bg-indigo-900/30 dark:border-indigo-700" id="bulk-toolbar" style="display:none">
+        <span class="text-sm font-semibold text-indigo-700 dark:text-indigo-300"><span id="selected-count">0</span> selected</span>
         <button onclick="submitBulkDelete()" class="btn-danger btn-sm">
             <i class="fas fa-trash mr-1.5"></i> Delete Selected
         </button>
@@ -128,34 +129,34 @@
             </thead>
             <tbody>
                 @forelse($questions as $question)
-                    <tr class="hover:bg-slate-50 cursor-pointer" onclick="rowClick(event, '{{ route('admin.questions.edit', $question) }}')">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer" onclick="rowClick(event, '{{ route('admin.questions.edit', $question) }}')">
                         <td onclick="event.stopPropagation()">
                             <input type="checkbox" data-id="{{ $question->id }}" class="row-checkbox w-4 h-4 accent-indigo-600">
                         </td>
                         <td>
-                            <div class="font-semibold text-slate-800 leading-snug">{{ $question->title }}</div>
+                            <div class="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{{ $question->title }}</div>
                             @if($question->language)
-                                <span class="text-xs font-mono text-slate-400">{{ $question->language }}</span>
+                                <span class="text-xs font-mono text-slate-400 dark:text-slate-500">{{ $question->language }}</span>
                             @endif
                         </td>
                         <td>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-medium dark:bg-indigo-900/40 dark:text-indigo-300">
                                 {{ \App\Models\Question::TYPES[$question->type] ?? $question->type }}
                             </span>
                         </td>
                         <td><x-admin.status-badge :value="$question->difficulty" /></td>
-                        <td class="text-sm font-semibold text-slate-600">{{ $question->default_weight }}</td>
-                        <td class="text-slate-500 text-xs leading-snug">
+                        <td class="text-sm font-semibold text-slate-600 dark:text-slate-300">{{ $question->default_weight }}</td>
+                        <td class="text-slate-500 dark:text-slate-400 text-xs leading-snug">
                             {{ $question->courseOffering->course->name }}<br>
-                            <span class="text-slate-400">{{ $question->courseOffering->academicPeriod->name }} · {{ $question->courseOffering->class_name }}</span>
+                            <span class="text-slate-400 dark:text-slate-500">{{ $question->courseOffering->academicPeriod->name }} · {{ $question->courseOffering->class_name }}</span>
                         </td>
                         <td>
                             <div class="flex flex-wrap gap-1">
                                 @foreach($question->tags->take(3) as $tag)
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[11px] font-medium">{{ $tag->name }}</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[11px] font-medium dark:bg-slate-700 dark:text-slate-300">{{ $tag->name }}</span>
                                 @endforeach
                                 @if($question->tags->count() > 3)
-                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 text-[11px]">+{{ $question->tags->count() - 3 }}</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 text-[11px] dark:bg-slate-700 dark:text-slate-500">+{{ $question->tags->count() - 3 }}</span>
                                 @endif
                             </div>
                         </td>
@@ -176,9 +177,9 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-5 py-14 text-slate-400">
+                        <td colspan="8" class="px-5 py-14 text-slate-400 dark:text-slate-500">
                             <div class="flex flex-col items-center gap-3">
-                                <i class="fas fa-database text-3xl text-slate-300"></i>
+                                <i class="fas fa-database text-3xl text-slate-300 dark:text-slate-600"></i>
                                 @if($search || $type || $difficulty)
                                     <span class="font-medium">No questions match your filters.</span>
                                     <a href="{{ route('admin.questions.index', array_filter(['course_offering_id' => $offeringId])) }}" class="btn-secondary btn-sm">Clear filters</a>
