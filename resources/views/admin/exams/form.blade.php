@@ -141,13 +141,30 @@
         </div>
 
         <div class="form-section">
-            <div class="form-section-title"><i class="fas fa-tags mr-1.5"></i> Question Pool Filter</div>
+            <div class="flex items-center justify-between mb-3">
+                <div class="form-section-title mb-0"><i class="fas fa-tags mr-1.5"></i> Question Pool Filter</div>
+                @if($allTags->isNotEmpty())
+                <div class="flex items-center gap-3">
+                    <button type="button" id="tag-select-all" onclick="toggleAllTags(true)"
+                            class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors">
+                        Select All
+                    </button>
+                    <span class="text-slate-300">|</span>
+                    <button type="button" id="tag-deselect-all" onclick="toggleAllTags(false)"
+                            class="text-xs text-slate-500 hover:text-slate-700 font-medium transition-colors">
+                        Deselect All
+                    </button>
+                    <span class="text-xs text-slate-400" id="tag-selected-count"></span>
+                </div>
+                @endif
+            </div>
             <p class="text-sm text-slate-500 mb-4">Leave empty to use all questions from the course offering. Select tags to limit the pool to questions with those tags (OR logic).</p>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-wrap gap-2" id="tag-pool">
                 @foreach($allTags as $tag)
                 <label class="flex items-center gap-1.5 cursor-pointer bg-white border border-slate-200 rounded-xl px-3 py-2 hover:border-indigo-300 has-[:checked]:border-indigo-400 has-[:checked]:bg-indigo-50">
                     <input type="checkbox" name="question_filter_tags[]" value="{{ $tag->id }}"
-                        class="w-4 h-4 accent-indigo-600"
+                        class="pool-tag-checkbox w-4 h-4 accent-indigo-600"
+                        onchange="updateTagCount()"
                         {{ in_array($tag->id, old('question_filter_tags', $exam->question_filter_tags ?? [])) ? 'checked' : '' }}>
                     <span class="text-sm font-medium text-slate-700">{{ $tag->name }}</span>
                 </label>
@@ -157,6 +174,22 @@
                 @endif
             </div>
         </div>
+
+        <script>
+        function toggleAllTags(check) {
+            document.querySelectorAll('.pool-tag-checkbox').forEach(cb => cb.checked = check);
+            updateTagCount();
+        }
+
+        function updateTagCount() {
+            const total   = document.querySelectorAll('.pool-tag-checkbox').length;
+            const checked = document.querySelectorAll('.pool-tag-checkbox:checked').length;
+            const el      = document.getElementById('tag-selected-count');
+            if (el) el.textContent = checked > 0 ? checked + ' / ' + total + ' selected' : '';
+        }
+
+        updateTagCount();
+        </script>
 
         <x-admin.form-actions :cancel="route('admin.exams.index')" />
     </form>
