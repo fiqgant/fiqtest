@@ -31,24 +31,21 @@
                                 <a href="{{ route('admin.exams.edit', $exam) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
 
                                 {{-- More dropdown --}}
-                                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                                    <button @click="open = !open" class="action-btn action-btn-neutral"><i class="fas fa-ellipsis-h"></i></button>
-                                    <div x-show="open" x-transition
-                                         class="absolute right-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1 text-left">
-                                        <a href="{{ route('admin.exams.question-pool', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-layer-group w-4 text-slate-400"></i> Question Pool</a>
-                                        <a href="{{ route('admin.exams.export', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-file-excel w-4 text-slate-400"></i> Export Excel</a>
-                                        <a href="{{ route('exam.instructions', $exam->slug) }}" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-external-link-alt w-4 text-slate-400"></i> Open Link</a>
-                                        <button onclick="copyLink('{{ route('exam.instructions', $exam->slug) }}')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-link w-4 text-slate-400"></i> Copy Link</button>
-                                        <div class="border-t border-slate-100 my-1"></div>
-                                        <form method="POST" action="{{ route('admin.exams.publish', $exam) }}">@csrf
-                                            <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50"><i class="fas fa-globe w-4"></i> Publish</button>
-                                        </form>
-                                        <form method="POST" action="{{ route('admin.exams.close', $exam) }}">@csrf
-                                            <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-amber-50"><i class="fas fa-lock w-4"></i> Close</button>
-                                        </form>
-                                        <div class="border-t border-slate-100 my-1"></div>
-                                        <button onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"><i class="fas fa-trash w-4"></i> Delete</button>
-                                    </div>
+                                <button class="action-btn action-btn-neutral" onclick="toggleDropdown(this)" type="button"><i class="fas fa-ellipsis-h"></i></button>
+                                <div class="exam-dropdown" style="display:none;position:fixed;width:176px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:9998;padding:4px 0;text-align:left;">
+                                    <a href="{{ route('admin.exams.question-pool', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-layer-group w-4 text-slate-400"></i> Question Pool</a>
+                                    <a href="{{ route('admin.exams.export', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-file-excel w-4 text-slate-400"></i> Export Excel</a>
+                                    <a href="{{ route('exam.instructions', $exam->slug) }}" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-external-link-alt w-4 text-slate-400"></i> Open Link</a>
+                                    <button onclick="copyLink('{{ route('exam.instructions', $exam->slug) }}')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-link w-4 text-slate-400"></i> Copy Link</button>
+                                    <div style="border-top:1px solid #f1f5f9;margin:4px 0;"></div>
+                                    <form method="POST" action="{{ route('admin.exams.publish', $exam) }}">@csrf
+                                        <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50"><i class="fas fa-globe w-4"></i> Publish</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.exams.close', $exam) }}">@csrf
+                                        <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-amber-50"><i class="fas fa-lock w-4"></i> Close</button>
+                                    </form>
+                                    <div style="border-top:1px solid #f1f5f9;margin:4px 0;"></div>
+                                    <button onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"><i class="fas fa-trash w-4"></i> Delete</button>
                                 </div>
                             </div>
                         </td>
@@ -67,7 +64,34 @@
     </div>
 
     <script>
+        let activeDropdown = null;
+
+        function toggleDropdown(btn) {
+            const dropdown = btn.nextElementSibling;
+            if (activeDropdown && activeDropdown !== dropdown) {
+                activeDropdown.style.display = 'none';
+            }
+            if (dropdown.style.display === 'none') {
+                const rect = btn.getBoundingClientRect();
+                dropdown.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+                dropdown.style.left = (rect.right + window.scrollX - 176) + 'px';
+                dropdown.style.display = 'block';
+                activeDropdown = dropdown;
+            } else {
+                dropdown.style.display = 'none';
+                activeDropdown = null;
+            }
+        }
+
+        document.addEventListener('click', function (e) {
+            if (activeDropdown && !activeDropdown.contains(e.target) && !e.target.closest('[onclick="toggleDropdown(this)"]')) {
+                activeDropdown.style.display = 'none';
+                activeDropdown = null;
+            }
+        });
+
         function copyLink(url) {
+            if (activeDropdown) { activeDropdown.style.display = 'none'; activeDropdown = null; }
             const done = () => {
                 const toast = document.getElementById('copy-toast');
                 toast.style.opacity = '1';
@@ -77,13 +101,9 @@
                 navigator.clipboard.writeText(url).then(done);
             } else {
                 const el = document.createElement('textarea');
-                el.value = url;
-                el.style.position = 'fixed';
-                el.style.opacity = '0';
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
+                el.value = url; el.style.position = 'fixed'; el.style.opacity = '0';
+                document.body.appendChild(el); el.select();
+                document.execCommand('copy'); document.body.removeChild(el);
                 done();
             }
         }
