@@ -235,7 +235,10 @@ class BulkQuestionController extends Controller
             $optionsRaw        = trim((string) ($optionsRaw ?? ''));
             $fillBlankAnswer   = trim((string) ($fillBlankAnswer ?? ''));
             $trueFalseRaw      = strtolower(trim((string) ($trueFalseRaw ?? '')));
-            $language          = $this->normalizeLanguage(trim((string) ($language ?? '')) ?: $defaultLanguage);
+            $rawLanguage       = trim((string) ($language ?? ''));
+            $language          = $type === 'coding'
+                ? $this->normalizeLanguage($rawLanguage ?: $defaultLanguage)
+                : null;
 
             // Validations
             if ($title === '') $errors[] = 'Title is required.';
