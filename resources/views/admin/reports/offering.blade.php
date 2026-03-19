@@ -283,6 +283,11 @@
                             ${refHtml}`;
 
                     } else if (type === 'essay') {
+                        const feedbackHtml = q.manual_feedback ? `
+                            <div>
+                                <div class="text-xs text-indigo-600 font-semibold uppercase tracking-wider mb-1.5">Admin Feedback</div>
+                                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-sm text-indigo-800 whitespace-pre-wrap">${escapeHtml(q.manual_feedback)}</div>
+                            </div>` : '';
                         answerHtml = `
                             ${refHtml}
                             <div>
@@ -290,7 +295,9 @@
                                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
                                     ${q.student_answer ? escapeHtml(q.student_answer) : '<span class="text-slate-400 italic">(No answer submitted)</span>'}
                                 </div>
-                            </div>`;
+                            </div>
+                            ${feedbackHtml}
+                            ${q.manual_score !== null && q.manual_score !== undefined ? `<div class="text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">Manual Score: ${q.manual_score} / ${q.weight} pts</div>` : '<div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2"><i class="fas fa-clock mr-1"></i>Awaiting manual grading</div>'}`;
                     }
 
                     const scoreLabel = type === 'coding'
