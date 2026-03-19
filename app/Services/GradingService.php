@@ -118,21 +118,38 @@ class GradingService
             return;
         }
 
-        $selectedIds = array_filter(array_map('trim', explode(',', $studentAnswer)));
-        sort($selectedIds);
+        // Cast to int for consistent numeric comparison (avoids '9' vs '10' lexicographic mismatch)
+        $selectedIds = array_values(array_unique(array_filter(
+            array_map('intval', explode(',', $studentAnswer))
+        )));
+        sort($selectedIds, SORT_NUMERIC);
 
         $correctIds = $aq->question->options()
             ->where('is_correct', true)
             ->pluck('id')
-            ->map('strval')
+            ->map(fn($id) => (int) $id)
             ->sort()
             ->values()
             ->toArray();
 
+        $allOptions   = $aq->question->options()->get();
+        $totalCorrect = $allOptions->where('is_correct', true)->count();
+        $totalWrong   = $allOptions->where('is_correct', false)->count();
+
+        $correctSelected = count(array_intersect($selectedIds, $correctIds));
+        $wrongSelected   = count(array_diff($selectedIds, $correctIds));
+
         $isCorrect = $selectedIds === $correctIds;
 
+        // Partial credit: subtract wrong-selection penalty
+        $rawScore = $totalCorrect > 0
+            ? (($correctSelected / $totalCorrect) - ($totalWrong > 0 ? $wrongSelected / $totalWrong : 0))
+            : 0.0;
+
+        $score = max(0.0, round($rawScore * (float) $aq->weight, 2));
+
         $aq->update([
-            'score'      => $isCorrect ? (float) $aq->weight : 0.0,
+            'score'      => $score,
             'is_correct' => $isCorrect,
         ]);
     }
