@@ -87,6 +87,13 @@
                     <input type="number" min="0" max="3600" name="inactivity_warning_seconds" value="{{ old('inactivity_warning_seconds', $exam->inactivity_warning_seconds ?? 15) }}" class="form-input" required>
                     <p class="text-xs text-slate-400 mt-1">Warning shown when N seconds remain.</p>
                 </div>
+                <div class="flex items-start gap-3 mt-2">
+                    <input type="checkbox" id="disable_inspect" name="disable_inspect" value="1" class="mt-1 w-4 h-4 rounded accent-indigo-600" {{ old('disable_inspect', $exam->disable_inspect ?? true) ? 'checked' : '' }}>
+                    <div>
+                        <label for="disable_inspect" class="form-label cursor-pointer">Disable DevTools &amp; Right-Click</label>
+                        <p class="text-xs text-slate-400">Blocks F12, Ctrl+Shift+I, right-click context menu, and view-source shortcuts during the exam.</p>
+                    </div>
+                </div>
             </div>
         </div>
 

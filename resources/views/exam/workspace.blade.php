@@ -74,6 +74,7 @@
 </head>
 <body class="bg-gray-900 text-white h-screen overflow-hidden" x-data="examApp()">
 
+    @if($exam->disable_inspect)
     <script>
         // Disable right-click context menu
         document.addEventListener('contextmenu', function(e) {
@@ -159,6 +160,7 @@
             };
         })();
     </script>
+    @endif
 
     <div class="flex h-full">
         <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0">
@@ -273,10 +275,10 @@
                     </template>
                 </div>
 
-                <div class="w-1/2 flex flex-col">
+                <div class="w-1/2 flex flex-col min-h-0">
 
                     {{-- ── CODING: Monaco editor ─────────────────────────────── --}}
-                    <div :style="(currentQuestion && currentQuestion.type === 'coding') ? 'display:flex;flex-direction:column;height:100%;overflow:hidden' : 'display:none'"
+                    <div :style="(currentQuestion && currentQuestion.type === 'coding') ? {display:'flex',flexDirection:'column',flex:'1',minHeight:'0',overflow:'hidden'} : {display:'none'}"
                          style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <div class="flex items-center space-x-2">
@@ -357,11 +359,10 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
                     </div>
 
                     {{-- ── NON-CODING: Answer panel ──────────────────────────── --}}
-                    <div :style="(currentQuestion && currentQuestion.type !== 'coding') ? 'display:flex;flex-direction:column;height:100%;overflow:hidden' : 'display:none'"
+                    <div :style="(currentQuestion && currentQuestion.type !== 'coding') ? {display:'flex',flexDirection:'column',flex:'1',minHeight:'0',overflow:'hidden'} : {display:'none'}"
                          style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <span class="text-sm font-medium">Your Answer</span>
@@ -470,7 +471,6 @@
                                 </template>
 
                             </div>
-                        </div>
                     </div>
 
                 </div>
@@ -1634,10 +1634,6 @@
                     }
                     return false;
                 },
-                image({ href, title, text }) {
-                    const titleAttr = title ? ` title="${title}"` : '';
-                    return `<img src="${href}" alt="${text}"${titleAttr} loading="lazy">`;
-                }
             }
         });
 
