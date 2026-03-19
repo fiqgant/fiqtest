@@ -52,11 +52,24 @@
 
     <script>
         function copyLink(url, btn) {
-            navigator.clipboard.writeText(url).then(() => {
-                const icon = btn.querySelector('i');
+            const icon = btn.querySelector('i');
+            const done = () => {
                 icon.className = 'fas fa-check text-emerald-600';
                 setTimeout(() => { icon.className = 'fas fa-link'; }, 1500);
-            });
+            };
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(done);
+            } else {
+                const el = document.createElement('textarea');
+                el.value = url;
+                el.style.position = 'fixed';
+                el.style.opacity = '0';
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                done();
+            }
         }
     </script>
 @endsection
