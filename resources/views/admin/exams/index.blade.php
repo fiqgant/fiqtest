@@ -5,7 +5,7 @@
         <a href="{{ route('admin.exams.create') }}" class="btn-primary"><i class="fas fa-plus"></i> Add Exam</a>
     </x-admin.page-header>
 
-    <div class="card overflow-hidden">
+    <div class="card">
         <table class="data-table">
             <thead>
                 <tr>
