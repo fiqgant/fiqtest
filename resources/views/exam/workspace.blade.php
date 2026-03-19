@@ -273,11 +273,11 @@
                     </template>
                 </div>
 
-                <div class="w-1/2 relative overflow-hidden">
+                <div class="w-1/2 flex flex-col">
 
                     {{-- ── CODING: Monaco editor ─────────────────────────────── --}}
-                    <div :style="(currentQuestion && currentQuestion.type === 'coding') ? '' : 'display:none'"
-                         class="absolute inset-0 flex flex-col overflow-hidden" style="display:none">
+                    <div :style="(currentQuestion && currentQuestion.type === 'coding') ? 'display:flex;flex-direction:column;height:100%;overflow:hidden' : 'display:none'"
+                         style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-sm font-medium">Code Editor</span>
@@ -361,8 +361,8 @@
                     </div>
 
                     {{-- ── NON-CODING: Answer panel ──────────────────────────── --}}
-                    <div :style="(currentQuestion && currentQuestion.type !== 'coding') ? '' : 'display:none'"
-                         class="absolute inset-0 flex flex-col overflow-hidden" style="display:none">
+                    <div :style="(currentQuestion && currentQuestion.type !== 'coding') ? 'display:flex;flex-direction:column;height:100%;overflow:hidden' : 'display:none'"
+                         style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <span class="text-sm font-medium">Your Answer</span>
                                 <div class="flex items-center space-x-2">
