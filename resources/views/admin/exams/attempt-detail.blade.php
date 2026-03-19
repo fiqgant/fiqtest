@@ -39,8 +39,10 @@
     {{-- Per-question review --}}
     @foreach($attempt->attemptQuestions as $aq)
         @php
-            $question = $aq->question;
-            $qPct = $aq->max_score > 0 ? round($aq->score / $aq->max_score * 100) : 0;
+            $question    = $aq->question;
+            $typeLabel   = \App\Models\Question::TYPES[$question->type] ?? $question->type;
+            $effectiveScore = $aq->effectiveScore();
+            $qPct        = $aq->max_score > 0 ? round($effectiveScore / $aq->max_score * 100) : 0;
             $finalSubmission = $aq->submissions->first();
         @endphp
 
@@ -53,17 +55,20 @@
                         {{ $question->difficulty === 'easy' ? 'text-emerald-600' : ($question->difficulty === 'medium' ? 'text-amber-500' : 'text-rose-500') }}">
                         {{ ucfirst($question->difficulty) }}
                     </span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">{{ $typeLabel }}</span>
                     <span class="font-semibold text-slate-800">{{ $question->title }}</span>
                 </div>
                 <div class="flex items-center gap-3 text-sm">
                     @if($aq->hint_used_count > 0)
                         <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium">
-                            <i class="fas fa-lightbulb text-[10px]"></i>
-                            Hint used {{ $aq->hint_used_count }}×
+                            <i class="fas fa-lightbulb text-[10px]"></i> Hint used {{ $aq->hint_used_count }}×
                         </span>
                     @endif
                     <span class="font-bold {{ $qPct >= 75 ? 'text-emerald-600' : ($qPct >= 50 ? 'text-amber-500' : 'text-rose-500') }}">
-                        {{ $aq->score ?? 0 }} / {{ $aq->max_score }} pts
+                        {{ $effectiveScore }} / {{ $aq->max_score }} pts
+                        @if($question->isManualGraded())
+                            <span class="text-xs font-normal text-slate-400">(manual)</span>
+                        @endif
                     </span>
                 </div>
             </div>
@@ -74,54 +79,179 @@
                 @if($aq->hint_used_count > 0 && !empty($question->hint))
                     <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                         <div class="flex items-center gap-2 text-amber-700 font-semibold text-sm mb-2">
-                            <i class="fas fa-lightbulb"></i>
-                            Hint (used {{ $aq->hint_used_count }}×)
+                            <i class="fas fa-lightbulb"></i> Hint (used {{ $aq->hint_used_count }}×)
                         </div>
-                        <div class="text-sm text-amber-900 prose prose-sm max-w-none hint-content">{{ $question->hint }}</div>
+                        <div class="text-sm text-amber-900">{{ $question->hint }}</div>
                     </div>
                 @endif
 
                 {{-- Reference solution --}}
-                <div>
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
-                    @if(!empty($question->reference_solution))
+                @if(!empty($question->reference_solution))
+                    <div>
+                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Reference Solution</div>
                         <pre class="bg-indigo-950 text-indigo-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $question->reference_solution }}</pre>
-                    @else
-                        <div class="text-sm text-slate-400 italic px-1">No reference solution provided. <a href="{{ route('admin.questions.edit', $question) }}" class="text-indigo-500 hover:underline">Add one →</a></div>
-                    @endif
-                </div>
+                    </div>
+                @endif
 
-                {{-- Student's code --}}
+                {{-- Student answer (type-aware) --}}
                 <div>
                     <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Student's Answer</div>
-                    @if($aq->code)
-                        <pre class="bg-gray-900 text-gray-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $aq->code }}</pre>
-                    @else
-                        <div class="text-sm text-slate-400 italic">No code submitted.</div>
+
+                    @if($question->isCoding())
+                        {{-- Coding --}}
+                        @if($aq->code)
+                            <pre class="bg-gray-900 text-gray-100 rounded-xl p-4 text-sm font-mono overflow-x-auto whitespace-pre-wrap break-all">{{ $aq->code }}</pre>
+                        @else
+                            <div class="text-sm text-slate-400 italic">No code submitted.</div>
+                        @endif
+
+                        {{-- Final submission output --}}
+                        @if($finalSubmission)
+                            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                @if($finalSubmission->output)
+                                    <div>
+                                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Output</div>
+                                        <pre class="bg-slate-900 text-green-300 rounded-xl p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap">{{ $finalSubmission->output }}</pre>
+                                    </div>
+                                @endif
+                                @if($finalSubmission->error)
+                                    <div>
+                                        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Error</div>
+                                        <pre class="bg-slate-900 text-rose-300 rounded-xl p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap">{{ $finalSubmission->error }}</pre>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="mt-2 flex items-center gap-4 text-xs text-slate-400">
+                                <span><i class="fas fa-check-circle mr-1 {{ $aq->passed_tests === $aq->total_tests ? 'text-emerald-500' : 'text-rose-400' }}"></i>{{ $aq->passed_tests ?? 0 }}/{{ $aq->total_tests ?? 0 }} test cases passed</span>
+                                @if($finalSubmission->execution_time_ms)
+                                    <span><i class="fas fa-clock mr-1"></i>{{ $finalSubmission->execution_time_ms }}ms</span>
+                                @endif
+                            </div>
+                        @endif
+
+                    @elseif(in_array($question->type, ['multiple_choice', 'multiple_select']))
+                        {{-- MC / MS --}}
+                        @php
+                            $selectedIds = $aq->student_answer
+                                ? array_map('trim', explode(',', $aq->student_answer))
+                                : [];
+                        @endphp
+                        @if($question->options->isEmpty())
+                            <div class="text-sm text-slate-400 italic">No options defined.</div>
+                        @else
+                            <div class="space-y-2">
+                                @foreach($question->options as $option)
+                                    @php
+                                        $isSelected = in_array((string) $option->id, $selectedIds);
+                                    @endphp
+                                    <div class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                        {{ $option->is_correct ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : ($isSelected && !$option->is_correct ? 'bg-rose-50 border border-rose-200 text-rose-800' : 'bg-slate-50 border border-slate-200 text-slate-600') }}">
+                                        @if($isSelected)
+                                            <i class="fas {{ $option->is_correct ? 'fa-check-circle text-emerald-600' : 'fa-times-circle text-rose-500' }} w-4"></i>
+                                        @elseif($option->is_correct)
+                                            <i class="fas fa-check-circle text-emerald-400 opacity-40 w-4"></i>
+                                        @else
+                                            <i class="far fa-circle text-slate-400 w-4"></i>
+                                        @endif
+                                        {{ $option->text }}
+                                        @if($option->is_correct)
+                                            <span class="ml-auto text-xs font-semibold text-emerald-600">Correct</span>
+                                        @endif
+                                        @if($isSelected)
+                                            <span class="ml-auto text-xs font-semibold {{ $option->is_correct ? 'text-emerald-600' : 'text-rose-500' }}">Student's choice</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
+                    @elseif($question->type === 'true_false')
+                        {{-- TF --}}
+                        @php
+                            $studentTF = $aq->student_answer;
+                            $correctTF = $question->true_false_answer;
+                        @endphp
+                        <div class="flex gap-4 text-sm">
+                            <div class="px-4 py-2 rounded-lg border {{ $studentTF === '1' ? 'bg-indigo-50 border-indigo-300 font-semibold text-indigo-800' : 'bg-slate-50 border-slate-200 text-slate-400' }}">
+                                True
+                                @if($correctTF === true) <i class="fas fa-check text-emerald-500 ml-1"></i> @endif
+                                @if($studentTF === '1') <span class="text-xs text-indigo-600 ml-1">(student)</span> @endif
+                            </div>
+                            <div class="px-4 py-2 rounded-lg border {{ $studentTF === '0' ? 'bg-indigo-50 border-indigo-300 font-semibold text-indigo-800' : 'bg-slate-50 border-slate-200 text-slate-400' }}">
+                                False
+                                @if($correctTF === false) <i class="fas fa-check text-emerald-500 ml-1"></i> @endif
+                                @if($studentTF === '0') <span class="text-xs text-indigo-600 ml-1">(student)</span> @endif
+                            </div>
+                        </div>
+                        @php $tfCorrect = ($studentTF === '1' && $correctTF === true) || ($studentTF === '0' && $correctTF === false); @endphp
+                        <div class="mt-2 text-sm {{ $tfCorrect ? 'text-emerald-600' : 'text-rose-500' }}">
+                            <i class="fas {{ $tfCorrect ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                            {{ $tfCorrect ? 'Correct' : 'Incorrect' }}
+                        </div>
+
+                    @elseif($question->type === 'fill_in_blank')
+                        {{-- FITB --}}
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <span class="text-slate-500">Student answered: </span>
+                                <code class="bg-slate-100 px-2 py-0.5 rounded text-slate-800">{{ $aq->student_answer ?: '(no answer)' }}</code>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">Correct answer: </span>
+                                <code class="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded">{{ $question->fill_blank_answer }}</code>
+                            </div>
+                            @php $fitbCorrect = mb_strtolower(trim((string)$aq->student_answer)) === mb_strtolower(trim((string)$question->fill_blank_answer)); @endphp
+                            <div class="{{ $fitbCorrect ? 'text-emerald-600' : 'text-rose-500' }}">
+                                <i class="fas {{ $fitbCorrect ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                                {{ $fitbCorrect ? 'Correct' : 'Incorrect' }}
+                            </div>
+                        </div>
+
+                    @elseif($question->type === 'essay')
+                        {{-- Essay --}}
+                        @if($aq->student_answer)
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">{{ $aq->student_answer }}</div>
+                        @else
+                            <div class="text-sm text-slate-400 italic">No answer submitted.</div>
+                        @endif
                     @endif
                 </div>
 
-                {{-- Final submission output --}}
-                @if($finalSubmission)
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        @if($finalSubmission->output)
-                            <div>
-                                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Output</div>
-                                <pre class="bg-slate-900 text-green-300 rounded-xl p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap">{{ $finalSubmission->output }}</pre>
+                {{-- Essay: manual grading form --}}
+                @if($question->type === 'essay')
+                    <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                        <div class="text-sm font-semibold text-indigo-700 mb-3"><i class="fas fa-edit mr-1.5"></i> Manual Grading</div>
+                        @if($aq->manual_score !== null)
+                            <div class="text-xs text-indigo-600 mb-3">
+                                Currently: <strong>{{ $aq->manual_score }}</strong> / {{ $aq->max_score }} pts
+                                @if($aq->manual_feedback)
+                                    — Feedback: "{{ Str::limit($aq->manual_feedback, 80) }}"
+                                @endif
                             </div>
                         @endif
-                        @if($finalSubmission->error)
-                            <div>
-                                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Error</div>
-                                <pre class="bg-slate-900 text-rose-300 rounded-xl p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap">{{ $finalSubmission->error }}</pre>
+                        <form method="POST"
+                              action="{{ route('admin.exams.attempts.grade-essay', [$exam, $attempt, $aq]) }}">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="form-label text-xs">Score (max {{ $aq->max_score }} pts)</label>
+                                    <input type="number" name="manual_score" min="0" max="{{ $aq->max_score }}" step="0.5"
+                                           value="{{ old('manual_score', $aq->manual_score) }}"
+                                           class="form-input" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="form-label text-xs">Feedback to student <span class="font-normal text-slate-400">(optional)</span></label>
+                                    <input type="text" name="manual_feedback"
+                                           value="{{ old('manual_feedback', $aq->manual_feedback) }}"
+                                           class="form-input" placeholder="Brief feedback…">
+                                </div>
                             </div>
-                        @endif
-                    </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-400">
-                        <span><i class="fas fa-check-circle mr-1 {{ $aq->passed_tests === $aq->total_tests ? 'text-emerald-500' : 'text-rose-400' }}"></i>{{ $aq->passed_tests ?? 0 }}/{{ $aq->total_tests ?? 0 }} test cases passed</span>
-                        @if($finalSubmission->execution_time_ms)
-                            <span><i class="fas fa-clock mr-1"></i>{{ $finalSubmission->execution_time_ms }}ms</span>
-                        @endif
+                            <div class="mt-3 flex justify-end">
+                                <button type="submit" class="btn-primary text-sm">
+                                    <i class="fas fa-save mr-1.5"></i> Save Grade
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 @endif
 

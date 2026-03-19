@@ -2,8 +2,9 @@
 
 @section('content')
     @php
-        $valid = array_filter($rows, fn($r) => empty($r['errors']));
+        $valid   = array_filter($rows, fn($r) => empty($r['errors']));
         $invalid = array_filter($rows, fn($r) => !empty($r['errors']));
+        $typeLabels = \App\Models\Question::TYPES;
     @endphp
 
     <x-admin.page-header title="Preview Import" subtitle="{{ count($valid) }} valid · {{ count($invalid) }} with errors">
@@ -25,24 +26,6 @@
             <div class="text-2xl font-extrabold text-rose-500">{{ count($invalid) }}</div>
         </div>
     </div>
-
-    @if(count($valid) > 0)
-        {{-- Confirm form --}}
-        <form method="POST" action="{{ route('admin.questions.bulk.store') }}" enctype="multipart/form-data" id="confirm-form">
-            @csrf
-            <input type="hidden" name="course_offering_id" value="{{ $offering->id }}">
-            <input type="hidden" name="language" value="{{ $language }}">
-            {{-- Re-upload file since we can't pass it via session --}}
-        </form>
-
-        <div class="mb-4 flex items-center justify-between">
-            <div class="text-sm text-slate-600">
-                Offering: <strong>{{ $offering->course->name }} — {{ $offering->academicPeriod->name }} · {{ $offering->class_name }}</strong>
-                &nbsp;·&nbsp; Language: <strong>{{ $language }}</strong>
-            </div>
-            {{-- Re-submit original form with hidden confirm flag --}}
-        </div>
-    @endif
 
     {{-- Invalid rows --}}
     @if(count($invalid) > 0)
@@ -76,12 +59,19 @@
                                 {{ $row['difficulty'] === 'easy' ? 'text-emerald-600' : ($row['difficulty'] === 'medium' ? 'text-amber-500' : 'text-rose-500') }}">
                                 {{ ucfirst($row['difficulty']) }}
                             </span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+                                {{ $typeLabels[$row['type']] ?? $row['type'] }}
+                            </span>
                             <span class="font-semibold text-slate-800">{{ $row['title'] }}</span>
                         </div>
                         <div class="flex items-center gap-3 text-xs text-slate-400">
                             @if($row['hint']) <span class="text-amber-500"><i class="fas fa-lightbulb"></i> Hint</span> @endif
                             @if($row['reference_solution']) <span class="text-indigo-500"><i class="fas fa-code"></i> Solution</span> @endif
-                            <span>{{ count($row['test_cases']) }} test case(s)</span>
+                            @if($row['type'] === 'coding')
+                                <span>{{ count($row['test_cases']) }} test case(s)</span>
+                            @elseif(in_array($row['type'], ['multiple_choice', 'multiple_select']))
+                                <span>{{ count($row['options']) }} option(s)</span>
+                            @endif
                             <span class="font-semibold text-slate-600">{{ $row['default_weight'] }} pts</span>
                         </div>
                     </div>
@@ -90,7 +80,7 @@
             @endforeach
         </div>
 
-        {{-- Confirm upload: re-upload form --}}
+        {{-- Confirm --}}
         <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex items-center justify-between">
             <div>
                 <div class="font-semibold text-indigo-800">Ready to import {{ count($valid) }} question(s)</div>
@@ -103,8 +93,6 @@
                 <form method="POST" action="{{ route('admin.questions.bulk.store') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="course_offering_id" value="{{ $offering->id }}">
-                    <input type="hidden" name="language" value="{{ $language }}">
-                    {{-- Pass parsed data as JSON to avoid re-parsing --}}
                     <input type="hidden" name="parsed_rows" value="{{ base64_encode(json_encode($valid)) }}">
                     <button type="submit" class="btn-primary"><i class="fas fa-file-import mr-1.5"></i> Confirm Import</button>
                 </form>

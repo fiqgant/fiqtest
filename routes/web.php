@@ -59,11 +59,13 @@ Route::prefix('admin')->group(function () {
         Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('admin.exams.close');
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
         Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
+        Route::post('exams/{exam}/attempts/{attempt}/grade/{attemptQuestion}', [ExamController::class, 'gradeEssay'])->name('admin.exams.attempts.grade-essay');
 
         Route::get('question-tags', [QuestionTagController::class, 'index'])->name('admin.question-tags.index');
         Route::post('question-tags', [QuestionTagController::class, 'store'])->name('admin.question-tags.store');
         Route::delete('question-tags/{questionTag}', [QuestionTagController::class, 'destroy'])->name('admin.question-tags.destroy');
 
+        Route::post('questions/upload-image', [QuestionController::class, 'uploadImage'])->name('admin.questions.upload-image');
         Route::get('questions/bulk/import', [BulkQuestionController::class, 'showImport'])->name('admin.questions.bulk.import');
         Route::get('questions/bulk/template', [BulkQuestionController::class, 'downloadTemplate'])->name('admin.questions.bulk.template');
         Route::post('questions/bulk/preview', [BulkQuestionController::class, 'preview'])->name('admin.questions.bulk.preview');

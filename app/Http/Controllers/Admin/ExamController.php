@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attempt;
+use App\Models\AttemptQuestion;
 use App\Models\CourseOffering;
 use App\Models\Exam;
 use App\Models\Question;
 use App\Models\QuestionTag;
+use App\Services\GradingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -98,11 +100,32 @@ class ExamController extends Controller
     {
         $attempt->load([
             'student',
-            'attemptQuestions.question',
+            'attemptQuestions.question.options',
             'attemptQuestions.submissions' => fn($q) => $q->where('is_final', true)->latest()->limit(1),
         ]);
 
         return view('admin.exams.attempt-detail', compact('exam', 'attempt'));
+    }
+
+    public function gradeEssay(Request $request, Exam $exam, Attempt $attempt, AttemptQuestion $attemptQuestion): RedirectResponse
+    {
+        $request->validate([
+            'manual_score'    => ['required', 'numeric', 'min:0'],
+            'manual_feedback' => ['nullable', 'string'],
+        ]);
+
+        $maxScore = (float) $attemptQuestion->weight;
+        $score    = min((float) $request->manual_score, $maxScore);
+
+        $attemptQuestion->update([
+            'manual_score'    => $score,
+            'manual_feedback' => $request->manual_feedback,
+        ]);
+
+        // Recompute attempt total
+        app(GradingService::class)->updateAttemptTotal($attempt);
+
+        return back()->with('success', 'Essay graded successfully.');
     }
 
     private function validatePayload(Request $request): array

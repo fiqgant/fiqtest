@@ -10,6 +10,7 @@ class Question extends Model
 {
     protected $fillable = [
         'course_offering_id',
+        'type',
         'title',
         'slug',
         'difficulty',
@@ -20,12 +21,28 @@ class Question extends Model
         'reference_solution',
         'hint',
         'language',
+        'fill_blank_answer',
+        'true_false_answer',
     ];
 
     protected $casts = [
-        'test_cases' => 'array',
-        'default_weight' => 'decimal:2',
+        'test_cases'        => 'array',
+        'default_weight'    => 'decimal:2',
+        'true_false_answer' => 'boolean',
     ];
+
+    const TYPES = [
+        'coding'          => 'Coding',
+        'multiple_choice' => 'Multiple Choice',
+        'multiple_select' => 'Multiple Select',
+        'true_false'      => 'True / False',
+        'fill_in_blank'   => 'Fill in the Blank',
+        'essay'           => 'Essay',
+    ];
+
+    public function isCoding(): bool       { return $this->type === 'coding'; }
+    public function isAutoGraded(): bool   { return in_array($this->type, ['coding', 'multiple_choice', 'multiple_select', 'true_false', 'fill_in_blank']); }
+    public function isManualGraded(): bool { return $this->type === 'essay'; }
 
     public function courseOffering(): BelongsTo
     {
@@ -35,6 +52,11 @@ class Question extends Model
     public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(QuestionTag::class, 'question_tag', 'question_id', 'question_tag_id');
+    }
+
+    public function options(): HasMany
+    {
+        return $this->hasMany(QuestionOption::class)->orderBy('order');
     }
 
     public function attemptQuestions(): HasMany

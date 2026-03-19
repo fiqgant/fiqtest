@@ -7,6 +7,7 @@ use App\Models\CourseOffering;
 use App\Models\Question;
 use App\Models\QuestionTag;
 use App\Services\Judge0Service;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -31,16 +32,16 @@ class QuestionController extends Controller
 
     public function create(): View
     {
-        $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
-        $judge0Languages = app(Judge0Service::class)->getSupportedLanguages();
-        $tags = QuestionTag::orderBy('name')->get();
+        $offerings        = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+        $judge0Languages  = app(Judge0Service::class)->getSupportedLanguages();
+        $tags             = QuestionTag::orderBy('name')->get();
 
         return view('admin.questions.form', [
-            'question' => new Question(),
-            'offerings' => $offerings,
+            'question'      => new Question(),
+            'offerings'     => $offerings,
             'testCasesText' => '',
             'judge0Languages' => $judge0Languages,
-            'tags' => $tags,
+            'tags'          => $tags,
             'selectedTagIds' => [],
         ]);
     }
@@ -52,25 +53,29 @@ class QuestionController extends Controller
 
         $question = Question::create($data);
         $question->tags()->sync($request->input('tag_ids', []));
+        $this->syncOptions($question, $request);
 
         return redirect()->route('admin.questions.index')->with('success', 'Question created.');
     }
 
     public function edit(Question $question): View
     {
-        $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
+        $offerings       = CourseOffering::with('course', 'academicPeriod')->latest()->get();
         $judge0Languages = app(Judge0Service::class)->getSupportedLanguages();
-        $tags = QuestionTag::orderBy('name')->get();
-        $selectedTagIds = $question->tags()->pluck('question_tags.id')->toArray();
-        $testCasesText = collect($question->test_cases)->map(function (array $tc): string {
-            $input = str_replace("\n", '\\n', (string) ($tc['input'] ?? ''));
+        $tags            = QuestionTag::orderBy('name')->get();
+        $selectedTagIds  = $question->tags()->pluck('question_tags.id')->toArray();
+
+        $testCasesText = collect($question->test_cases ?? [])->map(function (array $tc): string {
+            $input  = str_replace("\n", '\\n', (string) ($tc['input'] ?? ''));
             $output = str_replace("\n", '\\n', (string) ($tc['expected_output'] ?? ''));
             $hidden = !empty($tc['is_hidden']) ? '1' : '0';
 
             return $input . '||' . $output . '||' . $hidden;
         })->implode("\n");
 
-        return view('admin.questions.form', compact('question', 'offerings', 'testCasesText', 'judge0Languages', 'tags', 'selectedTagIds'));
+        return view('admin.questions.form', compact(
+            'question', 'offerings', 'testCasesText', 'judge0Languages', 'tags', 'selectedTagIds'
+        ));
     }
 
     public function update(Request $request, Question $question): RedirectResponse
@@ -78,6 +83,7 @@ class QuestionController extends Controller
         $data = $this->validatePayload($request);
         $question->update($data);
         $question->tags()->sync($request->input('tag_ids', []));
+        $this->syncOptions($question, $request);
 
         return redirect()->route('admin.questions.index')->with('success', 'Question updated.');
     }
@@ -91,45 +97,123 @@ class QuestionController extends Controller
 
     public function bulkDestroy(Request $request): RedirectResponse
     {
-        $ids = $request->input('ids', []);
+        $ids   = $request->input('ids', []);
         $count = Question::whereIn('id', $ids)->delete();
 
         return redirect()->route('admin.questions.index')->with('success', "{$count} question(s) deleted.");
     }
 
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate(['image' => ['required', 'image', 'max:4096']]);
+
+        $path = $request->file('image')->store('question-images', 'public');
+
+        return response()->json(['url' => asset('storage/' . $path)]);
+    }
+
+    // ── Internals ─────────────────────────────────────────────────────
+
     private function validatePayload(Request $request): array
     {
-        $data = $request->validate([
+        $type = $request->input('type', 'coding');
+
+        $rules = [
             'course_offering_id' => ['required', 'exists:course_offerings,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'difficulty' => ['required', 'in:easy,medium,hard'],
-            'description' => ['required', 'string'],
-            'default_weight' => ['required', 'numeric', 'min:0'],
-            'starter_code' => ['nullable', 'string'],
+            'type'               => ['required', 'in:' . implode(',', array_keys(Question::TYPES))],
+            'title'              => ['required', 'string', 'max:255'],
+            'difficulty'         => ['required', 'in:easy,medium,hard'],
+            'description'        => ['required', 'string'],
+            'default_weight'     => ['required', 'numeric', 'min:0'],
+            'starter_code'       => ['nullable', 'string'],
             'reference_solution' => ['nullable', 'string'],
-            'hint' => ['nullable', 'string'],
-            'language' => ['required', 'string', 'max:50'],
-            'test_cases_text' => ['required', 'string'],
-        ]);
+            'hint'               => ['nullable', 'string'],
+        ];
 
-        $testCases = collect(explode("\n", trim($data['test_cases_text'])))
-            ->map(fn($line) => trim($line))
-            ->filter()
-            ->map(function (string $line): array {
-                $parts = explode('||', $line);
+        if ($type === 'coding') {
+            $rules['language']        = ['required', 'string', 'max:50'];
+            $rules['test_cases_text'] = ['required', 'string'];
+        }
 
-                return [
-                    'input' => str_replace('\\n', "\n", $parts[0] ?? ''),
-                    'expected_output' => str_replace('\\n', "\n", $parts[1] ?? ''),
-                    'is_hidden' => ($parts[2] ?? '0') === '1',
-                ];
-            })
-            ->values()
-            ->all();
+        if ($type === 'fill_in_blank') {
+            $rules['fill_blank_answer'] = ['required', 'string', 'max:1000'];
+        }
 
-        unset($data['test_cases_text']);
-        $data['test_cases'] = $testCases;
+        if ($type === 'true_false') {
+            $rules['true_false_answer'] = ['required', 'in:0,1'];
+        }
+
+        if (in_array($type, ['multiple_choice', 'multiple_select'])) {
+            $rules['options']                  = ['required', 'array', 'min:2'];
+            $rules['options.*.text']           = ['required', 'string', 'max:1000'];
+            $rules['options.*.is_correct']     = ['nullable'];
+        }
+
+        $data = $request->validate($rules);
+
+        // Parse test cases for coding
+        if ($type === 'coding') {
+            $data['test_cases'] = collect(explode("\n", trim($data['test_cases_text'])))
+                ->map(fn($line) => trim($line))
+                ->filter()
+                ->map(function (string $line): array {
+                    $parts = explode('||', $line);
+
+                    return [
+                        'input'           => str_replace('\\n', "\n", $parts[0] ?? ''),
+                        'expected_output' => str_replace('\\n', "\n", $parts[1] ?? ''),
+                        'is_hidden'       => ($parts[2] ?? '0') === '1',
+                    ];
+                })
+                ->values()
+                ->all();
+
+            unset($data['test_cases_text']);
+        } else {
+            $data['test_cases'] = null;
+            $data['language']   = null;
+        }
+
+        // Clear fields that belong to other types
+        if ($type !== 'fill_in_blank') {
+            $data['fill_blank_answer'] = null;
+        }
+
+        if ($type !== 'true_false') {
+            $data['true_false_answer'] = null;
+        }
+
+        if ($type !== 'coding') {
+            $data['starter_code'] = null;
+        }
+
+        unset($data['options']); // handled separately via syncOptions()
 
         return $data;
+    }
+
+    private function syncOptions(Question $question, Request $request): void
+    {
+        if (! in_array($question->type, ['multiple_choice', 'multiple_select'])) {
+            $question->options()->delete();
+
+            return;
+        }
+
+        $question->options()->delete();
+
+        $rawOptions = $request->input('options', []);
+        foreach ($rawOptions as $i => $opt) {
+            $text = trim($opt['text'] ?? '');
+            if ($text === '') {
+                continue;
+            }
+
+            $question->options()->create([
+                'text'       => $text,
+                'is_correct' => isset($opt['is_correct']) && $opt['is_correct'] == '1',
+                'order'      => $i,
+            ]);
+        }
     }
 }

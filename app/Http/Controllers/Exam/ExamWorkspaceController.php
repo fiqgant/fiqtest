@@ -19,8 +19,8 @@ class ExamWorkspaceController extends Controller
         $this->ensureAttemptActive($attempt);
         
         $exam = $attempt->exam;
-        $attempt->load(['attemptQuestions.question', 'student']);
-        
+        $attempt->load(['attemptQuestions.question.options', 'student']);
+
         $currentQuestionId = request()->query('question', $attempt->attemptQuestions->first()?->question_id);
         $currentAttemptQuestion = $attempt->attemptQuestions()
             ->where('question_id', $currentQuestionId)
@@ -80,19 +80,26 @@ class ExamWorkspaceController extends Controller
     public function autosave(Request $request, Attempt $attempt)
     {
         $this->ensureAttemptActive($attempt);
-        
+
         $request->validate([
             'attempt_question_id' => 'required|exists:attempt_questions,id',
-            'code' => 'required|string',
         ]);
-        
+
         $attemptQuestion = AttemptQuestion::where('attempt_id', $attempt->id)
             ->findOrFail($request->attempt_question_id);
-        
-        $attemptQuestion->update(['code' => $request->code]);
-        
+
+        $question = $attemptQuestion->question;
+
+        if ($question->isCoding()) {
+            $request->validate(['code' => 'nullable|string']);
+            $attemptQuestion->update(['code' => $request->input('code', '')]);
+        } else {
+            $request->validate(['student_answer' => 'nullable|string']);
+            $attemptQuestion->update(['student_answer' => $request->input('student_answer', '')]);
+        }
+
         return response()->json([
-            'saved' => true,
+            'saved'    => true,
             'saved_at' => now()->toIso8601String(),
         ]);
     }
