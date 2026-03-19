@@ -446,51 +446,50 @@
                     this.error = '';
                     this.lastTime = null;
                     this.testResults = [];
-                    this.outputTab = 'output';
+                    this.outputTab = 'tests';
 
                     const code = this.editor.getValue();
                     const testCases = @json($question->test_cases ?? []);
+                    const csrfToken = document.querySelector('meta[name=csrf-token]').content;
+                    const runUrl = '{{ route('admin.questions.preview.run', $question) }}';
 
                     try {
-                        // Run against all test cases
-                        const results = await Promise.all(testCases.map(async (tc) => {
-                            const res = await fetch('{{ route('admin.questions.preview.run', $question) }}', {
+                        for (const tc of testCases) {
+                            const res = await fetch(runUrl, {
                                 method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-                                },
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
                                 body: JSON.stringify({ code, stdin: tc.input ?? '' }),
                             });
                             const data = await res.json();
-                            const got = (data.output ?? '').trimEnd();
+                            const got      = (data.output ?? '').trimEnd();
                             const expected = (tc.expected_output ?? '').trimEnd();
-                            return {
+                            this.testResults.push({
                                 input: tc.input,
                                 expected,
                                 got,
-                                passed: got === expected,
+                                passed: got === expected && !data.error,
                                 hidden: tc.is_hidden ?? false,
                                 time: data.time,
                                 error: data.error,
-                            };
-                        }));
+                            });
+                            this.lastTime = data.time ?? this.lastTime;
 
-                        this.testResults = results;
-                        this.lastTime = results.map(r => r.time).filter(Boolean).pop() ?? null;
+                            // Stop early on runtime error
+                            if (data.error) {
+                                this.error = data.error;
+                                this.outputTab = 'output';
+                                break;
+                            }
+                        }
 
-                        const passed = results.filter(r => r.passed).length;
-                        const total  = results.length;
-
-                        if (results.some(r => r.error)) {
-                            this.error = results.find(r => r.error).error;
-                            this.outputTab = 'output';
-                        } else {
+                        if (!this.error) {
+                            const passed = this.testResults.filter(r => r.passed).length;
+                            const total  = this.testResults.length;
                             this.output = `✓ ${passed}/${total} test cases passed`;
-                            this.outputTab = 'tests';
                         }
                     } catch (e) {
                         this.error = 'Request failed: ' + e.message;
+                        this.outputTab = 'output';
                     } finally {
                         this.running = false;
                     }
