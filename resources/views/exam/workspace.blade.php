@@ -371,7 +371,12 @@
                                         <button @click="requestHint()" :disabled="hintLoading || hintLimitReached"
                                                 class="bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:opacity-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                                                 :title="hintLimitReached ? 'Hint limit reached' : 'Show hint'">
-                                            <span x-show="!hintLoading"><i class="fas fa-lightbulb"></i> Hint</span>
+                                            <span x-show="!hintLoading">
+                                                <i class="fas fa-lightbulb"></i> Hint
+                                                <template x-if="maxHintsPerQuestion > 0">
+                                                    <span class="text-xs opacity-75" x-text="'(' + hintUsedCount + '/' + maxHintsPerQuestion + ')'"></span>
+                                                </template>
+                                            </span>
                                             <span x-show="hintLoading"><i class="fas fa-spinner fa-spin"></i></span>
                                         </button>
                                     </template>
