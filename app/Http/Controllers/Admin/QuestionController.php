@@ -22,14 +22,18 @@ class QuestionController extends Controller
         $type       = $request->string('type')->trim()->toString();
         $difficulty = $request->string('difficulty')->trim()->toString();
 
-        $questions = Question::with('courseOffering.course', 'courseOffering.academicPeriod', 'tags')
+        $perPage = in_array((int) $request->input('per_page'), [20, 50, 100, 0]) ? (int) $request->input('per_page') : 20;
+
+        $query = Question::with('courseOffering.course', 'courseOffering.academicPeriod', 'tags')
             ->when($offeringId, fn($q) => $q->where('course_offering_id', $offeringId))
             ->when($search,     fn($q) => $q->where('title', 'like', "%{$search}%"))
             ->when($type,       fn($q) => $q->where('type', $type))
             ->when($difficulty, fn($q) => $q->where('difficulty', $difficulty))
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
+            ->latest();
+
+        $questions = $perPage === 0
+            ? $query->paginate($query->count() ?: 1)->withQueryString()
+            : $query->paginate($perPage)->withQueryString();
 
         $offerings = CourseOffering::with('course', 'academicPeriod')->latest()->get();
 
@@ -38,7 +42,7 @@ class QuestionController extends Controller
             ->groupBy('difficulty')
             ->pluck('total', 'difficulty');
 
-        return view('admin.questions.index', compact('questions', 'offerings', 'offeringId', 'search', 'type', 'difficulty', 'stats'));
+        return view('admin.questions.index', compact('questions', 'offerings', 'offeringId', 'search', 'type', 'difficulty', 'stats', 'perPage'));
     }
 
     public function create(): View

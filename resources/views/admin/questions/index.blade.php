@@ -81,6 +81,23 @@
         </form>
     </div>
 
+    {{-- Per-page + result count --}}
+    <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-slate-400">
+            Showing {{ $questions->firstItem() ?? 0 }}–{{ $questions->lastItem() ?? 0 }} of {{ $questions->total() }}
+        </span>
+        <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500">Show</span>
+            @foreach([20, 50, 100, 0] as $pp)
+                <a href="{{ request()->fullUrlWithQuery(['per_page' => $pp, 'page' => 1]) }}"
+                   class="px-2.5 py-1 rounded text-xs font-semibold border transition-colors
+                       {{ $perPage === $pp ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-400' }}">
+                    {{ $pp === 0 ? 'All' : $pp }}
+                </a>
+            @endforeach
+        </div>
+    </div>
+
     {{-- Bulk delete form --}}
     <form method="POST" action="{{ route('admin.questions.bulk-destroy') }}" id="bulk-form">
         @csrf @method('DELETE')
