@@ -124,7 +124,7 @@ class QuestionController extends Controller
             'output' => $result->output,
             'error'  => $result->error,
             'status' => $result->status,
-            'time'   => $result->executionTimeMs,
+            'time'   => $result->executionTime,
         ]);
     }
 
