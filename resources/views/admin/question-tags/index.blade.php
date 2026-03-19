@@ -25,11 +25,8 @@
                         @foreach($tags as $tag)
                         <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-xl px-3 py-1.5">
                             <span class="text-sm font-medium text-indigo-700">{{ $tag->name }}</span>
-                            <span class="text-xs text-indigo-400">{{ $tag->questions_count }} soal</span>
-                            <form method="POST" action="{{ route('admin.question-tags.destroy', $tag) }}" onsubmit="return confirm('Delete tag {{ $tag->name }}?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="text-rose-400 hover:text-rose-600 ml-1"><i class="fas fa-times text-xs"></i></button>
-                            </form>
+                            <span class="text-xs text-indigo-400">{{ $tag->questions_count }} questions</span>
+                            <button type="button" class="text-rose-400 hover:text-rose-600 ml-1" onclick="confirmDelete('/admin/question-tags/{{ $tag->id }}', 'Delete tag {{ $tag->name }}?')"><i class="fas fa-times text-xs"></i></button>
                         </div>
                         @endforeach
                     </div>

@@ -28,7 +28,7 @@
                     <textarea name="csv_data" rows="10" class="form-textarea font-mono text-sm mb-2"
                         placeholder="Budi Santoso,2021001,budi@email.com&#10;Siti Rahayu,2021002&#10;Ahmad Fauzi,2021003,ahmad@email.com">{{ old('csv_data') }}</textarea>
                     @error('csv_data') <p class="text-xs text-rose-500 mb-2">{{ $message }}</p> @enderror
-                    <p class="text-xs text-slate-400 mb-3">Satu baris = satu mahasiswa. Format: <code class="bg-slate-100 px-1 rounded">name,nim</code> atau <code class="bg-slate-100 px-1 rounded">name,nim,email</code></p>
+                    <p class="text-xs text-slate-400 mb-3">One row = one student. Format: <code class="bg-slate-100 px-1 rounded">name,nim</code> or <code class="bg-slate-100 px-1 rounded">name,nim,email</code></p>
                     <button type="submit" class="btn-primary"><i class="fas fa-eye mr-1.5"></i> Preview CSV</button>
                 </div>
             </form>
@@ -49,11 +49,11 @@
                 </table>
             </div>
             <div class="bg-amber-50 rounded-2xl border border-amber-200 p-5">
-                <div class="font-semibold text-amber-700 mb-2"><i class="fas fa-exclamation-triangle mr-1.5"></i> Catatan</div>
+                <div class="font-semibold text-amber-700 mb-2"><i class="fas fa-exclamation-triangle mr-1.5"></i> Notes</div>
                 <ul class="text-xs text-amber-700 space-y-1 list-disc list-inside">
-                    <li>NIM yang sudah ada akan di-skip</li>
-                    <li>Baris kosong diabaikan</li>
-                    <li>Untuk Excel, baris pertama (header) diabaikan</li>
+                    <li>Duplicate NIMs will be skipped</li>
+                    <li>Empty rows are ignored</li>
+                    <li>For Excel, the first row (header) is ignored</li>
                 </ul>
             </div>
         </div>

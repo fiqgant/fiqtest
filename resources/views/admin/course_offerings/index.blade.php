@@ -26,10 +26,7 @@
                                 <a href="{{ route('admin.course-offerings.enrollment', $offering) }}" class="action-btn action-btn-neutral"><i class="fas fa-user-plus"></i> Enrollment</a>
                                 <a href="{{ route('admin.reports.offering', $offering) }}" class="action-btn action-btn-neutral"><i class="fas fa-chart-bar"></i> Report</a>
                                 <a href="{{ route('admin.course-offerings.edit', $offering) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form class="inline" method="POST" action="{{ route('admin.course-offerings.destroy', $offering) }}">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete offering?')"><i class="fas fa-trash"></i></button>
-                                </form>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/course-offerings/{{ $offering->id }}', 'Delete offering?')"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>
                     </tr>

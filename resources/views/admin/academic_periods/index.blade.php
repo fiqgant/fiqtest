@@ -25,10 +25,7 @@
                             <div class="flex items-center justify-end gap-1.5">
                                 <a href="{{ route('admin.reports.period', $period) }}" class="action-btn action-btn-neutral"><i class="fas fa-chart-bar"></i> Report</a>
                                 <a href="{{ route('admin.academic-periods.edit', $period) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form class="inline" method="POST" action="{{ route('admin.academic-periods.destroy', $period) }}">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete period?')"><i class="fas fa-trash"></i> Delete</button>
-                                </form>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/academic-periods/{{ $period->id }}', 'Delete period?')"><i class="fas fa-trash"></i> Delete</button>
                             </div>
                         </td>
                     </tr>

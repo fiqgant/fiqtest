@@ -30,9 +30,9 @@
     </form>
 
     <div class="flex items-center justify-between mb-3" id="bulk-toolbar" style="display:none">
-        <span class="text-sm text-slate-600"><span id="selected-count">0</span> soal dipilih</span>
+        <span class="text-sm text-slate-600"><span id="selected-count">0</span> questions selected</span>
         <button onclick="submitBulkDelete()" class="btn-danger">
-            <i class="fas fa-trash mr-1.5"></i> Hapus yang Dipilih
+            <i class="fas fa-trash mr-1.5"></i> Delete Selected
         </button>
     </div>
 
@@ -59,10 +59,7 @@
                         <td class="text-right">
                             <div class="flex items-center justify-end gap-1.5">
                                 <a href="{{ route('admin.questions.edit', $question) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form method="POST" action="{{ route('admin.questions.destroy', $question) }}" style="display:inline">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete question?')"><i class="fas fa-trash"></i> Delete</button>
-                                </form>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/questions/{{ $question->id }}', 'Delete question?')"><i class="fas fa-trash"></i> Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -89,17 +86,19 @@
         }
 
         function submitBulkDelete() {
-            if (!confirm('Hapus semua soal yang dipilih?')) return;
-            const container = document.getElementById('bulk-ids');
-            container.innerHTML = '';
-            document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'ids[]';
-                input.value = cb.dataset.id;
-                container.appendChild(input);
-            });
-            document.getElementById('bulk-form').submit();
+            const n = document.querySelectorAll('.row-checkbox:checked').length;
+            showConfirm('Delete ' + n + ' selected question(s)? This action cannot be undone.', function () {
+                const container = document.getElementById('bulk-ids');
+                container.innerHTML = '';
+                document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = cb.dataset.id;
+                    container.appendChild(input);
+                });
+                document.getElementById('bulk-form').submit();
+            }, { title: 'Bulk Delete' });
         }
 
         selectAll.addEventListener('change', () => {

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'fiqtest Admin' }}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -129,8 +130,10 @@
             text-transform: uppercase; letter-spacing: 0.08em;
             color: #64748b; background: #f8fafc;
             border-bottom: 1.5px solid #e2e8f0;
-            white-space: nowrap;
+            white-space: nowrap; vertical-align: middle;
         }
+        .data-table thead th:last-child,
+        .data-table tbody td:last-child { text-align: right; }
         .data-table tbody tr { border-top: 1px solid #f1f5f9; transition: background 0.1s; }
         .data-table tbody tr:hover { background: #f8fafc; }
         .data-table tbody td { padding: 0.875rem 1.25rem; color: #334155; vertical-align: middle; }
@@ -176,13 +179,18 @@
         .modal-content {
             background: #fff; border-radius: 1rem;
             box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-            max-width: 32rem; width: 100%; max-height: 90vh; overflow: hidden;
+            max-width: 28rem; width: 100%; overflow: hidden;
+            animation: modalIn 0.15s ease-out;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+            to   { opacity: 1; transform: scale(1)    translateY(0); }
         }
         .modal-header {
-            padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0;
+            padding: 1.25rem 1.5rem; border-bottom: 1px solid #f1f5f9;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .modal-body { padding: 1.25rem 1.5rem; overflow-y: auto; max-height: 60vh; }
+        .modal-body { padding: 1.25rem 1.5rem; }
         .modal-footer {
             padding: 1rem 1.5rem; border-top: 1px solid #f1f5f9;
             background: #f8fafc; display: flex; justify-content: flex-end; gap: 0.75rem;
@@ -358,5 +366,82 @@
             </footer>
         </main>
     </div>
+    {{-- Confirm Modal --}}
+    <div id="admin-confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center; padding:1rem;">
+        <div style="background:#fff; border-radius:1rem; box-shadow:0 25px 50px rgba(0,0,0,0.25); max-width:26rem; width:100%; animation:modalIn 0.15s ease-out; overflow:hidden;">
+            <div style="padding:1.25rem 1.5rem; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; justify-content:space-between;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div style="width:2.25rem; height:2.25rem; border-radius:50%; background:#fee2e2; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <i class="fas fa-exclamation-triangle" style="color:#ef4444; font-size:0.875rem;"></i>
+                    </div>
+                    <span id="acm-title" style="font-weight:600; color:#1e293b; font-size:0.95rem;">Confirm</span>
+                </div>
+                <button onclick="adminModalClose()" style="border:none; background:none; cursor:pointer; color:#94a3b8; padding:0.25rem; border-radius:0.375rem;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div style="padding:1.25rem 1.5rem;">
+                <p id="acm-message" style="color:#475569; font-size:0.875rem; line-height:1.6; margin:0;"></p>
+            </div>
+            <div style="padding:1rem 1.5rem; border-top:1px solid #f1f5f9; background:#f8fafc; display:flex; justify-content:flex-end; gap:0.75rem;">
+                <button onclick="adminModalClose()" class="btn-secondary">Cancel</button>
+                <button id="acm-ok" onclick="adminModalConfirm()" class="btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var _acmCallback = null;
+
+        function adminModalOpen(title, message, okText, cb) {
+            document.getElementById('acm-title').textContent   = title   || 'Confirm';
+            document.getElementById('acm-message').textContent = message || 'Are you sure?';
+            document.getElementById('acm-ok').textContent      = okText  || 'Delete';
+            _acmCallback = cb || null;
+            var m = document.getElementById('admin-confirm-modal');
+            m.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function adminModalClose() {
+            document.getElementById('admin-confirm-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            _acmCallback = null;
+        }
+
+        function adminModalConfirm() {
+            var cb = _acmCallback;
+            adminModalClose();
+            if (cb) cb();
+        }
+
+        document.getElementById('admin-confirm-modal').addEventListener('click', function(e) {
+            if (e.target === this) adminModalClose();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') adminModalClose();
+        });
+
+        window.confirmDelete = function(path, message) {
+            adminModalOpen(
+                'Confirm Delete',
+                message || 'This data will be permanently deleted. Continue?',
+                'Yes, Delete',
+                function() {
+                    var token = document.querySelector('meta[name="csrf-token"]');
+                    var body  = new URLSearchParams({_method: 'DELETE', _token: token ? token.content : ''});
+                    fetch(path, {method: 'POST', body: body, headers: {'X-Requested-With': 'XMLHttpRequest'}})
+                        .then(function(r) { window.location.href = r.url || window.location.pathname; })
+                        .catch(function()  { window.location.reload(); });
+                }
+            );
+        };
+
+        window.showConfirm = function(message, cb, opts) {
+            opts = opts || {};
+            adminModalOpen(opts.title || 'Confirm', message, opts.okText || 'Yes, Continue', cb);
+        };
+    </script>
 </body>
 </html>

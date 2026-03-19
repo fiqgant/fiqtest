@@ -24,10 +24,7 @@
                         <td class="text-right">
                             <div class="flex items-center justify-end gap-1.5">
                                 <a href="{{ route('admin.courses.edit', $course) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form class="inline" method="POST" action="{{ route('admin.courses.destroy', $course) }}">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete course?')"><i class="fas fa-trash"></i> Delete</button>
-                                </form>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/courses/{{ $course->id }}', 'Delete course?')"><i class="fas fa-trash"></i> Delete</button>
                             </div>
                         </td>
                     </tr>

@@ -33,10 +33,7 @@
                                 <form class="inline" method="POST" action="{{ route('admin.exams.close', $exam) }}">@csrf
                                     <button class="action-btn action-btn-warning"><i class="fas fa-lock"></i> Close</button>
                                 </form>
-                                <form class="inline" method="POST" action="{{ route('admin.exams.destroy', $exam) }}">
-                                    @csrf @method('DELETE')
-                                    <button class="action-btn action-btn-danger" onclick="return confirm('Delete exam?')"><i class="fas fa-trash"></i></button>
-                                </form>
+                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')"><i class="fas fa-trash"></i></button>
                                 <a class="action-btn action-btn-neutral" target="_blank" href="{{ route('exam.instructions', $exam->slug) }}"><i class="fas fa-external-link-alt"></i></a>
                             </div>
                         </td>
