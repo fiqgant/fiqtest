@@ -221,8 +221,8 @@ class ExamWorkspaceController extends Controller
             abort(403, 'Scores are not shown for this exam.');
         }
         
-        $attempt->load(['attemptQuestions.question', 'student']);
-        
+        $attempt->load(['attemptQuestions.question.options', 'student']);
+
         return view('exam.result', compact('attempt', 'exam'));
     }
 
@@ -238,7 +238,7 @@ class ExamWorkspaceController extends Controller
             abort(403, 'Ujian belum selesai.');
         }
 
-        $attempt->load(['attemptQuestions.question', 'student']);
+        $attempt->load(['attemptQuestions.question.options', 'student']);
 
         $pdf = Pdf::loadView('exam.result-pdf', compact('attempt', 'exam'))
             ->setPaper('a4', 'portrait');
