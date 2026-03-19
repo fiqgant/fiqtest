@@ -62,7 +62,7 @@
         .md-body .katex-display { overflow-x: auto; margin: 0.75rem 0; }
     </style>
 </head>
-<body class="bg-gray-900 text-white" style="height: calc(100vh - 36px); overflow: hidden; margin-top: 36px;" x-data="previewApp()" @keydown.ctrl.enter.window="runCode()"  @keydown.meta.enter.window="runCode()">
+<body class="bg-gray-900 text-white" style="height: calc(100vh - 36px); overflow: hidden; margin-top: 36px;" x-data="previewApp()">
 
     {{-- Admin preview banner --}}
     <div class="bg-amber-500 text-gray-900 px-4 flex items-center justify-between text-xs font-semibold fixed top-0 left-0 right-0 z-50" style="height:36px">
@@ -208,61 +208,7 @@
                         <div class="flex-1" id="monaco-editor"></div>
 
                         <div class="flex items-center justify-between px-4 py-3 bg-gray-800 border-t border-gray-700 flex-shrink-0">
-                            <div class="flex items-center space-x-2">
-                                <button @click="runCode()" :disabled="running"
-                                    :class="running ? 'opacity-60 cursor-not-allowed' : 'hover:bg-green-500'"
-                                    class="bg-green-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors">
-                                    <i class="fas" :class="running ? 'fa-spinner fa-spin' : 'fa-play'"></i>
-                                    <span x-text="running ? 'Running…' : 'Run Code'"></span>
-                                </button>
-                                <button @click="resetCode()" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg font-medium transition-colors">
-                                    <i class="fas fa-undo"></i> Reset
-                                </button>
-                            </div>
-                            <span class="text-xs text-amber-400"><i class="fas fa-flask mr-1"></i> Admin Test Mode</span>
-                        </div>
-
-                        <div class="h-52 bg-gray-900 border-t border-gray-700 flex flex-col flex-shrink-0">
-                            <div class="flex items-center justify-between border-b border-gray-700 px-4">
-                                <div class="flex">
-                                    <button @click="outputTab='output'" :class="outputTab==='output' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400'" class="px-4 py-2 text-sm font-medium">Output</button>
-                                    <button @click="outputTab='tests'" :class="outputTab==='tests' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400'" class="px-4 py-2 text-sm font-medium">Test Cases</button>
-                                </div>
-                                <span x-show="lastTime" class="text-xs text-gray-500" x-text="'⏱ ' + lastTime + 'ms'"></span>
-                            </div>
-                            <div class="flex-1 p-4 overflow-auto font-mono text-sm scrollbar-thin">
-                                {{-- Output tab --}}
-                                <div x-show="outputTab==='output'">
-                                    <template x-if="!output && !error && !running">
-                                        <div class="text-gray-500">Click "Run Code" to execute</div>
-                                    </template>
-                                    <template x-if="error">
-                                        <pre class="text-red-400 whitespace-pre-wrap" x-text="error"></pre>
-                                    </template>
-                                    <template x-if="output && !error">
-                                        <pre class="text-green-300 whitespace-pre-wrap" x-text="output"></pre>
-                                    </template>
-                                </div>
-                                {{-- Test Cases tab --}}
-                                <div x-show="outputTab==='tests'" class="space-y-2">
-                                    <template x-if="testResults.length === 0">
-                                        <div class="text-gray-500">Run code to see test case results</div>
-                                    </template>
-                                    <template x-for="(tc, i) in testResults" :key="i">
-                                        <div :class="tc.passed ? 'border-green-700/50 bg-green-900/20' : 'border-red-700/50 bg-red-900/20'" class="border rounded p-3 text-xs">
-                                            <div class="flex items-center gap-2 mb-2">
-                                                <i :class="tc.passed ? 'fas fa-check text-green-400' : 'fas fa-times text-red-400'"></i>
-                                                <span :class="tc.passed ? 'text-green-400' : 'text-red-400'" class="font-semibold" x-text="'Test ' + (i+1) + (tc.hidden ? ' (hidden)' : '')"></span>
-                                            </div>
-                                            <div class="grid grid-cols-3 gap-2">
-                                                <div><div class="text-gray-400 mb-1">Input</div><pre class="bg-gray-900 p-1.5 rounded text-gray-300 whitespace-pre-wrap" x-text="tc.input || '(none)'"></pre></div>
-                                                <div><div class="text-gray-400 mb-1">Expected</div><pre class="bg-gray-900 p-1.5 rounded text-emerald-300 whitespace-pre-wrap" x-text="tc.expected"></pre></div>
-                                                <div><div class="text-gray-400 mb-1">Got</div><pre class="bg-gray-900 p-1.5 rounded" :class="tc.passed ? 'text-emerald-300' : 'text-red-300'" x-text="tc.got ?? '—'"></pre></div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
+                            <span class="text-xs text-amber-400"><i class="fas fa-lock mr-1"></i> Read-only — Admin Preview</span>
                         </div>
                     </div>
 
@@ -355,12 +301,6 @@
     <script>
         function previewApp() {
             return {
-                running: false,
-                output: '',
-                error: '',
-                lastTime: null,
-                outputTab: 'output',
-                testResults: [],
                 editor: null,
 
                 init() {
@@ -429,101 +369,12 @@
                             minimap: { enabled: false },
                             scrollBeyondLastLine: false,
                             padding: { top: 12, bottom: 12 },
+                            readOnly: true,
                             automaticLayout: true,
                         });
                     });
                 },
 
-                resetCode() {
-                    if (this.editor) {
-                        this.editor.setValue(@json($question->starter_code ?? '# Write your solution here\n'));
-                    }
-                },
-
-                async runCode() {
-                    if (this.running || !this.editor) return;
-
-                    this.running    = true;
-                    this.output     = '';
-                    this.error      = '';
-                    this.lastTime   = null;
-                    this.testResults = [];
-                    this.outputTab  = 'tests';
-
-                    const code      = this.editor.getValue();
-                    const testCases = @json($question->test_cases ?? []);
-                    const metaTag   = document.querySelector('meta[name=csrf-token]');
-                    const csrfToken = metaTag ? metaTag.content : '';
-                    const runUrl    = '{{ route('admin.questions.preview.run', $question) }}';
-
-                    if (!testCases.length) {
-                        this.output     = 'No test cases defined for this question.';
-                        this.outputTab  = 'output';
-                        this.running    = false;
-                        return;
-                    }
-
-                    try {
-                        for (let i = 0; i < testCases.length; i++) {
-                            const tc = testCases[i];
-                            this.output = `Running test ${i + 1} / ${testCases.length}…`;
-
-                            const controller = new AbortController();
-                            const timeout    = setTimeout(() => controller.abort(), 30000);
-
-                            let data;
-                            try {
-                                const res = await fetch(runUrl, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-                                    body:    JSON.stringify({ code, stdin: tc.input ?? '' }),
-                                    signal:  controller.signal,
-                                });
-                                clearTimeout(timeout);
-                                if (!res.ok) {
-                                    throw new Error(`HTTP ${res.status} — ${res.statusText}`);
-                                }
-                                data = await res.json();
-                            } catch (fetchErr) {
-                                clearTimeout(timeout);
-                                this.error     = fetchErr.name === 'AbortError'
-                                    ? `Test ${i + 1} timed out (30s limit).`
-                                    : 'Fetch error: ' + fetchErr.message;
-                                this.outputTab = 'output';
-                                break;
-                            }
-
-                            const got      = (data.output ?? '').trimEnd();
-                            const expected = (tc.expected_output ?? '').trimEnd();
-                            this.testResults = [...this.testResults, {
-                                input:    tc.input,
-                                expected,
-                                got,
-                                passed:   got === expected && !data.error,
-                                hidden:   tc.is_hidden ?? false,
-                                time:     data.time,
-                                error:    data.error,
-                            }];
-                            this.lastTime = data.time ?? this.lastTime;
-
-                            if (data.error) {
-                                this.error     = data.error;
-                                this.outputTab = 'output';
-                                break;
-                            }
-                        }
-
-                        if (!this.error) {
-                            const passed = this.testResults.filter(r => r.passed).length;
-                            this.output  = `✓ ${passed} / ${this.testResults.length} test cases passed`;
-                        }
-                    } catch (e) {
-                        this.error     = 'Unexpected error: ' + e.message;
-                        this.outputTab = 'output';
-                    } finally {
-                        this.running = false;
-                    }
-                },
                 @endif
             };
         }
