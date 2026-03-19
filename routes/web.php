@@ -63,6 +63,7 @@ Route::prefix('admin')->group(function () {
 
         Route::get('question-tags', [QuestionTagController::class, 'index'])->name('admin.question-tags.index');
         Route::post('question-tags', [QuestionTagController::class, 'store'])->name('admin.question-tags.store');
+        Route::delete('question-tags/bulk-destroy', [QuestionTagController::class, 'bulkDestroy'])->name('admin.question-tags.bulk-destroy');
         Route::delete('question-tags/{questionTag}', [QuestionTagController::class, 'destroy'])->name('admin.question-tags.destroy');
 
         Route::post('questions/upload-image', [QuestionController::class, 'uploadImage'])->name('admin.questions.upload-image');

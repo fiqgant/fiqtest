@@ -26,4 +26,11 @@ class QuestionTagController extends Controller
         $questionTag->delete();
         return back()->with('success', 'Tag deleted.');
     }
+
+    public function bulkDestroy(Request $request)
+    {
+        $ids   = $request->input('ids', []);
+        $count = QuestionTag::whereIn('id', $ids)->delete();
+        return back()->with('success', "{$count} tag(s) deleted.");
+    }
 }
