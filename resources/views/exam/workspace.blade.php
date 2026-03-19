@@ -601,11 +601,11 @@
                     <i class="fas fa-hourglass-end text-red-400 text-4xl"></i>
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-red-400 mb-3">Waktu Habis!</h3>
-            <p class="text-gray-300 mb-2">Waktu pengerjaan ujian telah berakhir.</p>
-            <p class="text-gray-400 text-sm mb-6">Jawaban kamu akan dikumpulkan secara otomatis dalam</p>
+            <h3 class="text-2xl font-bold text-red-400 mb-3">Time's Up!</h3>
+            <p class="text-gray-300 mb-2">The exam duration has ended.</p>
+            <p class="text-gray-400 text-sm mb-6">Your answers will be submitted automatically in</p>
             <div class="text-5xl font-bold text-white mb-6" x-text="timeUpCountdown"></div>
-            <p class="text-gray-500 text-xs">detik...</p>
+            <p class="text-gray-500 text-xs">seconds...</p>
         </div>
     </div>
 
