@@ -36,44 +36,49 @@ class GradeReportService
                 $questions = [];
                 if ($attempt) {
                     $attemptQuestions = $attempt->attemptQuestions()
-                        ->with('question')
+                        ->with('question.options')
                         ->get();
-                    
+
                     foreach ($attemptQuestions as $aq) {
                         $question = $aq->question;
                         if ($question) {
                             $testCases = $question->test_cases ?? [];
                             $visibleTestCases = array_filter($testCases, fn($tc) => !($tc['is_hidden'] ?? false));
-                            
+
                             $questions[] = [
-                                'question_id' => $question->id,
-                                'title' => $question->title,
-                                'difficulty' => $question->difficulty,
-                                'language' => $question->language,
-                                'description' => $question->description,
-                                'starter_code' => $question->starter_code ?? '',
+                                'question_id'        => $question->id,
+                                'type'               => $question->type,
+                                'title'              => $question->title,
+                                'difficulty'         => $question->difficulty,
+                                'language'           => $question->language,
+                                'description'        => $question->description,
+                                'starter_code'       => $question->starter_code ?? '',
                                 'reference_solution' => $question->reference_solution ?? '',
-                                'hint' => $question->hint ?? '',
-                                'hint_used_count' => (int) ($aq->hint_used_count ?? 0),
-                                'weight' => $aq->weight,
-                                'student_code' => $aq->code ?? '',
-                                'passed_tests' => $aq->passed_tests ?? 0,
-                                'total_tests' => $aq->total_tests ?? 0,
-                                'score' => $aq->score ?? 0,
-                                'is_correct' => $aq->is_correct ?? false,
-                                'test_cases' => array_map(function($tc) {
-                                    return [
-                                        'input' => $tc['input'] ?? '',
-                                        'expected_output' => $tc['expected_output'] ?? '',
-                                        'is_hidden' => $tc['is_hidden'] ?? false,
-                                    ];
-                                }, $testCases),
-                                'visible_test_cases' => array_map(function($tc) {
-                                    return [
-                                        'input' => $tc['input'] ?? '',
-                                        'expected_output' => $tc['expected_output'] ?? '',
-                                    ];
-                                }, $visibleTestCases),
+                                'hint'               => $question->hint ?? '',
+                                'hint_used_count'    => (int) ($aq->hint_used_count ?? 0),
+                                'weight'             => $aq->weight,
+                                'student_code'       => $aq->code ?? '',
+                                'student_answer'     => $aq->student_answer ?? '',
+                                'passed_tests'       => $aq->passed_tests ?? 0,
+                                'total_tests'        => $aq->total_tests ?? 0,
+                                'score'              => $aq->score ?? 0,
+                                'is_correct'         => $aq->is_correct ?? false,
+                                'fill_blank_answer'  => $question->fill_blank_answer ?? '',
+                                'true_false_answer'  => $question->true_false_answer,
+                                'options'            => $question->options->map(fn($o) => [
+                                    'id'         => $o->id,
+                                    'text'       => $o->text,
+                                    'is_correct' => (bool) $o->is_correct,
+                                ])->toArray(),
+                                'test_cases' => array_map(fn($tc) => [
+                                    'input'           => $tc['input'] ?? '',
+                                    'expected_output' => $tc['expected_output'] ?? '',
+                                    'is_hidden'       => $tc['is_hidden'] ?? false,
+                                ], $testCases),
+                                'visible_test_cases' => array_map(fn($tc) => [
+                                    'input'           => $tc['input'] ?? '',
+                                    'expected_output' => $tc['expected_output'] ?? '',
+                                ], $visibleTestCases),
                             ];
                         }
                     }

@@ -178,31 +178,124 @@
 
                 return questions.map((q, idx) => {
                     const difficultyColor = q.difficulty === 'easy' ? 'text-emerald-600 bg-emerald-50' : (q.difficulty === 'medium' ? 'text-amber-600 bg-amber-50' : 'text-rose-600 bg-rose-50');
-                    const passedColor = q.is_correct ? 'text-emerald-600' : 'text-rose-600';
-
-                    let testResultsHtml = '';
-                    if (q.visible_test_cases && q.visible_test_cases.length > 0) {
-                        testResultsHtml = q.visible_test_cases.map((tc, tcIdx) => {
-                            return `
-                                <div class="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                                    <div class="text-xs text-slate-500 font-semibold mb-1.5">Test Case ${tcIdx + 1}</div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <div><span class="text-xs text-slate-400 block mb-0.5">Input</span><code class="text-xs bg-white border border-slate-200 px-2 py-1 rounded block">${escapeHtml(tc.input)}</code></div>
-                                        <div><span class="text-xs text-slate-400 block mb-0.5">Expected</span><code class="text-xs bg-white border border-slate-200 px-2 py-1 rounded block">${escapeHtml(tc.expected_output)}</code></div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-                    }
+                    const scoreColor = q.is_correct ? 'text-emerald-600' : 'text-rose-600';
+                    const type = q.type || 'coding';
 
                     const hintHtml = (q.hint_used_count > 0 && q.hint) ? `
                         <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                            <div class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1.5">
-                                <i class="fas fa-lightbulb mr-1"></i> Hint (used ${q.hint_used_count}×)
-                            </div>
+                            <div class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1.5"><i class="fas fa-lightbulb mr-1"></i> Hint (used ${q.hint_used_count}×)</div>
                             <div class="text-sm text-amber-900 whitespace-pre-wrap">${escapeHtml(q.hint)}</div>
-                        </div>
-                    ` : '';
+                        </div>` : '';
+
+                    const refHtml = q.reference_solution ? `
+                        <div>
+                            <div class="text-xs text-indigo-600 font-semibold uppercase tracking-wider mb-1.5">Reference Solution</div>
+                            <pre class="bg-indigo-950 text-indigo-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.reference_solution)}</pre>
+                        </div>` : '';
+
+                    let answerHtml = '';
+
+                    if (type === 'coding') {
+                        let testResultsHtml = '';
+                        if (q.visible_test_cases && q.visible_test_cases.length > 0) {
+                            testResultsHtml = q.visible_test_cases.map((tc, tcIdx) => `
+                                <div class="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div class="text-xs text-slate-500 font-semibold mb-1.5">Test Case ${tcIdx + 1}</div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div><span class="text-xs text-slate-400 block mb-0.5">Input</span><code class="text-xs bg-white border border-slate-200 px-2 py-1 rounded block whitespace-pre">${escapeHtml(tc.input || '(none)')}</code></div>
+                                        <div><span class="text-xs text-slate-400 block mb-0.5">Expected</span><code class="text-xs bg-white border border-slate-200 px-2 py-1 rounded block whitespace-pre">${escapeHtml(tc.expected_output)}</code></div>
+                                    </div>
+                                </div>`).join('');
+                        }
+                        answerHtml = `
+                            <div class="text-xs text-slate-400 font-semibold">Language: <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">${escapeHtml(q.language || '-')}</span></div>
+                            ${testResultsHtml}
+                            ${refHtml}
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Code</div>
+                                <pre class="bg-slate-800 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.student_code || '(No code submitted)')}</pre>
+                            </div>`;
+
+                    } else if (type === 'multiple_choice' || type === 'multiple_select') {
+                        const selectedIds = (q.student_answer || '').split(',').map(s => String(s.trim())).filter(Boolean);
+                        const optionsHtml = (q.options || []).map(opt => {
+                            const selected = selectedIds.includes(String(opt.id));
+                            let cls = 'border-slate-200 bg-white text-slate-700';
+                            let badge = '';
+                            if (opt.is_correct && selected) { cls = 'border-emerald-400 bg-emerald-50 text-emerald-800'; badge = '<span class="ml-auto text-xs text-emerald-600 font-semibold">✓ Correct</span>'; }
+                            else if (opt.is_correct && !selected) { cls = 'border-emerald-200 bg-emerald-50/50 text-emerald-700'; badge = '<span class="ml-auto text-xs text-emerald-500 font-semibold">✓ Key</span>'; }
+                            else if (!opt.is_correct && selected) { cls = 'border-rose-400 bg-rose-50 text-rose-800'; badge = '<span class="ml-auto text-xs text-rose-600 font-semibold">✗ Wrong</span>'; }
+                            return `<div class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm ${cls}">
+                                ${selected ? '<i class="fas fa-check-circle text-xs flex-shrink-0"></i>' : '<i class="far fa-circle text-xs text-slate-300 flex-shrink-0"></i>'}
+                                <span>${escapeHtml(opt.text)}</span>${badge}
+                            </div>`;
+                        }).join('');
+                        answerHtml = `
+                            ${refHtml}
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
+                                ${q.student_answer ? `<div class="space-y-1.5">${optionsHtml}</div>` : '<div class="text-slate-400 text-sm italic">(No answer submitted)</div>'}
+                            </div>`;
+
+                    } else if (type === 'true_false') {
+                        const ans = q.student_answer;
+                        const correct = q.true_false_answer; // true/false/null
+                        const renderBtn = (val, label, icon) => {
+                            const isStudent = ans === String(val ? 1 : 0);
+                            const isCorrect = correct === val;
+                            let cls = 'border-slate-200 bg-white text-slate-500';
+                            if (isStudent && isCorrect) cls = 'border-emerald-400 bg-emerald-50 text-emerald-700 font-semibold';
+                            else if (isStudent && !isCorrect) cls = 'border-rose-400 bg-rose-50 text-rose-700 font-semibold';
+                            else if (isCorrect) cls = 'border-emerald-200 bg-emerald-50/50 text-emerald-600';
+                            return `<div class="flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm ${cls}">
+                                ${icon} <span>${label}</span>
+                                ${isStudent ? '<span class="ml-2 text-xs">(student)</span>' : ''}
+                                ${isCorrect ? '<span class="ml-auto text-xs font-semibold">✓ Key</span>' : ''}
+                            </div>`;
+                        };
+                        answerHtml = `
+                            ${refHtml}
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
+                                ${ans !== '' && ans !== null ? `<div class="space-y-1.5">
+                                    ${renderBtn(true, 'True', '<i class="fas fa-check text-xs"></i>')}
+                                    ${renderBtn(false, 'False', '<i class="fas fa-times text-xs"></i>')}
+                                </div>` : '<div class="text-slate-400 text-sm italic">(No answer submitted)</div>'}
+                            </div>`;
+
+                    } else if (type === 'fill_in_blank') {
+                        const ans = q.student_answer || '';
+                        const correct = q.fill_blank_answer || '';
+                        const isRight = ans.trim().toLowerCase() === correct.trim().toLowerCase();
+                        answerHtml = `
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
+                                    <div class="px-3 py-2 rounded-lg border text-sm font-mono ${ans ? (isRight ? 'border-emerald-400 bg-emerald-50 text-emerald-800' : 'border-rose-400 bg-rose-50 text-rose-800') : 'border-slate-200 text-slate-400 italic'}">
+                                        ${ans ? escapeHtml(ans) : '(No answer submitted)'}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-emerald-600 font-semibold uppercase tracking-wider mb-1.5">Correct Answer</div>
+                                    <div class="px-3 py-2 rounded-lg border border-emerald-300 bg-emerald-50 text-sm font-mono text-emerald-800">${escapeHtml(correct || '—')}</div>
+                                </div>
+                            </div>
+                            ${refHtml}`;
+
+                    } else if (type === 'essay') {
+                        answerHtml = `
+                            ${refHtml}
+                            <div>
+                                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
+                                <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed">
+                                    ${q.student_answer ? escapeHtml(q.student_answer) : '<span class="text-slate-400 italic">(No answer submitted)</span>'}
+                                </div>
+                            </div>`;
+                    }
+
+                    const scoreLabel = type === 'coding'
+                        ? `${q.passed_tests}/${q.total_tests} passed · ${q.score}/${q.weight} pts`
+                        : `${q.score}/${q.weight} pts`;
 
                     return `
                         <div class="border border-slate-200 rounded-xl overflow-hidden">
@@ -211,29 +304,18 @@
                                     <span class="font-bold text-slate-700">Q${idx + 1}:</span>
                                     <span class="font-semibold text-slate-800">${escapeHtml(q.title)}</span>
                                     <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${difficultyColor}">${q.difficulty}</span>
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-200 text-slate-600 uppercase tracking-wider">${type.replace('_', ' ')}</span>
                                 </div>
                                 <div class="text-sm flex items-center gap-2">
                                     ${q.hint_used_count > 0 ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-medium"><i class="fas fa-lightbulb"></i> Hint ${q.hint_used_count}×</span>` : ''}
-                                    <span class="${passedColor} font-semibold">${q.passed_tests}/${q.total_tests} passed</span>
-                                    <span class="text-slate-400 text-xs">(${q.score}/${q.weight} pts)</span>
+                                    <span class="${scoreColor} font-semibold text-xs">${scoreLabel}</span>
                                 </div>
                             </div>
                             <div class="p-4 space-y-3">
-                                <div class="text-sm text-slate-600">${escapeHtml(q.description || '')}</div>
-                                <div class="text-xs text-slate-400 font-semibold">Language: <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">${q.language}</span></div>
-                                ${testResultsHtml}
                                 ${hintHtml}
-                                <div>
-                                    <div class="text-xs text-indigo-600 font-semibold uppercase tracking-wider mb-1.5">Reference Solution</div>
-                                    <pre class="bg-indigo-950 text-indigo-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.reference_solution || '// No reference solution provided')}</pre>
-                                </div>
-                                <div>
-                                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1.5">Student's Answer</div>
-                                    <pre class="bg-slate-800 text-slate-100 p-3 rounded-lg text-xs overflow-x-auto max-h-48 leading-relaxed">${escapeHtml(q.student_code || '(No answer submitted)')}</pre>
-                                </div>
+                                ${answerHtml}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }).join('');
             };
 
