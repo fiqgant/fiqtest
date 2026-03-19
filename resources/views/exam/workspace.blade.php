@@ -1710,6 +1710,18 @@
         document.addEventListener('alpine:init', () => {
             Alpine.magic('renderMarkdown', () => renderMarkdown);
         });
+
+        // Prevent back button from showing stale exam after submission
+        // pageshow fires when page is restored from bfcache (browser back) — does NOT affect
+        // in-page navigation, fullscreen, question switching, or autosave.
+        window.addEventListener('pageshow', function (e) {
+            const status = '{{ $attempt->status }}';
+            if (e.persisted || (window.performance && window.performance.getEntriesByType('navigation')[0]?.type === 'back_forward')) {
+                if (status !== 'in_progress') {
+                    window.location.replace('{{ route('exam.submitted', $attempt->id) }}');
+                }
+            }
+        });
     </script>
 </body>
 </html>
