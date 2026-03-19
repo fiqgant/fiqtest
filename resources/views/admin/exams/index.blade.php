@@ -50,15 +50,26 @@
     </div>
     <div class="mt-4">{{ $exams->links() }}</div>
 
+    <div id="copy-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        <i class="fas fa-check mr-1.5 text-emerald-400"></i> Link copied!
+    </div>
+
     <script>
         function copyLink(url, btn) {
             const icon = btn.querySelector('i');
-            const done = () => {
+            const showToast = () => {
                 icon.className = 'fas fa-check text-emerald-600';
                 setTimeout(() => { icon.className = 'fas fa-link'; }, 1500);
+                const toast = document.getElementById('copy-toast');
+                toast.classList.remove('opacity-0');
+                toast.classList.add('opacity-100');
+                setTimeout(() => {
+                    toast.classList.remove('opacity-100');
+                    toast.classList.add('opacity-0');
+                }, 2000);
             };
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(done);
+                navigator.clipboard.writeText(url).then(showToast);
             } else {
                 const el = document.createElement('textarea');
                 el.value = url;
@@ -68,7 +79,7 @@
                 el.select();
                 document.execCommand('copy');
                 document.body.removeChild(el);
-                done();
+                showToast();
             }
         }
     </script>
