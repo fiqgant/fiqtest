@@ -103,6 +103,13 @@ class QuestionController extends Controller
         return redirect()->route('admin.questions.index')->with('success', "{$count} question(s) deleted.");
     }
 
+    public function preview(Question $question): View
+    {
+        $question->load('options');
+
+        return view('admin.questions.preview', compact('question'));
+    }
+
     public function uploadImage(Request $request): JsonResponse
     {
         $request->validate(['image' => ['required', 'image', 'max:4096']]);
