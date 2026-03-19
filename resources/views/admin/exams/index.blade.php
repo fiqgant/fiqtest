@@ -24,21 +24,32 @@
                         <td class="font-mono text-xs text-slate-500">{{ $exam->opens_at->format('d M H:i') }}<br>→ {{ $exam->closes_at->format('d M H:i') }}</td>
                         <td><x-admin.status-badge :value="$exam->status" /></td>
                         <td class="text-right">
-                            <div class="flex items-center justify-end gap-1.5 flex-wrap">
+                            <div class="flex items-center justify-end gap-1.5">
+                                {{-- Primary actions --}}
                                 <a href="{{ route('admin.exams.monitor', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-satellite-dish"></i> Monitor</a>
                                 <a href="{{ route('admin.exams.attempts', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-list"></i> Attempts</a>
-                                <a href="{{ route('admin.exams.question-pool', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-layer-group"></i> Pool</a>
-                                <a href="{{ route('admin.exams.export', $exam) }}" class="action-btn action-btn-neutral"><i class="fas fa-file-excel"></i> Export</a>
                                 <a href="{{ route('admin.exams.edit', $exam) }}" class="action-btn action-btn-primary"><i class="fas fa-pen"></i> Edit</a>
-                                <form class="inline" method="POST" action="{{ route('admin.exams.publish', $exam) }}">@csrf
-                                    <button class="action-btn action-btn-success"><i class="fas fa-globe"></i> Publish</button>
-                                </form>
-                                <form class="inline" method="POST" action="{{ route('admin.exams.close', $exam) }}">@csrf
-                                    <button class="action-btn action-btn-warning"><i class="fas fa-lock"></i> Close</button>
-                                </form>
-                                <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')"><i class="fas fa-trash"></i></button>
-                                <a class="action-btn action-btn-neutral" target="_blank" href="{{ route('exam.instructions', $exam->slug) }}"><i class="fas fa-external-link-alt"></i></a>
-                                <button class="action-btn action-btn-neutral" onclick="copyLink('{{ route('exam.instructions', $exam->slug) }}', this)" title="Copy exam link"><i class="fas fa-link"></i></button>
+
+                                {{-- More dropdown --}}
+                                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                                    <button @click="open = !open" class="action-btn action-btn-neutral"><i class="fas fa-ellipsis-h"></i></button>
+                                    <div x-show="open" x-transition
+                                         class="absolute right-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1 text-left">
+                                        <a href="{{ route('admin.exams.question-pool', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-layer-group w-4 text-slate-400"></i> Question Pool</a>
+                                        <a href="{{ route('admin.exams.export', $exam) }}" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-file-excel w-4 text-slate-400"></i> Export Excel</a>
+                                        <a href="{{ route('exam.instructions', $exam->slug) }}" target="_blank" class="flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-external-link-alt w-4 text-slate-400"></i> Open Link</a>
+                                        <button onclick="copyLink('{{ route('exam.instructions', $exam->slug) }}')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"><i class="fas fa-link w-4 text-slate-400"></i> Copy Link</button>
+                                        <div class="border-t border-slate-100 my-1"></div>
+                                        <form method="POST" action="{{ route('admin.exams.publish', $exam) }}">@csrf
+                                            <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-emerald-700 hover:bg-emerald-50"><i class="fas fa-globe w-4"></i> Publish</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.exams.close', $exam) }}">@csrf
+                                            <button class="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-700 hover:bg-amber-50"><i class="fas fa-lock w-4"></i> Close</button>
+                                        </form>
+                                        <div class="border-t border-slate-100 my-1"></div>
+                                        <button onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')" class="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"><i class="fas fa-trash w-4"></i> Delete</button>
+                                    </div>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -50,26 +61,20 @@
     </div>
     <div class="mt-4">{{ $exams->links() }}</div>
 
-    <div id="copy-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-sm px-4 py-2 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-        <i class="fas fa-check mr-1.5 text-emerald-400"></i> Link copied!
+    {{-- Toast --}}
+    <div id="copy-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;font-size:14px;padding:8px 16px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;">
+        <i class="fas fa-check" style="color:#34d399;margin-right:6px;"></i> Link copied!
     </div>
 
     <script>
-        function copyLink(url, btn) {
-            const icon = btn.querySelector('i');
-            const showToast = () => {
-                icon.className = 'fas fa-check text-emerald-600';
-                setTimeout(() => { icon.className = 'fas fa-link'; }, 1500);
+        function copyLink(url) {
+            const done = () => {
                 const toast = document.getElementById('copy-toast');
-                toast.classList.remove('opacity-0');
-                toast.classList.add('opacity-100');
-                setTimeout(() => {
-                    toast.classList.remove('opacity-100');
-                    toast.classList.add('opacity-0');
-                }, 2000);
+                toast.style.opacity = '1';
+                setTimeout(() => { toast.style.opacity = '0'; }, 2000);
             };
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(showToast);
+                navigator.clipboard.writeText(url).then(done);
             } else {
                 const el = document.createElement('textarea');
                 el.value = url;
@@ -79,7 +84,7 @@
                 el.select();
                 document.execCommand('copy');
                 document.body.removeChild(el);
-                showToast();
+                done();
             }
         }
     </script>
