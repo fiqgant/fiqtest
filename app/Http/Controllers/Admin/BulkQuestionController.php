@@ -235,7 +235,7 @@ class BulkQuestionController extends Controller
             $optionsRaw        = trim((string) ($optionsRaw ?? ''));
             $fillBlankAnswer   = trim((string) ($fillBlankAnswer ?? ''));
             $trueFalseRaw      = strtolower(trim((string) ($trueFalseRaw ?? '')));
-            $language          = trim((string) ($language ?? '')) ?: $defaultLanguage;
+            $language          = $this->normalizeLanguage(trim((string) ($language ?? '')) ?: $defaultLanguage);
 
             // Validations
             if ($title === '') $errors[] = 'Title is required.';
@@ -327,5 +327,31 @@ class BulkQuestionController extends Controller
         }
 
         return $results;
+    }
+
+    private function normalizeLanguage(string $language): string
+    {
+        $aliases = [
+            'python'     => 'python3',
+            'python 3'   => 'python3',
+            'python3'    => 'python3',
+            'py'         => 'python3',
+            'js'         => 'javascript',
+            'javascript' => 'javascript',
+            'node'       => 'javascript',
+            'nodejs'     => 'javascript',
+            'node.js'    => 'javascript',
+            'java'       => 'java',
+            'c++'        => 'cpp',
+            'cpp'        => 'cpp',
+            'c'          => 'c',
+            'go'         => 'go',
+            'golang'     => 'go',
+            'rust'       => 'rust',
+            'php'        => 'php',
+            'sql'        => 'sql',
+        ];
+
+        return $aliases[strtolower(trim($language))] ?? $language;
     }
 }
