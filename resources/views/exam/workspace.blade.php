@@ -275,8 +275,7 @@
                 <div class="w-1/2 flex flex-col">
 
                     {{-- ── CODING: Monaco editor ─────────────────────────────── --}}
-                    <template x-if="currentQuestion && currentQuestion.type === 'coding'">
-                        <div class="flex flex-col flex-1 min-h-0">
+                    <div x-show="currentQuestion && currentQuestion.type === 'coding'" class="flex flex-col flex-1 min-h-0" style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-sm font-medium">Code Editor</span>
@@ -357,11 +356,10 @@
                                 </div>
                             </div>
                         </div>
-                    </template>
+                    </div>
 
                     {{-- ── NON-CODING: Answer panel ──────────────────────────── --}}
-                    <template x-if="currentQuestion && currentQuestion.type !== 'coding'">
-                        <div class="flex flex-col flex-1 min-h-0">
+                    <div x-show="currentQuestion && currentQuestion.type !== 'coding'" class="flex flex-col flex-1 min-h-0" style="display:none">
                             <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
                                 <span class="text-sm font-medium">Your Answer</span>
                                 <div class="flex items-center space-x-2">
@@ -470,7 +468,7 @@
 
                             </div>
                         </div>
-                    </template>
+                    </div>
 
                 </div>
             </div>
@@ -1259,6 +1257,11 @@
                             starterCode                     = next.starter_code || '';
                             workspaceConfig.attemptQuestionId = aqId;
                             workspaceConfig.starterCode       = next.starter_code || '';
+
+                            // Re-measure Monaco after x-show makes the panel visible
+                            this.$nextTick(() => {
+                                setTimeout(() => { if (editor) editor.layout(); }, 50);
+                            });
                         } else {
                             this.studentAnswer = next.student_answer || '';
                             this.msSelected    = this.studentAnswer ? this.studentAnswer.split(',').filter(Boolean) : [];
