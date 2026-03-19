@@ -146,8 +146,9 @@ class ExamController extends Controller
 
         // Header row
         $headers = ['NIM', 'Name', 'Started', 'Submitted', 'Duration (min)', 'Score', 'Max Score', '%', 'Tab Switches', 'Disqualified', 'Disqualification Reason'];
+        $cols = ['A','B','C','D','E','F','G','H','I','J','K'];
         foreach ($headers as $i => $h) {
-            $sheet->setCellValueByColumnAndRow($i + 1, 1, $h);
+            $sheet->setCellValue($cols[$i] . '1', $h);
         }
 
         $row = 2;
@@ -159,17 +160,17 @@ class ExamController extends Controller
                 ? round($attempt->total_score / $attempt->max_score * 100, 1)
                 : 0;
 
-            $sheet->setCellValueByColumnAndRow(1, $row, $attempt->student->nim);
-            $sheet->setCellValueByColumnAndRow(2, $row, $attempt->student->name);
-            $sheet->setCellValueByColumnAndRow(3, $row, optional($attempt->started_at)->format('d/m/Y H:i'));
-            $sheet->setCellValueByColumnAndRow(4, $row, optional($attempt->submitted_at)->format('d/m/Y H:i'));
-            $sheet->setCellValueByColumnAndRow(5, $row, $duration);
-            $sheet->setCellValueByColumnAndRow(6, $row, $attempt->total_score);
-            $sheet->setCellValueByColumnAndRow(7, $row, $attempt->max_score);
-            $sheet->setCellValueByColumnAndRow(8, $row, $pct . '%');
-            $sheet->setCellValueByColumnAndRow(9, $row, $attempt->tab_switch_count);
-            $sheet->setCellValueByColumnAndRow(10, $row, $attempt->is_disqualified ? 'Yes' : 'No');
-            $sheet->setCellValueByColumnAndRow(11, $row, $attempt->disqualification_reason ?? '');
+            $sheet->setCellValue('A' . $row, $attempt->student->nim);
+            $sheet->setCellValue('B' . $row, $attempt->student->name);
+            $sheet->setCellValue('C' . $row, optional($attempt->started_at)->format('d/m/Y H:i'));
+            $sheet->setCellValue('D' . $row, optional($attempt->submitted_at)->format('d/m/Y H:i'));
+            $sheet->setCellValue('E' . $row, $duration);
+            $sheet->setCellValue('F' . $row, $attempt->total_score);
+            $sheet->setCellValue('G' . $row, $attempt->max_score);
+            $sheet->setCellValue('H' . $row, $pct . '%');
+            $sheet->setCellValue('I' . $row, $attempt->tab_switch_count);
+            $sheet->setCellValue('J' . $row, $attempt->is_disqualified ? 'Yes' : 'No');
+            $sheet->setCellValue('K' . $row, $attempt->disqualification_reason ?? '');
             $row++;
         }
 
