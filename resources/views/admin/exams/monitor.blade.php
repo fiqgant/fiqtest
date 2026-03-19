@@ -30,7 +30,7 @@
     </div>
 
     {{-- Active students table --}}
-    <div class="card overflow-hidden">
+    <div class="card overflow-x-auto">
         <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
             <span class="font-semibold text-slate-700">Active Students</span>
             <div class="flex items-center gap-3">
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div id="table-wrapper">
-            <table class="data-table">
+            <table class="data-table" style="min-width:700px">
                 <thead>
                     <tr>
                         <th>Student</th>

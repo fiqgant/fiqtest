@@ -110,7 +110,7 @@
         </div>
     </div>
 
-    <div class="card overflow-hidden">
+    <div class="card overflow-x-auto">
         <div class="card-header">
             <div class="flex items-center gap-2">
                 <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
@@ -119,7 +119,7 @@
                 <span class="font-semibold text-slate-700">Recent Attempt Activity</span>
             </div>
         </div>
-        <table class="data-table">
+        <table class="data-table" style="min-width:700px">
             <thead>
                 <tr>
                     <th>Student</th>

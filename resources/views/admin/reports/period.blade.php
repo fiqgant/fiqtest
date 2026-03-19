@@ -5,8 +5,8 @@
         <a href="{{ route('admin.reports.index') }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Reports</a>
     </x-admin.page-header>
 
-    <div class="card overflow-hidden">
-        <table class="data-table">
+    <div class="card overflow-x-auto">
+        <table class="data-table" style="min-width:700px">
             <thead>
                 <tr>
                     <th>Course</th>

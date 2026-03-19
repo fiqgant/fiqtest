@@ -19,8 +19,8 @@
         </button>
     </div>
 
-    <div class="card overflow-hidden">
-        <table class="data-table">
+    <div class="card overflow-x-auto">
+        <table class="data-table" style="min-width:700px">
             <thead>
                 <tr>
                     <th class="w-8"><input type="checkbox" id="select-all" class="w-4 h-4 accent-indigo-600"></th>

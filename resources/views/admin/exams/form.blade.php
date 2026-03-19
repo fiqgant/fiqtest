@@ -124,7 +124,7 @@
 
         <div class="form-section">
             <div class="form-section-title"><i class="fas fa-sliders-h mr-1.5"></i> Question Distribution & Weights</div>
-            <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="form-label">Easy Count</label>
                     <input type="number" min="0" name="easy_count" value="{{ old('easy_count', $exam->easy_count ?? 1) }}" class="form-input">
@@ -138,7 +138,7 @@
                     <input type="number" min="0" name="hard_count" value="{{ old('hard_count', $exam->hard_count ?? 1) }}" class="form-input">
                 </div>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                     <label class="form-label">Easy Weight (pts)</label>
                     <input type="number" min="0" step="0.01" name="easy_weight" value="{{ old('easy_weight', $exam->easy_weight ?? 20) }}" class="form-input">

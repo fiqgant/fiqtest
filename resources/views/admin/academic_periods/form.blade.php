@@ -16,7 +16,7 @@
                 <input type="text" name="name" value="{{ old('name', $period->name) }}" class="form-input" placeholder="e.g. Semester Ganjil 2024/2025" required>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label">Start Date</label>
                     <input type="date" name="start_date" value="{{ old('start_date', optional($period->start_date)->format('Y-m-d')) }}" class="form-input" required>

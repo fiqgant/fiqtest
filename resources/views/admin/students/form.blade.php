@@ -9,7 +9,7 @@
 
         <div class="form-section">
             <div class="form-section-title"><i class="fas fa-id-card mr-1.5"></i> Student Identity</div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label">NIM</label>
                     <input type="text" name="nim" value="{{ old('nim', $student->nim) }}" class="form-input font-mono" placeholder="e.g. 123456789" required>

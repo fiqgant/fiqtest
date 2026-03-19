@@ -11,7 +11,7 @@
 
         <div class="form-section">
             <div class="form-section-title"><i class="fas fa-book mr-1.5"></i> Course Details</div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label">Course Code</label>
                     <input type="text" name="code" value="{{ old('code', $course->code) }}" class="form-input font-mono" placeholder="e.g. CS101" required>

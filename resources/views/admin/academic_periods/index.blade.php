@@ -5,8 +5,8 @@
         <a href="{{ route('admin.academic-periods.create') }}" class="btn-primary"><i class="fas fa-plus"></i> Add Period</a>
     </x-admin.page-header>
 
-    <div class="card overflow-hidden">
-        <table class="data-table">
+    <div class="card overflow-x-auto">
+        <table class="data-table" style="min-width:700px">
             <thead>
                 <tr>
                     <th>Name</th>

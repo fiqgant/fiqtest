@@ -205,8 +205,11 @@
 </head>
 <body class="app-bg text-slate-800 dark:text-slate-200 min-h-screen font-sans">
     <div class="min-h-screen flex">
-        <!-- Sidebar (already dark) -->
-        <aside class="w-64 bg-panel text-slate-100 flex flex-col sticky top-0 h-screen">
+        <!-- Mobile sidebar overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 z-40 bg-black/50 hidden lg:hidden" onclick="closeSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-panel text-slate-100 flex flex-col -translate-x-full transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen">
             <div class="p-5 border-b border-slate-700/50">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -269,16 +272,22 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <main class="flex-1 flex flex-col min-h-screen lg:h-screen lg:overflow-hidden">
             <!-- Top Bar -->
-            <div class="admin-topbar px-6 py-3 shadow-sm flex-shrink-0">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold">{{ $title ?? 'Admin Workspace' }}</p>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Manage coding exams, questions, students, and grading</p>
+            <div class="admin-topbar px-4 lg:px-6 py-3 shadow-sm flex-shrink-0">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <!-- Hamburger (mobile only) -->
+                        <button onclick="openSidebar()" class="lg:hidden flex-shrink-0 w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                            <i class="fas fa-bars text-sm"></i>
+                        </button>
+                        <div class="min-w-0">
+                            <p class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold truncate">{{ $title ?? 'Admin Workspace' }}</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 hidden sm:block">Manage coding exams, questions, students, and grading</p>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="text-right mr-1">
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <div class="text-right mr-1 hidden md:block">
                             <p class="font-mono text-sm text-slate-600 dark:text-slate-400">{{ now()->format('Y-m-d H:i') }}</p>
                             <p class="text-xs text-slate-400 dark:text-slate-500">Asia/Jakarta</p>
                         </div>
@@ -304,7 +313,7 @@
             </div>
 
             <!-- Scrollable Content -->
-            <div class="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8 pb-12">
+            <div class="flex-1 min-h-0 overflow-y-auto p-4 lg:p-8 pb-12">
                 @if(session('success'))
                     <div class="alert-success mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-sm flex items-center gap-2">
                         <i class="fas fa-check-circle"></i>
@@ -368,6 +377,22 @@
     </div>
 
     <script>
+        // ── Mobile sidebar ───────────────────────────────────────────
+        function openSidebar() {
+            document.getElementById('admin-sidebar').classList.remove('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            document.getElementById('admin-sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+        // Close sidebar on resize to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 1024) closeSidebar();
+        });
+
         // ── Dark mode ────────────────────────────────────────────────
         function updateThemeIcon() {
             const isDark = document.documentElement.classList.contains('dark');
