@@ -110,6 +110,24 @@ class QuestionController extends Controller
         return view('admin.questions.preview', compact('question'));
     }
 
+    public function previewRun(Request $request, Question $question): JsonResponse
+    {
+        $request->validate(['code' => ['required', 'string'], 'stdin' => ['nullable', 'string']]);
+
+        $result = app(Judge0Service::class)->execute(
+            $request->input('code'),
+            $question->language ?? 'python3',
+            $request->input('stdin') ? [$request->input('stdin')] : []
+        );
+
+        return response()->json([
+            'output' => $result->output,
+            'error'  => $result->error,
+            'status' => $result->status,
+            'time'   => $result->executionTimeMs,
+        ]);
+    }
+
     public function duplicate(Question $question): RedirectResponse
     {
         $question->load('options');

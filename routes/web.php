@@ -78,6 +78,7 @@ Route::prefix('admin')->group(function () {
         Route::post('questions/bulk/import', [BulkQuestionController::class, 'import'])->name('admin.questions.bulk.store');
         Route::delete('questions/bulk-destroy', [QuestionController::class, 'bulkDestroy'])->name('admin.questions.bulk-destroy');
         Route::get('questions/{question}/preview', [QuestionController::class, 'preview'])->name('admin.questions.preview');
+        Route::post('questions/{question}/preview/run', [QuestionController::class, 'previewRun'])->name('admin.questions.preview.run');
         Route::post('questions/{question}/duplicate', [QuestionController::class, 'duplicate'])->name('admin.questions.duplicate');
         Route::get('questions/{question}/stats', [QuestionController::class, 'stats'])->name('admin.questions.stats');
         Route::resource('questions', QuestionController::class)->except('show')->names('admin.questions');
