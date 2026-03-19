@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\Response;
 
 class BulkQuestionController extends Controller
 {
@@ -22,12 +25,83 @@ class BulkQuestionController extends Controller
         return view('admin.questions.bulk-import', compact('offerings', 'judge0Languages'));
     }
 
-    public function downloadTemplate(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function downloadTemplate(): Response
     {
-        $path = public_path('questions-template.xlsx');
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Questions');
 
-        return response()->download($path, 'questions-template.xlsx', [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        // Header row
+        $headers = [
+            'title', 'type', 'difficulty', 'description', 'default_weight',
+            'starter_code', 'hint', 'reference_solution', 'tags',
+            'test_cases', 'options', 'fill_blank_answer', 'true_false_answer', 'language',
+        ];
+        foreach ($headers as $col => $header) {
+            $sheet->setCellValue([$col + 1, 1], $header);
+        }
+
+        // Example rows
+        $examples = [
+            // coding
+            [
+                'Sum Two Numbers', 'coding', 'easy',
+                'Write a function that returns the sum of two integers.',
+                10, '', 'Use a + b', 'return a + b', 'math,basics',
+                '2 3||5||0; -1 1||0||0', '', '', '', 'python',
+            ],
+            // multiple_choice
+            [
+                'What is 2+2?', 'multiple_choice', 'easy',
+                'Choose the correct answer.',
+                5, '', '', '', 'math',
+                '', '*4|3|5|6', '', '', '',
+            ],
+            // multiple_select
+            [
+                'Which are prime numbers?', 'multiple_select', 'medium',
+                'Select all that apply.',
+                5, '', '', '', 'math',
+                '', '*2|*3|4|*5', '', '', '',
+            ],
+            // true_false
+            [
+                'Is PHP a scripting language?', 'true_false', 'easy',
+                'Answer true or false.',
+                5, '', '', '', '',
+                '', '', '', 'true', '',
+            ],
+            // fill_in_blank
+            [
+                'PHP stands for ___', 'fill_in_blank', 'easy',
+                'Complete the blank.',
+                5, '', '', '', '',
+                '', '', 'Hypertext Preprocessor', '', '',
+            ],
+            // essay
+            [
+                'Explain OOP principles', 'essay', 'hard',
+                'Describe the four main principles of object-oriented programming.',
+                20, '', '', '', 'oop,concepts',
+                '', '', '', '', '',
+            ],
+        ];
+
+        foreach ($examples as $rowIdx => $row) {
+            foreach ($row as $col => $value) {
+                $sheet->setCellValue([$col + 1, $rowIdx + 2], $value);
+            }
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        ob_start();
+        $writer->save('php://output');
+        $content = ob_get_clean();
+
+        return response($content, 200, [
+            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="questions-template.xlsx"',
         ]);
     }
 

@@ -94,6 +94,13 @@
                         <p class="text-xs text-slate-400">Blocks F12, Ctrl+Shift+I, right-click context menu, and view-source shortcuts during the exam.</p>
                     </div>
                 </div>
+                <div class="flex items-start gap-3 mt-2">
+                    <input type="checkbox" id="shuffle_options" name="shuffle_options" value="1" class="mt-1 w-4 h-4 rounded accent-indigo-600" {{ old('shuffle_options', $exam->shuffle_options ?? false) ? 'checked' : '' }}>
+                    <div>
+                        <label for="shuffle_options" class="form-label cursor-pointer">Shuffle MC/MS Option Order</label>
+                        <p class="text-xs text-slate-400">Randomizes the order of answer choices per student, making it harder to copy from neighbors.</p>
+                    </div>
+                </div>
             </div>
         </div>
 

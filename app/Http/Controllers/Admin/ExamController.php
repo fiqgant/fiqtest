@@ -97,7 +97,27 @@ class ExamController extends Controller
     {
         $attempts = $exam->attempts()->with('student')->latest()->paginate(30);
 
-        return view('admin.exams.attempts', compact('exam', 'attempts'));
+        $allSubmitted = $exam->attempts()
+            ->whereIn('status', ['submitted', 'graded'])
+            ->where('max_score', '>', 0)
+            ->get(['total_score', 'max_score']);
+
+        $buckets = ['0-49' => 0, '50-59' => 0, '60-69' => 0, '70-79' => 0, '80-89' => 0, '90-100' => 0];
+        foreach ($allSubmitted as $a) {
+            $pct = round($a->total_score / $a->max_score * 100);
+            if ($pct < 50)       $buckets['0-49']++;
+            elseif ($pct < 60)   $buckets['50-59']++;
+            elseif ($pct < 70)   $buckets['60-69']++;
+            elseif ($pct < 80)   $buckets['70-79']++;
+            elseif ($pct < 90)   $buckets['80-89']++;
+            else                 $buckets['90-100']++;
+        }
+        $maxBucket = max(1, max($buckets));
+        $avgPct    = $allSubmitted->count() > 0
+            ? round($allSubmitted->avg(fn($a) => $a->total_score / $a->max_score * 100), 1)
+            : null;
+
+        return view('admin.exams.attempts', compact('exam', 'attempts', 'buckets', 'maxBucket', 'avgPct'));
     }
 
     public function attemptDetail(Exam $exam, Attempt $attempt): View
@@ -262,7 +282,8 @@ class ExamController extends Controller
             'tab_switch_warning_count' => ['required', 'integer', 'min:0', 'max:20'],
             'inactivity_limit_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
             'inactivity_warning_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
-            'disable_inspect' => ['nullable', 'boolean'],
+            'disable_inspect'  => ['nullable', 'boolean'],
+            'shuffle_options'  => ['nullable', 'boolean'],
             'easy_count' => ['required', 'integer', 'min:0'],
             'medium_count' => ['required', 'integer', 'min:0'],
             'hard_count' => ['required', 'integer', 'min:0'],
@@ -276,6 +297,7 @@ class ExamController extends Controller
         $data['show_score_immediately'] = (bool) ($data['show_score_immediately'] ?? false);
         $data['hints_enabled'] = (bool) ($data['hints_enabled'] ?? false);
         $data['disable_inspect'] = (bool) ($data['disable_inspect'] ?? false);
+        $data['shuffle_options'] = (bool) ($data['shuffle_options'] ?? false);
 
         if ((int) $data['max_tab_switches'] === 0) {
             $data['tab_switch_warning_count'] = 0;

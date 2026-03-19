@@ -38,6 +38,7 @@
                                 </form>
                                 <button class="action-btn action-btn-danger" onclick="confirmDelete('/admin/exams/{{ $exam->id }}', 'Delete exam?')"><i class="fas fa-trash"></i></button>
                                 <a class="action-btn action-btn-neutral" target="_blank" href="{{ route('exam.instructions', $exam->slug) }}"><i class="fas fa-external-link-alt"></i></a>
+                                <button class="action-btn action-btn-neutral" onclick="copyLink('{{ route('exam.instructions', $exam->slug) }}', this)" title="Copy exam link"><i class="fas fa-link"></i></button>
                             </div>
                         </td>
                     </tr>
@@ -48,4 +49,14 @@
         </table>
     </div>
     <div class="mt-4">{{ $exams->links() }}</div>
+
+    <script>
+        function copyLink(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                const icon = btn.querySelector('i');
+                icon.className = 'fas fa-check text-emerald-600';
+                setTimeout(() => { icon.className = 'fas fa-link'; }, 1500);
+            });
+        }
+    </script>
 @endsection

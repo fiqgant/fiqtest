@@ -692,10 +692,19 @@
                 'code'           => $aq->code ?? '',
                 'student_answer' => $aq->student_answer ?? '',
                 'test_cases'     => $aq->question->getVisibleTestCases(),
-                'options'        => $aq->question->options->map(fn($o) => [
-                    'id'   => $o->id,
-                    'text' => $o->text,
-                ])->values()->toArray(),
+                'options'        => (function() use ($aq, $attempt, $exam) {
+                    $opts = $aq->question->options->map(fn($o) => [
+                        'id'   => $o->id,
+                        'text' => $o->text,
+                    ])->toArray();
+                    if ($exam->shuffle_options && in_array($aq->question->type, ['multiple_choice', 'multiple_select'])) {
+                        $seed = $attempt->id * 1000 + $aq->question_id;
+                        mt_srand($seed);
+                        shuffle($opts);
+                        mt_srand();
+                    }
+                    return array_values($opts);
+                })(),
                 'has_answer'  => ($aq->code && strlen($aq->code) > strlen($aq->question->starter_code ?? ''))
                               || ($aq->student_answer && $aq->student_answer !== ''),
                 'has_hint'       => !empty($aq->question->hint),

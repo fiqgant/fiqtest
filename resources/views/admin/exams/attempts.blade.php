@@ -7,6 +7,37 @@
         <a href="{{ route('admin.exams.index') }}" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back to Exams</a>
     </x-admin.page-header>
 
+    {{-- Score distribution chart --}}
+    @if(array_sum($buckets) > 0)
+    <div class="card p-5 mb-5">
+        <div class="flex items-center justify-between mb-4">
+            <div class="font-semibold text-slate-700 text-sm">Score Distribution</div>
+            <div class="text-xs text-slate-500">
+                {{ array_sum($buckets) }} submitted &bull;
+                Avg: <span class="font-bold text-slate-700">{{ $avgPct }}%</span>
+            </div>
+        </div>
+        <div class="flex items-end gap-3 h-32">
+            @foreach($buckets as $label => $count)
+            @php
+                $height = $maxBucket > 0 ? round($count / $maxBucket * 100) : 0;
+                $color  = match(true) {
+                    str_starts_with($label, '9'), str_starts_with($label, '8') => 'bg-emerald-500',
+                    str_starts_with($label, '7') => 'bg-blue-500',
+                    str_starts_with($label, '6') => 'bg-amber-400',
+                    default => 'bg-rose-400',
+                };
+            @endphp
+            <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="text-xs font-bold text-slate-600">{{ $count > 0 ? $count : '' }}</div>
+                <div class="w-full rounded-t-md {{ $color }} transition-all" style="height: {{ max(4, $height) }}%"></div>
+                <div class="text-xs text-slate-400 whitespace-nowrap">{{ $label }}</div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <div class="card overflow-hidden">
         <table class="data-table">
             <thead>
