@@ -191,11 +191,16 @@
         /* ── Nav dropdown ────────────────────────── */
         .nav-dropdown-wrap { position: relative; }
         .nav-dropdown {
-            display: none; position: absolute; top: calc(100% + 6px); left: 0;
-            min-width: 13rem; background: #fff; border: 1px solid #e2e8f0;
-            border-radius: 0.875rem; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            padding: 0.375rem; z-index: 100; animation: dropIn 0.12s ease-out;
+            display: none; position: absolute; top: 100%; left: 0;
+            min-width: 13rem; background: transparent;
+            padding-top: 6px; z-index: 100;
         }
+        .nav-dropdown-inner {
+            background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 0.875rem; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 0.375rem; animation: dropIn 0.12s ease-out;
+        }
+        .dark .nav-dropdown-inner { background: #1e293b; border-color: #334155; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
         .nav-dropdown-wrap:hover .nav-dropdown,
         .nav-dropdown-wrap.open .nav-dropdown { display: block; }
         .nav-dropdown-item {
@@ -206,7 +211,6 @@
         }
         .nav-dropdown-item:hover { background: #f1f5f9; color: #1e293b; }
         .nav-dropdown-item.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
-        .dark .nav-dropdown { background: #1e293b; border-color: #334155; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
         .dark .nav-dropdown-item { color: #94a3b8; }
         .dark .nav-dropdown-item:hover { background: #293548; color: #e2e8f0; }
         .dark .nav-dropdown-item.active { background: rgba(99,102,241,0.15); color: #a5b4fc; }
@@ -280,6 +284,7 @@
                             <i class="fas fa-chevron-down text-xs opacity-60"></i>
                         </button>
                         <div class="nav-dropdown">
+                          <div class="nav-dropdown-inner">
                             <a href="{{ route('admin.academic-periods.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.academic-periods.*') ? 'active' : '' }}">
                                 <i class="fas fa-calendar-alt w-4 text-center text-emerald-500"></i> Academic Periods
                             </a>
@@ -292,6 +297,7 @@
                             <a href="{{ route('admin.students.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
                                 <i class="fas fa-users w-4 text-center text-rose-500"></i> Students
                             </a>
+                          </div>
                         </div>
                     </div>
 
@@ -302,6 +308,7 @@
                             <i class="fas fa-chevron-down text-xs opacity-60"></i>
                         </button>
                         <div class="nav-dropdown">
+                          <div class="nav-dropdown-inner">
                             <a href="{{ route('admin.questions.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
                                 <i class="fas fa-database w-4 text-center text-orange-500"></i> Question Bank
                             </a>
@@ -314,6 +321,7 @@
                             <a href="{{ route('admin.reports.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
                                 <i class="fas fa-chart-bar w-4 text-center text-blue-500"></i> Reports
                             </a>
+                          </div>
                         </div>
                     </div>
 
@@ -324,12 +332,14 @@
                             <i class="fas fa-chevron-down text-xs opacity-60"></i>
                         </button>
                         <div class="nav-dropdown">
+                          <div class="nav-dropdown-inner">
                             <a href="{{ route('admin.profile.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
                                 <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
                             </a>
                             <a href="{{ route('admin.settings.judge0.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                                 <i class="fas fa-server w-4 text-center text-slate-400"></i> Judge0 Settings
                             </a>
+                          </div>
                         </div>
                     </div>
                 </nav>
