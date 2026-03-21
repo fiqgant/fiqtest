@@ -18,5 +18,8 @@ php artisan view:cache
 echo "==> Linking storage..."
 php artisan storage:link || true
 
+echo "==> Generating question import template..."
+php artisan questions:generate-template
+
 echo "==> Starting PHP-FPM..."
 exec php-fpm
