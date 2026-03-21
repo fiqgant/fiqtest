@@ -71,6 +71,35 @@
         .md-body .mermaid { background: #1e293b; border-radius: 8px; padding: 1rem; margin: 0.75rem 0; text-align: center; }
         .md-body .katex { font-size: 1em; }
         .md-body .katex-display { overflow-x: auto; margin: 0.75rem 0; }
+
+        /* ── Light mode overrides ───────────────── */
+        body.ws-light { background: #f8fafc !important; color: #0f172a !important; }
+        body.ws-light .bg-black { background-color: #f8fafc !important; }
+        body.ws-light .bg-neutral-900 { background-color: #ffffff !important; }
+        body.ws-light .bg-neutral-800 { background-color: #f1f5f9 !important; }
+        body.ws-light .bg-neutral-700 { background-color: #e2e8f0 !important; }
+        body.ws-light .border-neutral-800 { border-color: #e2e8f0 !important; }
+        body.ws-light .border-neutral-700 { border-color: #cbd5e1 !important; }
+        body.ws-light .text-white { color: #0f172a !important; }
+        body.ws-light .text-gray-400 { color: #64748b !important; }
+        body.ws-light .text-gray-500 { color: #94a3b8 !important; }
+        body.ws-light .text-gray-300 { color: #475569 !important; }
+        body.ws-light .hover\:bg-neutral-700:hover { background-color: #e2e8f0 !important; }
+        body.ws-light .hover\:bg-neutral-800:hover { background-color: #f1f5f9 !important; }
+        body.ws-light .hover\:bg-neutral-600:hover { background-color: #e2e8f0 !important; }
+        body.ws-light .scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
+        body.ws-light .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; }
+        body.ws-light .md-body { color: #334155; }
+        body.ws-light .md-body h1, body.ws-light .md-body h2, body.ws-light .md-body h3 { color: #0f172a; }
+        body.ws-light .md-body code { background: #f1f5f9; color: #0e7490; }
+        body.ws-light .md-body pre { background: #f8fafc; border-color: #e2e8f0; }
+        body.ws-light .md-body pre code { color: #334155; }
+        body.ws-light .md-body blockquote { color: #64748b; }
+        body.ws-light .md-body th { background: #f1f5f9; color: #0f172a; border-color: #e2e8f0; }
+        body.ws-light .md-body td { border-color: #e2e8f0; }
+        body.ws-light .md-body tr:nth-child(even) td { background: #f8fafc; }
+        body.ws-light .md-body strong { color: #0f172a; }
+        body.ws-light .md-body .mermaid { background: #f1f5f9; }
     </style>
 </head>
 <body class="bg-black text-white h-screen overflow-hidden" x-data="examApp()" @time-up.window="handleTimeUp()">
@@ -277,6 +306,13 @@
                               x-text="formatTime(timeRemaining)"></span>
                     </div>
                     
+                    <button @click="toggleTheme()"
+                            class="bg-neutral-700 hover:bg-neutral-600 w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-200"
+                            :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                        <i class="fas fa-sun text-amber-400 text-sm" x-show="isDark"></i>
+                        <i class="fas fa-moon text-indigo-400 text-sm" x-show="!isDark"></i>
+                    </button>
+
                     <button @click="toggleFullscreen()"
                             class="bg-neutral-700 hover:bg-neutral-800 px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
                             title="Toggle Fullscreen">
@@ -871,10 +907,11 @@
                     return;
                 }
 
+                const savedWsTheme = localStorage.getItem('exam-ws-theme');
                 editor = monaco.editor.create(container, {
                     value: currentCode || starterCode || '# Write your code here\n',
                     language: monacoLanguage,
-                    theme: 'vs-dark',
+                    theme: savedWsTheme === 'light' ? 'vs' : 'vs-dark',
                     automaticLayout: true,
                     minimap: { enabled: false },
                     fontSize: 14,
@@ -884,6 +921,8 @@
                     tabSize: 4,
                     insertSpaces: true,
                 });
+
+                window.monacoEditor = editor;
 
                 editor.onDidChangeModelContent(() => {
                     scheduleAutosave();
@@ -1088,11 +1127,15 @@
                 isPageNavigating: false,
                 isFullscreen: false,
                 fullscreenDismissed: sessionStorage.getItem('examFullscreenDismissed') === 'true',
+                isDark: localStorage.getItem('exam-ws-theme') !== 'light',
 
                 init() {
                     if (this.monitoringInitialized) {
                         return;
                     }
+
+                    // Apply saved theme
+                    if (!this.isDark) document.body.classList.add('ws-light');
 
                     this.monitoringInitialized = true;
                     examAppInstance = this;
@@ -1371,6 +1414,16 @@
                     this.error       = '';
                     this.testResults = [];
                     this.activeTab   = 'output';
+                },
+
+                toggleTheme() {
+                    this.isDark = !this.isDark;
+                    document.body.classList.toggle('ws-light', !this.isDark);
+                    localStorage.setItem('exam-ws-theme', this.isDark ? 'dark' : 'light');
+                    // Update Monaco editor theme if loaded
+                    if (window.monacoEditor) {
+                        window.monaco.editor.setTheme(this.isDark ? 'vs-dark' : 'vs');
+                    }
                 },
 
                 toggleFullscreen() {
