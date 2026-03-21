@@ -112,6 +112,38 @@
         /* timer white when not warning */
         body.ws-light .font-mono.text-white { color: #0f172a !important; }
 
+        /* colored action buttons — keep white text */
+        body.ws-light .bg-indigo-600,
+        body.ws-light .bg-indigo-700 { background-color: #4f46e5 !important; color: #ffffff !important; }
+        body.ws-light .bg-indigo-600 *, body.ws-light .bg-indigo-700 * { color: #ffffff !important; }
+        body.ws-light .hover\:bg-indigo-700:hover { background-color: #4338ca !important; color: #ffffff !important; }
+        body.ws-light .hover\:bg-indigo-700:hover * { color: #ffffff !important; }
+
+        body.ws-light .bg-green-600,
+        body.ws-light .bg-green-700 { background-color: #16a34a !important; color: #ffffff !important; }
+        body.ws-light .bg-green-600 *, body.ws-light .bg-green-700 * { color: #ffffff !important; }
+        body.ws-light .hover\:bg-green-700:hover { background-color: #15803d !important; color: #ffffff !important; }
+        body.ws-light .hover\:bg-green-700:hover * { color: #ffffff !important; }
+
+        body.ws-light .bg-blue-600,
+        body.ws-light .bg-blue-700 { background-color: #2563eb !important; color: #ffffff !important; }
+        body.ws-light .bg-blue-600 *, body.ws-light .bg-blue-700 * { color: #ffffff !important; }
+        body.ws-light .hover\:bg-blue-700:hover { background-color: #1d4ed8 !important; color: #ffffff !important; }
+        body.ws-light .hover\:bg-blue-700:hover * { color: #ffffff !important; }
+
+        body.ws-light .bg-amber-600,
+        body.ws-light .bg-amber-500 { background-color: #d97706 !important; color: #ffffff !important; }
+        body.ws-light .bg-amber-600 *, body.ws-light .bg-amber-500 * { color: #ffffff !important; }
+        body.ws-light .hover\:bg-amber-500:hover { background-color: #f59e0b !important; color: #1e293b !important; }
+        body.ws-light .hover\:bg-amber-500:hover * { color: #1e293b !important; }
+
+        /* neutral buttons — dark text */
+        body.ws-light .bg-neutral-700 { color: #1e293b !important; }
+        body.ws-light .bg-neutral-700 * { color: #1e293b !important; }
+
+        /* disabled colored buttons */
+        body.ws-light .disabled\:bg-neutral-700:disabled { background-color: #e2e8f0 !important; color: #94a3b8 !important; }
+
         /* hover states */
         body.ws-light .hover\:bg-neutral-700:hover { background-color: #e2e8f0 !important; }
         body.ws-light .hover\:bg-neutral-800:hover { background-color: #f1f5f9 !important; }
