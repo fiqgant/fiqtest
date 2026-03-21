@@ -36,11 +36,11 @@
         }
         
         .scrollbar-thin::-webkit-scrollbar-track {
-            background: #1f2937;
+            background: #111111;
         }
         
         .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: #4b5563;
+            background: #333333;
             border-radius: 3px;
         }
         
@@ -73,7 +73,7 @@
         .md-body .katex-display { overflow-x: auto; margin: 0.75rem 0; }
     </style>
 </head>
-<body class="bg-gray-900 text-white h-screen overflow-hidden" x-data="examApp()" @time-up.window="handleTimeUp()">
+<body class="bg-black text-white h-screen overflow-hidden" x-data="examApp()" @time-up.window="handleTimeUp()">
 
     @if($exam->disable_inspect)
     <script>
@@ -222,8 +222,8 @@
     @endif
 
     <div class="flex h-full">
-        <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0">
-            <div class="p-4 border-b border-gray-700">
+        <aside class="w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col flex-shrink-0">
+            <div class="p-4 border-b border-neutral-800">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Questions</h3>
                 <div class="text-xs text-gray-500">
                     {{ $attempt->attemptQuestions->count() }} questions
@@ -234,7 +234,7 @@
                 <template x-for="(aq, index) in allQuestions" :key="aq.id">
                     <button @click="switchQuestion(aq.id)"
                        class="block w-full text-left p-3 rounded-lg mb-2 transition-all duration-200"
-                       :class="currentAttemptQuestionId === aq.id ? 'bg-indigo-600 ring-2 ring-indigo-400' : 'bg-gray-700 hover:bg-gray-600'">
+                       :class="currentAttemptQuestionId === aq.id ? 'bg-indigo-600 ring-2 ring-indigo-400' : 'bg-neutral-800 hover:bg-neutral-700'">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium" x-text="'Q' + (index + 1)"></span>
                             <span x-show="aq.has_answer" class="text-xs text-green-400"><i class="fas fa-check-circle"></i></span>
@@ -249,7 +249,7 @@
         </aside>
 
         <main class="flex-1 flex flex-col min-w-0">
-            <header class="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-6 flex-shrink-0">
+            <header class="h-16 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-6 flex-shrink-0">
                 <div class="flex items-center space-x-4 min-w-0">
                     <h1 class="text-lg font-semibold truncate">{{ $exam->title }}</h1>
                     <span class="text-gray-500">|</span>
@@ -278,7 +278,7 @@
                     </div>
                     
                     <button @click="toggleFullscreen()"
-                            class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
+                            class="bg-neutral-700 hover:bg-neutral-800 px-4 py-2 rounded-lg font-semibold transition-colors duration-200 flex items-center space-x-2"
                             title="Toggle Fullscreen">
                         <i class="fas fa-expand" x-show="!isFullscreen"></i>
                         <i class="fas fa-compress" x-show="isFullscreen"></i>
@@ -295,7 +295,7 @@
             </header>
 
             <div class="flex-1 flex overflow-hidden">
-                <div class="w-1/2 border-r border-gray-700 overflow-y-auto scrollbar-thin p-6">
+                <div class="w-1/2 border-r border-neutral-800 overflow-y-auto scrollbar-thin p-6">
                     <template x-if="currentQuestion">
                         <div>
                             <h2 class="text-2xl font-bold mb-4">
@@ -315,15 +315,15 @@
                                 <div class="mt-6">
                                     <h3 class="text-lg font-semibold mb-3">Example Test Cases</h3>
                                     <template x-for="(tc, i) in currentQuestion.test_cases" :key="i">
-                                        <div class="bg-gray-800 rounded-lg p-4 mb-3">
+                                        <div class="bg-neutral-900 rounded-lg p-4 mb-3">
                                             <div class="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <div class="text-xs text-gray-400 uppercase mb-1">Input</div>
-                                                    <pre class="font-mono text-sm bg-gray-900 p-2 rounded" x-text="tc.input"></pre>
+                                                    <pre class="font-mono text-sm bg-black p-2 rounded" x-text="tc.input"></pre>
                                                 </div>
                                                 <div>
                                                     <div class="text-xs text-gray-400 uppercase mb-1">Output</div>
-                                                    <pre class="font-mono text-sm bg-gray-900 p-2 rounded" x-text="tc.expected_output"></pre>
+                                                    <pre class="font-mono text-sm bg-black p-2 rounded" x-text="tc.expected_output"></pre>
                                                 </div>
                                             </div>
                                         </div>
@@ -339,7 +339,7 @@
                     {{-- ── CODING: Monaco editor ─────────────────────────────── --}}
                     <div :style="(currentQuestion && currentQuestion.type === 'coding') ? {display:'flex',flexDirection:'column',flex:'1',minHeight:'0',overflow:'hidden'} : {display:'none'}"
                          style="display:none">
-                            <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                            <div class="flex items-center justify-between px-4 py-2 bg-neutral-900 border-b border-neutral-800">
                                 <div class="flex items-center space-x-2">
                                     <span class="text-sm font-medium">Code Editor</span>
                                     <span class="text-xs text-gray-500" x-text="currentQuestion ? '(' + (currentQuestion.language || '') + ')' : ''"></span>
@@ -352,21 +352,21 @@
 
                             <div class="flex-1" id="monaco-editor"></div>
 
-                            <div class="flex items-center justify-between px-4 py-3 bg-gray-800 border-t border-gray-700 flex-shrink-0">
+                            <div class="flex items-center justify-between px-4 py-3 bg-neutral-900 border-t border-neutral-800 flex-shrink-0">
                                 <div class="flex items-center space-x-2">
                                     <button @click="runCode()" :disabled="running"
-                                            class="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
+                                            class="bg-green-600 hover:bg-green-700 disabled:bg-neutral-700 px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors">
                                         <span x-show="!running"><i class="fas fa-play"></i> Run Code</span>
                                         <span x-show="running"><i class="fas fa-spinner fa-spin"></i> Running...</span>
                                     </button>
                                     <button @click="autosave(true)" :disabled="saving"
-                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 px-4 py-2 rounded-lg font-medium transition-colors">
+                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 px-4 py-2 rounded-lg font-medium transition-colors">
                                         <span x-show="!saving"><i class="fas fa-save"></i> Save Now</span>
                                         <span x-show="saving"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                                     </button>
                                     <template x-if="hintsEnabled && currentQuestion?.has_hint">
                                         <button @click="requestHint()" :disabled="hintLoading || hintLimitReached"
-                                                class="bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:opacity-50 px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
+                                                class="bg-amber-600 hover:bg-amber-500 disabled:bg-neutral-700 disabled:opacity-50 px-4 py-2 rounded-lg font-medium flex items-center space-x-2 transition-colors"
                                                 :title="hintLimitReached ? 'Hint limit reached for this question' : 'Show hint'">
                                             <span x-show="!hintLoading">
                                                 <i class="fas fa-lightbulb"></i> Hint
@@ -378,11 +378,11 @@
                                         </button>
                                     </template>
                                 </div>
-                                <button @click="resetCode()" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-medium transition-colors">Reset</button>
+                                <button @click="resetCode()" class="bg-neutral-700 hover:bg-neutral-800 px-4 py-2 rounded-lg font-medium transition-colors">Reset</button>
                             </div>
 
-                            <div class="h-72 bg-gray-900 border-t border-gray-700 flex flex-col flex-shrink-0">
-                                <div class="flex border-b border-gray-700">
+                            <div class="h-72 bg-black border-t border-neutral-800 flex flex-col flex-shrink-0">
+                                <div class="flex border-b border-neutral-800">
                                     <button @click="activeTab = 'output'" class="px-4 py-2 text-sm font-medium"
                                             :class="activeTab === 'output' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'">Output</button>
                                     <button @click="activeTab = 'testcases'" class="px-4 py-2 text-sm font-medium"
@@ -423,19 +423,19 @@
                     {{-- ── NON-CODING: Answer panel ──────────────────────────── --}}
                     <div :style="(currentQuestion && currentQuestion.type !== 'coding') ? {display:'flex',flexDirection:'column',flex:'1',minHeight:'0',overflow:'hidden'} : {display:'none'}"
                          style="display:none">
-                            <div class="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
+                            <div class="flex items-center justify-between px-4 py-2 bg-neutral-900 border-b border-neutral-800">
                                 <span class="text-sm font-medium">Your Answer</span>
                                 <div class="flex items-center space-x-2">
                                     <span x-show="saving" class="text-xs text-gray-400"><i class="fas fa-spinner fa-spin"></i> Saving...</span>
                                     <span x-show="saved && !saving" class="text-xs text-green-400"><i class="fas fa-check"></i> Saved</span>
                                     <button @click="autosave(true)" :disabled="saving"
-                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
+                                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors">
                                         <span x-show="!saving"><i class="fas fa-save"></i> Save</span>
                                         <span x-show="saving"><i class="fas fa-spinner fa-spin"></i></span>
                                     </button>
                                     <template x-if="hintsEnabled && currentQuestion?.has_hint">
                                         <button @click="requestHint()" :disabled="hintLoading || hintLimitReached"
-                                                class="bg-amber-600 hover:bg-amber-500 disabled:bg-gray-600 disabled:opacity-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                                                class="bg-amber-600 hover:bg-amber-500 disabled:bg-neutral-700 disabled:opacity-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                                                 :title="hintLimitReached ? 'Hint limit reached' : 'Show hint'">
                                             <span x-show="!hintLoading">
                                                 <i class="fas fa-lightbulb"></i> Hint
@@ -457,7 +457,7 @@
                                         <p class="text-sm text-gray-400 mb-4">Select one correct answer.</p>
                                         <template x-for="option in currentQuestion.options" :key="option.id">
                                             <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
-                                                   :class="studentAnswer === String(option.id) ? 'border-indigo-500 bg-indigo-900/30' : 'border-gray-700 bg-gray-800 hover:border-gray-500'">
+                                                   :class="studentAnswer === String(option.id) ? 'border-indigo-500 bg-indigo-900/30' : 'border-neutral-800 bg-neutral-900 hover:border-gray-500'">
                                                 <input type="radio"
                                                        :name="'mc_' + currentAttemptQuestionId"
                                                        :value="String(option.id)"
@@ -476,7 +476,7 @@
                                         <p class="text-sm text-gray-400 mb-4">Select all that apply.</p>
                                         <template x-for="option in currentQuestion.options" :key="option.id">
                                             <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
-                                                   :class="msSelected.includes(String(option.id)) ? 'border-indigo-500 bg-indigo-900/30' : 'border-gray-700 bg-gray-800 hover:border-gray-500'">
+                                                   :class="msSelected.includes(String(option.id)) ? 'border-indigo-500 bg-indigo-900/30' : 'border-neutral-800 bg-neutral-900 hover:border-gray-500'">
                                                 <input type="checkbox"
                                                        :value="String(option.id)"
                                                        :checked="msSelected.includes(String(option.id))"
@@ -493,14 +493,14 @@
                                     <div class="space-y-3">
                                         <p class="text-sm text-gray-400 mb-4">Select True or False.</p>
                                         <label class="flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors"
-                                               :class="studentAnswer === '1' ? 'border-green-500 bg-green-900/30' : 'border-gray-700 bg-gray-800 hover:border-gray-500'">
+                                               :class="studentAnswer === '1' ? 'border-green-500 bg-green-900/30' : 'border-neutral-800 bg-neutral-900 hover:border-gray-500'">
                                             <input type="radio" :name="'tf_' + currentAttemptQuestionId" value="1"
                                                    :checked="studentAnswer === '1'" @change="selectAnswer('1')"
                                                    class="accent-green-500">
                                             <span class="text-sm font-medium text-green-400">True</span>
                                         </label>
                                         <label class="flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors"
-                                               :class="studentAnswer === '0' ? 'border-red-500 bg-red-900/30' : 'border-gray-700 bg-gray-800 hover:border-gray-500'">
+                                               :class="studentAnswer === '0' ? 'border-red-500 bg-red-900/30' : 'border-neutral-800 bg-neutral-900 hover:border-gray-500'">
                                             <input type="radio" :name="'tf_' + currentAttemptQuestionId" value="0"
                                                    :checked="studentAnswer === '0'" @change="selectAnswer('0')"
                                                    class="accent-red-500">
@@ -516,7 +516,7 @@
                                         <input type="text"
                                                :value="studentAnswer"
                                                @input="onTextAnswer($event.target.value)"
-                                               class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-sm font-mono focus:border-indigo-500 focus:outline-none"
+                                               class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white text-sm font-mono focus:border-indigo-500 focus:outline-none"
                                                placeholder="Type your answer here…">
                                     </div>
                                 </template>
@@ -529,7 +529,7 @@
                                             :value="studentAnswer"
                                             @input="onTextAnswer($event.target.value)"
                                             rows="16"
-                                            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-3 text-white text-sm resize-none focus:border-indigo-500 focus:outline-none scrollbar-thin"
+                                            class="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-3 text-white text-sm resize-none focus:border-indigo-500 focus:outline-none scrollbar-thin"
                                             placeholder="Write your answer here…"></textarea>
                                     </div>
                                 </template>
@@ -546,7 +546,7 @@
          x-cloak
          class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
          @keydown.escape.window="showSubmitModal = false">
-        <div class="bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
+        <div class="bg-neutral-900 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl"
              @click.outside="showSubmitModal = false">
             <h3 class="text-xl font-bold mb-4">Submit Exam</h3>
             <p class="text-gray-300 mb-4">
@@ -560,7 +560,7 @@
             </div>
             <div class="flex space-x-3">
                 <button @click="showSubmitModal = false"
-                        class="flex-1 bg-gray-600 hover:bg-gray-700 py-2 rounded-lg font-medium transition-colors">
+                        class="flex-1 bg-neutral-700 hover:bg-neutral-800 py-2 rounded-lg font-medium transition-colors">
                     Cancel
                 </button>
                 <button @click="submitExam()"
@@ -576,7 +576,7 @@
          x-cloak
          class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
          @keydown.escape.window="showHintModal = false">
-        <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-amber-500/40"
+        <div class="bg-neutral-900 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-amber-500/40"
              @click.outside="showHintModal = false">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-2 text-amber-400">
@@ -587,11 +587,11 @@
                     <span class="text-xs text-gray-400" x-text="'Used ' + hintUsedCount + ' of ' + maxHintsPerQuestion + ' hint(s)'"></span>
                 </template>
             </div>
-            <div class="prose prose-invert prose-sm max-w-none text-gray-200 bg-gray-900 rounded-lg p-4 mb-5"
+            <div class="prose prose-invert prose-sm max-w-none text-gray-200 bg-black rounded-lg p-4 mb-5"
                  x-ref="hintContentEl"></div>
             <div class="flex justify-end">
                 <button @click="showHintModal = false"
-                        class="px-5 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg font-medium transition-colors">
+                        class="px-5 py-2 bg-neutral-700 hover:bg-neutral-600 rounded-lg font-medium transition-colors">
                     Close
                 </button>
             </div>
@@ -601,8 +601,8 @@
     <!-- Fullscreen Requirement Modal -->
     <div x-show="!isFullscreen && !fullscreenDismissed" 
          x-cloak
-         class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl border border-indigo-500/50 text-center">
+         class="fixed inset-0 bg-black flex items-center justify-center z-50">
+        <div class="bg-neutral-900 rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl border border-indigo-500/50 text-center">
             <div class="flex items-center justify-center mb-6">
                 <div class="w-20 h-20 rounded-full bg-indigo-500/20 flex items-center justify-center">
                     <i class="fas fa-expand text-indigo-400 text-4xl"></i>
@@ -638,7 +638,7 @@
          x-cloak
          class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
          @keydown.escape.window="hideTabWarning()">
-        <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-amber-500/50">
+        <div class="bg-neutral-900 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-amber-500/50">
             <div class="flex items-center justify-center mb-4">
                 <div class="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center">
                     <i class="fas fa-exclamation-triangle text-amber-500 text-3xl"></i>
@@ -659,7 +659,7 @@
     <div x-show="showTimeUpModal"
          x-cloak
          class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl border border-red-500/60 text-center">
+        <div class="bg-neutral-900 rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl border border-red-500/60 text-center">
             <div class="flex items-center justify-center mb-5">
                 <div class="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center">
                     <i class="fas fa-hourglass-end text-red-400 text-4xl"></i>
@@ -677,7 +677,7 @@
     <div x-show="showInactivityWarningModal"
          x-cloak
          class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-rose-500/50">
+        <div class="bg-neutral-900 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-rose-500/50">
             <div class="flex items-center justify-center mb-4">
                 <div class="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center">
                     <i class="fas fa-clock text-rose-500 text-3xl"></i>
@@ -703,7 +703,7 @@
     <div x-show="showDisqualificationModal" 
          x-cloak
          class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-red-500/50">
+        <div class="bg-neutral-900 rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl border border-red-500/50">
             <div class="flex items-center justify-center mb-4">
                 <div class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
                     <i class="fas fa-times-circle text-red-500 text-3xl"></i>
@@ -827,7 +827,7 @@
             container.innerHTML = '';
 
             const textArea = document.createElement('textarea');
-            textArea.className = 'h-full w-full resize-none bg-gray-900 p-4 font-mono text-sm text-white outline-none';
+            textArea.className = 'h-full w-full resize-none bg-black p-4 font-mono text-sm text-white outline-none';
             textArea.spellcheck = false;
             textArea.value = currentCode || starterCode || '# Write your code here\n';
             textArea.addEventListener('input', () => {
