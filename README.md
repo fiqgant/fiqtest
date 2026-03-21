@@ -2,7 +2,7 @@
 
 A self-hosted online exam platform for academic institutions. Supports 6 question types (including coding with real code execution), automated proctoring, auto-grading, and real-time monitoring.
 
-> 🇮🇩 Tersedia juga dalam Bahasa Indonesia: [README.id.md](README.id.md)
+> 🇮🇩 Also available in Bahasa Indonesia: [README.id.md](README.id.md)
 
 ---
 
