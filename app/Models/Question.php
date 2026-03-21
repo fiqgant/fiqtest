@@ -23,6 +23,7 @@ class Question extends Model
         'language',
         'fill_blank_answer',
         'true_false_answer',
+        'essay_model_answer',
     ];
 
     protected $casts = [

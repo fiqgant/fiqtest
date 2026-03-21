@@ -197,6 +197,17 @@
             </div>
         </div>
 
+        {{-- ── Essay Model Answer ───────────────────────────────────────── --}}
+        <div id="section-essay" class="form-section hidden">
+            <div class="form-section-title"><i class="fas fa-align-left mr-1.5"></i> Model Answer <span class="text-xs font-normal text-slate-400">(optional)</span></div>
+            <div>
+                <label class="form-label">Sample / Model Answer</label>
+                <textarea name="essay_model_answer" rows="6" class="form-textarea"
+                          placeholder="Write a sample answer or grading rubric here…">{{ old('essay_model_answer', $question->essay_model_answer) }}</textarea>
+                <p class="text-xs text-slate-400 mt-1">Shown to admin when grading student essays. Not visible to students.</p>
+            </div>
+        </div>
+
         {{-- ── Fill in the Blank Answer ─────────────────────────────────── --}}
         <div id="section-fill-blank" class="form-section hidden">
             <div class="form-section-title"><i class="fas fa-pencil-alt mr-1.5"></i> Correct Answer</div>
@@ -279,6 +290,7 @@
         const isMS       = type === 'multiple_select';
         const isTF       = type === 'true_false';
         const isFITB     = type === 'fill_in_blank';
+        const isEssay    = type === 'essay';
 
         // Show/hide sections
         toggle('section-language',    isCoding);
@@ -287,6 +299,7 @@
         toggle('section-options',     isMC || isMS);
         toggle('section-true-false',  isTF);
         toggle('section-fill-blank',  isFITB);
+        toggle('section-essay',       isEssay);
 
         // Required attributes
         const langInput = document.getElementById('language-value');

@@ -348,6 +348,12 @@
 
                 {{-- Essay: manual grading form --}}
                 @if($question->type === 'essay')
+                    @if($question->essay_model_answer)
+                    <div class="rounded-xl border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 p-4 mb-3">
+                        <div class="text-sm font-semibold text-emerald-700 dark:text-emerald-300 mb-2"><i class="fas fa-bookmark mr-1.5"></i> Model Answer</div>
+                        <div class="text-sm text-slate-700 dark:text-slate-200 whitespace-pre-wrap leading-relaxed">{{ $question->essay_model_answer }}</div>
+                    </div>
+                    @endif
                     <div class="rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 p-4">
                         <div class="text-sm font-semibold text-indigo-700 dark:text-indigo-300 mb-3"><i class="fas fa-edit mr-1.5"></i> Manual Grading</div>
                         @if($aq->manual_score !== null)

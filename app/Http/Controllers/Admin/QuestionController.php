@@ -212,6 +212,10 @@ class QuestionController extends Controller
             $rules['fill_blank_answer'] = ['required', 'string', 'max:1000'];
         }
 
+        if ($type === 'essay') {
+            $rules['essay_model_answer'] = ['nullable', 'string'];
+        }
+
         if ($type === 'true_false') {
             $rules['true_false_answer'] = ['required', 'in:0,1'];
         }
@@ -250,6 +254,10 @@ class QuestionController extends Controller
         // Clear fields that belong to other types
         if ($type !== 'fill_in_blank') {
             $data['fill_blank_answer'] = null;
+        }
+
+        if ($type !== 'essay') {
+            $data['essay_model_answer'] = null;
         }
 
         if ($type !== 'true_false') {
