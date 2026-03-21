@@ -411,8 +411,8 @@
     </header>
 
     <!-- ── Page Content ────────────────────────────────────────────── -->
-    <main class="min-h-[calc(100vh-3.5rem)] flex flex-col">
-        <div class="flex-1 p-4 lg:p-8 pb-12">
+    <main class="h-[calc(100vh-3.5rem)] flex flex-col">
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8 pb-12">
             @if(session('success'))
                 <div class="alert-success mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-sm flex items-center gap-2">
                     <i class="fas fa-check-circle"></i>
