@@ -77,6 +77,7 @@
                     <div><code class="bg-slate-100 px-1 rounded font-mono">L</code> Fill-blank Answer</div>
                     <div><code class="bg-slate-100 px-1 rounded font-mono">M</code> True/False Answer <span class="text-slate-400">(true/false)</span></div>
                     <div><code class="bg-slate-100 px-1 rounded font-mono">N</code> Language <span class="text-slate-400">(coding)</span></div>
+                    <div><code class="bg-slate-100 px-1 rounded font-mono">O</code> Essay Model Answer <span class="text-slate-400">(essay)</span></div>
                 </div>
             </div>
 

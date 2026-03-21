@@ -19,7 +19,7 @@ echo "==> Linking storage..."
 php artisan storage:link || true
 
 echo "==> Generating question import template..."
-php artisan questions:generate-template
+php artisan questions:generate-template || true
 
 echo "==> Starting PHP-FPM..."
 exec php-fpm

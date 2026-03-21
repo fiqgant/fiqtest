@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
@@ -28,11 +27,10 @@ class GenerateQuestionTemplate extends Command
             'language', 'essay_model_answer',
         ];
 
-        // ── Header row styling ──────────────────────────────────────────
+        // ── Header row ──────────────────────────────────────────────────
         foreach ($headers as $col => $header) {
-            $cell = $sheet->getCellByColumnAndRow($col + 1, 1);
-            $cell->setValue($header);
-            $cell->getStyle()->applyFromArray([
+            $sheet->setCellValue([$col + 1, 1], $header);
+            $sheet->getStyle([$col + 1, 1])->applyFromArray([
                 'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
                 'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4F46E5']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -95,25 +93,26 @@ class GenerateQuestionTemplate extends Command
 
         foreach ($examples as $rowIdx => $row) {
             foreach ($row as $col => $value) {
-                $sheet->setCellByColumnAndRow($col + 1, $rowIdx + 2, $value);
+                $sheet->setCellValue([$col + 1, $rowIdx + 2], (string) $value);
             }
-            // Zebra stripe
             if ($rowIdx % 2 === 0) {
-                $sheet->getStyle('A' . ($rowIdx + 2) . ':O' . ($rowIdx + 2))
+                $sheet->getStyle([1, $rowIdx + 2, count($headers), $rowIdx + 2])
                     ->getFill()->setFillType(Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('F8F8FF');
+                    ->getStartColor()->setRGB('F5F5FF');
             }
         }
 
         // ── Column widths ───────────────────────────────────────────────
-        $widths = [30, 18, 12, 50, 16, 30, 40, 30, 20, 40, 30, 20, 18, 14, 50];
+        $widths = [28, 16, 12, 45, 14, 28, 38, 28, 18, 38, 28, 20, 16, 12, 45];
         foreach ($widths as $i => $w) {
             $sheet->getColumnDimensionByColumn($i + 1)->setWidth($w);
         }
 
         // Wrap text for description, hint, test_cases, essay_model_answer
-        foreach ([4, 7, 10, 15] as $col) {
-            $sheet->getStyleByColumnAndRow($col, 2, $col, count($examples) + 1)
+        $wrapCols = [4, 7, 10, 15];
+        $lastRow  = count($examples) + 1;
+        foreach ($wrapCols as $col) {
+            $sheet->getStyle([$col, 2, $col, $lastRow])
                 ->getAlignment()->setWrapText(true);
         }
 
@@ -122,7 +121,7 @@ class GenerateQuestionTemplate extends Command
         $writer = new Xlsx($spreadsheet);
         $writer->save($path);
 
-        $this->info("Template saved to: {$path}");
+        $this->info("Template saved: {$path}");
 
         return self::SUCCESS;
     }
