@@ -240,14 +240,14 @@
                     <i class="fas fa-users w-5 text-center {{ request()->routeIs('admin.students.*') ? 'text-white' : 'text-rose-400' }}"></i><span>Students</span>
                 </a>
                 <div class="pt-3 pb-2"><p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Assessment</p></div>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.exams.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.exams.index') }}">
-                    <i class="fas fa-file-alt w-5 text-center {{ request()->routeIs('admin.exams.*') ? 'text-white' : 'text-purple-400' }}"></i><span>Exams</span>
-                </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.questions.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.questions.index') }}">
                     <i class="fas fa-database w-5 text-center {{ request()->routeIs('admin.questions.*') ? 'text-white' : 'text-orange-400' }}"></i><span>Question Bank</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.question-tags.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.question-tags.index') }}">
                     <i class="fas fa-tags w-5 text-center {{ request()->routeIs('admin.question-tags.*') ? 'text-white' : 'text-teal-400' }}"></i><span>Question Tags</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.exams.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.exams.index') }}">
+                    <i class="fas fa-file-alt w-5 text-center {{ request()->routeIs('admin.exams.*') ? 'text-white' : 'text-purple-400' }}"></i><span>Exams</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.reports.index') }}">
                     <i class="fas fa-chart-bar w-5 text-center {{ request()->routeIs('admin.reports.*') ? 'text-white' : 'text-blue-400' }}"></i><span>Reports</span>
