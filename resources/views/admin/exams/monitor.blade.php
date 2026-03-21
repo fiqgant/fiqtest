@@ -41,7 +41,7 @@
             </div>
         </div>
         <div id="table-wrapper">
-            <table class="data-table" style="min-width:700px">
+            <table class="data-table" style="min-width:900px">
                 <thead>
                     <tr>
                         <th>Student</th>
@@ -51,11 +51,12 @@
                         <th>Tab Switches</th>
                         <th>Last Activity</th>
                         <th>IP</th>
+                        <th>Device</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody id="monitor-tbody">
-                    <tr><td colspan="8" class="px-5 py-8 text-center text-slate-400">Loading...</td></tr>
+                    <tr><td colspan="9" class="px-5 py-8 text-center text-slate-400">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -85,7 +86,7 @@
                 const tbody = document.getElementById('monitor-tbody');
 
                 if (data.active.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="px-5 py-10 text-center text-slate-400"><i class="fas fa-users text-2xl mb-2 block"></i>No students currently taking this exam.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" class="px-5 py-10 text-center text-slate-400"><i class="fas fa-users text-2xl mb-2 block"></i>No students currently taking this exam.</td></tr>`;
                     return;
                 }
 
@@ -96,17 +97,29 @@
                         ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-xs font-medium"><i class="fas fa-ban"></i> Disqualified</span>`
                         : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium"><i class="fas fa-pencil-alt"></i> In Progress</span>`;
 
+                    const deviceCell = s.device
+                        ? `<td>
+                            <div title="${s.device.browser} · ${s.device.os}" class="cursor-default">
+                                <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 text-xs font-medium">
+                                    <i class="fas ${s.device.icon} text-slate-400"></i> ${s.device.type}
+                                </div>
+                                <div class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">${s.device.browser}</div>
+                                <div class="text-xs text-slate-400 dark:text-slate-500">${s.device.os}</div>
+                            </div>
+                           </td>`
+                        : `<td class="text-xs text-slate-400">—</td>`;
+
                     return `<tr>
                         <td>
-                            <div class="font-semibold text-slate-800">${s.name}</div>
+                            <div class="font-semibold text-slate-800 dark:text-slate-100">${s.name}</div>
                             <div class="font-mono text-xs text-slate-400">${s.nim}</div>
                         </td>
                         <td class="font-mono text-xs text-slate-500">${s.started_at}</td>
                         <td class="${timeClass}">${formatTime(s.remaining_sec)}</td>
                         <td>
                             <div class="flex items-center gap-2">
-                                <span class="text-sm text-slate-700 font-medium">${s.answered}/${s.total_questions}</span>
-                                <div class="w-20 bg-slate-100 rounded-full h-1.5">
+                                <span class="text-sm text-slate-700 dark:text-slate-200 font-medium">${s.answered}/${s.total_questions}</span>
+                                <div class="w-20 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5">
                                     <div class="h-1.5 rounded-full bg-indigo-500"
                                          style="width: ${s.total_questions > 0 ? Math.round(s.answered/s.total_questions*100) : 0}%"></div>
                                 </div>
@@ -115,6 +128,7 @@
                         <td class="${tabClass}"><i class="fas fa-exchange-alt mr-1"></i>${s.tab_switches}</td>
                         <td class="text-xs text-slate-500">${s.last_activity}</td>
                         <td class="font-mono text-xs text-slate-400">${s.ip_address ?? '—'}</td>
+                        ${deviceCell}
                         <td>${disqBadge}</td>
                     </tr>`;
                 }).join('');

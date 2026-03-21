@@ -258,6 +258,23 @@ class ExamController extends Controller
                     'last_activity'   => optional($attempt->last_activity_at)->diffForHumans() ?? 'Unknown',
                     'is_disqualified' => $attempt->is_disqualified,
                     'ip_address'      => $attempt->ip_address,
+                    'device'          => (function () use ($attempt) {
+                        if (!$attempt->user_agent) return null;
+                        $agent = new \Jenssegers\Agent\Agent();
+                        $agent->setUserAgent($attempt->user_agent);
+                        $browser    = $agent->browser() ?: null;
+                        $browserVer = $browser ? ($agent->version($browser) ?: '') : '';
+                        $os         = $agent->platform() ?: null;
+                        $osVer      = $os ? ($agent->version($os) ?: '') : '';
+                        $type       = $agent->isTablet() ? 'Tablet' : ($agent->isMobile() ? 'Mobile' : 'Desktop');
+                        $icon       = $agent->isTablet() ? 'fa-tablet-alt' : ($agent->isMobile() ? 'fa-mobile-alt' : 'fa-desktop');
+                        return [
+                            'type'    => $type,
+                            'icon'    => $icon,
+                            'browser' => $browser ? ($browserVer ? "$browser $browserVer" : $browser) : '—',
+                            'os'      => $os ? ($osVer ? "$os $osVer" : $os) : '—',
+                        ];
+                    })(),
                 ];
             });
 
