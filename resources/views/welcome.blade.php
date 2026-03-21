@@ -383,10 +383,10 @@
         pGeo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
 
         const pMat = new THREE.PointsMaterial({
-            size: 0.022,
+            size: 0.028,
             vertexColors: true,
             transparent: true,
-            opacity: 0.85,
+            opacity: 1.0,
             sizeAttenuation: true,
         });
 
@@ -396,22 +396,14 @@
         // --- Outer wireframe torus ---
         const torus = new THREE.Mesh(
             new THREE.TorusGeometry(1.6, 0.45, 16, 100),
-            new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true, transparent: true, opacity: 0.07 })
+            new THREE.MeshBasicMaterial({ color: 0x6366f1, wireframe: true, transparent: true, opacity: 0.22 })
         );
         scene.add(torus);
-
-        // --- Inner ring ---
-        const ring = new THREE.Mesh(
-            new THREE.TorusGeometry(0.9, 0.018, 8, 120),
-            new THREE.MeshBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0.5 })
-        );
-        ring.rotation.x = Math.PI / 3;
-        scene.add(ring);
 
         // --- Icosahedron left ---
         const ico1 = new THREE.Mesh(
             new THREE.IcosahedronGeometry(0.55, 1),
-            new THREE.MeshBasicMaterial({ color: 0x4f46e5, wireframe: true, transparent: true, opacity: 0.18 })
+            new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.45 })
         );
         ico1.position.set(-2.8, 0.6, -1.5);
         scene.add(ico1);
@@ -419,7 +411,7 @@
         // --- Icosahedron right ---
         const ico2 = new THREE.Mesh(
             new THREE.IcosahedronGeometry(0.4, 1),
-            new THREE.MeshBasicMaterial({ color: 0x818cf8, wireframe: true, transparent: true, opacity: 0.15 })
+            new THREE.MeshBasicMaterial({ color: 0xa5b4fc, wireframe: true, transparent: true, opacity: 0.40 })
         );
         ico2.position.set(2.8, -0.5, -1);
         scene.add(ico2);
@@ -427,7 +419,7 @@
         // --- Octahedron center-ish ---
         const oct = new THREE.Mesh(
             new THREE.OctahedronGeometry(0.3, 0),
-            new THREE.MeshBasicMaterial({ color: 0xa5b4fc, wireframe: true, transparent: true, opacity: 0.2 })
+            new THREE.MeshBasicMaterial({ color: 0xc7d2fe, wireframe: true, transparent: true, opacity: 0.50 })
         );
         oct.position.set(0.5, 1.5, 0.5);
         scene.add(oct);
@@ -459,9 +451,6 @@
 
             torus.rotation.x = t * 0.25 + mouse.y * 0.1;
             torus.rotation.y = t * 0.18 + mouse.x * 0.25;
-
-            ring.rotation.z  = t * 0.45;
-            ring.rotation.y  = mouse.x * 0.2;
 
             ico1.rotation.x  = t * 0.5;
             ico1.rotation.y  = t * 0.35;
