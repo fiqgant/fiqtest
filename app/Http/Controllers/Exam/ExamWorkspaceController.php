@@ -176,6 +176,29 @@ class ExamWorkspaceController extends Controller
         ]);
     }
 
+    public function logClipboard(Request $request, Attempt $attempt): JsonResponse
+    {
+        if ($attempt->status !== 'in_progress') {
+            return response()->json(['ok' => false]);
+        }
+
+        $request->validate([
+            'event_type'          => ['required', 'in:copy,cut,paste'],
+            'content'             => ['nullable', 'string', 'max:5000'],
+            'attempt_question_id' => ['nullable', 'integer'],
+        ]);
+
+        \App\Models\CopyPasteLog::create([
+            'attempt_id'          => $attempt->id,
+            'event_type'          => $request->input('event_type'),
+            'content'             => $request->input('content'),
+            'attempt_question_id' => $request->input('attempt_question_id'),
+            'logged_at'           => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
     public function finalSubmit(Attempt $attempt)
     {
         $exam = $attempt->exam;

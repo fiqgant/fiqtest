@@ -51,6 +51,11 @@ class Attempt extends Model
         return $this->hasMany(AttemptQuestion::class);
     }
 
+    public function copyPasteLogs(): HasMany
+    {
+        return $this->hasMany(CopyPasteLog::class);
+    }
+
     public function isSubmitted(): bool
     {
         return $this->status !== 'in_progress';

@@ -162,6 +162,64 @@
     </script>
     @endif
 
+    @if($exam->detect_copy_paste)
+    <script>
+        (function() {
+            const logUrl   = '{{ route('exam.log-clipboard', $attempt->id) }}';
+            const csrfToken = '{{ csrf_token() }}';
+
+            function getCurrentAttemptQuestionId() {
+                // Try to get from Alpine/examApp state if available
+                try {
+                    return window.__currentAttemptQuestionId ?? null;
+                } catch(e) { return null; }
+            }
+
+            function sendLog(eventType, content) {
+                navigator.sendBeacon
+                    ? navigator.sendBeacon(logUrl, (() => {
+                        const fd = new FormData();
+                        fd.append('_token', csrfToken);
+                        fd.append('event_type', eventType);
+                        fd.append('content', content ?? '');
+                        const aqId = getCurrentAttemptQuestionId();
+                        if (aqId) fd.append('attempt_question_id', aqId);
+                        return fd;
+                    })())
+                    : fetch(logUrl, {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ event_type: eventType, content: content ?? '', attempt_question_id: getCurrentAttemptQuestionId() }),
+                        keepalive: true,
+                    });
+            }
+
+            // Detect copy & cut — log selected text
+            document.addEventListener('copy', function(e) {
+                const selected = window.getSelection()?.toString() ?? '';
+                sendLog('copy', selected.slice(0, 2000));
+            });
+            document.addEventListener('cut', function(e) {
+                const selected = window.getSelection()?.toString() ?? '';
+                sendLog('cut', selected.slice(0, 2000));
+            });
+
+            // Detect paste — log pasted text
+            document.addEventListener('paste', function(e) {
+                const text = e.clipboardData?.getData('text') ?? '';
+                sendLog('paste', text.slice(0, 2000));
+            });
+
+            // Detect Ctrl+C / Ctrl+X / Ctrl+V via keyboard (backup, covers edge cases)
+            document.addEventListener('keydown', function(e) {
+                if (!e.ctrlKey && !e.metaKey) return;
+                if (e.key === 'c') sendLog('copy', window.getSelection()?.toString()?.slice(0, 2000) ?? '');
+                if (e.key === 'x') sendLog('cut',  window.getSelection()?.toString()?.slice(0, 2000) ?? '');
+            });
+        })();
+    </script>
+    @endif
+
     <div class="flex h-full">
         <aside class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col flex-shrink-0">
             <div class="p-4 border-b border-gray-700">
@@ -734,6 +792,7 @@
         let editor = null;
         let fallbackEditor = null;
         let currentAttemptQuestionId = Number(workspaceConfig.attemptQuestionId || 0);
+        window.__currentAttemptQuestionId = currentAttemptQuestionId;
         let starterCode = String(workspaceConfig.starterCode || '');
         let currentCode = String(workspaceConfig.currentCode || '');
         let examAppInstance = null;
@@ -1273,6 +1332,7 @@
                     // Switch to new question
                     this.currentAttemptQuestionId = aqId;
                     currentAttemptQuestionId      = aqId;
+                    window.__currentAttemptQuestionId = aqId;
                     this.showHintModal = false;
 
                     const next = this.allQuestions.find(q => q.id === aqId);

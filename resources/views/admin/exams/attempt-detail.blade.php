@@ -80,6 +80,67 @@
     </div>
     @endif
 
+    {{-- Copy-paste log --}}
+    @if($exam->detect_copy_paste)
+    @php $cpLogs = $attempt->copyPasteLogs()->orderBy('logged_at')->get(); @endphp
+    @if($cpLogs->isNotEmpty())
+    <div class="mb-6 bg-white dark:bg-slate-800 rounded-2xl border border-rose-200 dark:border-rose-800/50 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-semibold text-sm">
+                <i class="fas fa-clipboard-list"></i> Copy-Paste Activity Log
+            </div>
+            <span class="text-xs text-slate-400">{{ $cpLogs->count() }} event(s)</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="text-xs text-slate-400 dark:text-slate-500 uppercase border-b border-slate-100 dark:border-slate-700">
+                        <th class="text-left pb-2 pr-4">Time</th>
+                        <th class="text-left pb-2 pr-4">Event</th>
+                        <th class="text-left pb-2">Content</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                    @foreach($cpLogs as $log)
+                    <tr>
+                        <td class="py-2 pr-4 font-mono text-xs text-slate-400 whitespace-nowrap">
+                            {{ $log->logged_at->format('H:i:s') }}
+                        </td>
+                        <td class="py-2 pr-4">
+                            @if($log->event_type === 'paste')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-medium">
+                                    <i class="fas fa-paste"></i> Paste
+                                </span>
+                            @elseif($log->event_type === 'copy')
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-xs font-medium">
+                                    <i class="fas fa-copy"></i> Copy
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium">
+                                    <i class="fas fa-cut"></i> Cut
+                                </span>
+                            @endif
+                        </td>
+                        <td class="py-2 text-slate-600 dark:text-slate-300 text-xs font-mono break-all">
+                            @if($log->content)
+                                <span class="bg-slate-50 dark:bg-slate-700/50 rounded px-1.5 py-0.5 block max-h-16 overflow-hidden">{{ $log->content }}</span>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @else
+    <div class="mb-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 px-5 py-3 shadow-sm text-sm text-slate-400 flex items-center gap-2">
+        <i class="fas fa-clipboard-check text-emerald-500"></i> No copy-paste activity detected.
+    </div>
+    @endif
+    @endif
+
     {{-- Summary bar --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">

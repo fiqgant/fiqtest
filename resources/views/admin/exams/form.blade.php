@@ -95,6 +95,13 @@
                     </div>
                 </div>
                 <div class="flex items-start gap-3 mt-2">
+                    <input type="checkbox" id="detect_copy_paste" name="detect_copy_paste" value="1" class="mt-1 w-4 h-4 rounded accent-indigo-600" {{ old('detect_copy_paste', $exam->detect_copy_paste ?? false) ? 'checked' : '' }}>
+                    <div>
+                        <label for="detect_copy_paste" class="form-label cursor-pointer">Detect Copy-Paste Activity</label>
+                        <p class="text-xs text-slate-400">Logs every copy, cut, and paste action (including text content) during the exam. Visible in attempt detail.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3 mt-2">
                     <input type="checkbox" id="shuffle_options" name="shuffle_options" value="1" class="mt-1 w-4 h-4 rounded accent-indigo-600" {{ old('shuffle_options', $exam->shuffle_options ?? false) ? 'checked' : '' }}>
                     <div>
                         <label for="shuffle_options" class="form-label cursor-pointer">Shuffle MC/MS Option Order</label>

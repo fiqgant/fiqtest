@@ -306,8 +306,9 @@ class ExamController extends Controller
             'tab_switch_warning_count' => ['required', 'integer', 'min:0', 'max:20'],
             'inactivity_limit_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
             'inactivity_warning_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
-            'disable_inspect'  => ['nullable', 'boolean'],
-            'shuffle_options'  => ['nullable', 'boolean'],
+            'disable_inspect'    => ['nullable', 'boolean'],
+            'detect_copy_paste'  => ['nullable', 'boolean'],
+            'shuffle_options'    => ['nullable', 'boolean'],
             'easy_count' => ['required', 'integer', 'min:0'],
             'medium_count' => ['required', 'integer', 'min:0'],
             'hard_count' => ['required', 'integer', 'min:0'],
@@ -320,8 +321,9 @@ class ExamController extends Controller
 
         $data['show_score_immediately'] = (bool) ($data['show_score_immediately'] ?? false);
         $data['hints_enabled'] = (bool) ($data['hints_enabled'] ?? false);
-        $data['disable_inspect'] = (bool) ($data['disable_inspect'] ?? false);
-        $data['shuffle_options'] = (bool) ($data['shuffle_options'] ?? false);
+        $data['disable_inspect']   = (bool) ($data['disable_inspect'] ?? false);
+        $data['detect_copy_paste'] = (bool) ($data['detect_copy_paste'] ?? false);
+        $data['shuffle_options']   = (bool) ($data['shuffle_options'] ?? false);
 
         if ((int) $data['max_tab_switches'] === 0) {
             $data['tab_switch_warning_count'] = 0;

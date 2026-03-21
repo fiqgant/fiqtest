@@ -26,6 +26,7 @@ class Exam extends Model
         'inactivity_limit_seconds',
         'inactivity_warning_seconds',
         'disable_inspect',
+        'detect_copy_paste',
         'shuffle_options',
         'easy_count',
         'medium_count',
@@ -46,8 +47,9 @@ class Exam extends Model
         'tab_switch_warning_count' => 'integer',
         'inactivity_limit_seconds' => 'integer',
         'inactivity_warning_seconds' => 'integer',
-        'disable_inspect'  => 'boolean',
-        'shuffle_options'  => 'boolean',
+        'disable_inspect'    => 'boolean',
+        'detect_copy_paste'  => 'boolean',
+        'shuffle_options'    => 'boolean',
         'question_filter_tags' => 'array',
     ];
 

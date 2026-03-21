@@ -107,6 +107,7 @@ Route::prefix('attempt/{attempt}')->group(function () {
     Route::post('/run', [ExamWorkspaceController::class, 'runCode'])->name('exam.run');
     Route::post('/autosave', [ExamWorkspaceController::class, 'autosave'])->name('exam.autosave');
     Route::post('/activity', [ExamWorkspaceController::class, 'trackActivity'])->name('exam.activity');
+    Route::post('/log-clipboard', [ExamWorkspaceController::class, 'logClipboard'])->name('exam.log-clipboard');
     Route::post('/submit', [ExamWorkspaceController::class, 'finalSubmit'])->name('exam.submit');
     Route::post('/hint/{attemptQuestion}', [HintController::class, 'use'])->name('exam.hint');
     Route::get('/submitted', [ExamWorkspaceController::class, 'submitted'])->name('exam.submitted');
