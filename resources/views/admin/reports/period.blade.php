@@ -53,7 +53,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-inbox text-2xl"></i><span>No offering report data in this period.</span></div></td></tr>
+                    <tr><td colspan="7" class="px-5 py-10 text-center text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-inbox text-2xl"></i><span>No offering report data in this period.</span></div></td></tr>
                 @endforelse
             </tbody>
         </table>

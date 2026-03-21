@@ -177,7 +177,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-5 py-14 text-slate-400 dark:text-slate-500">
+                        <td colspan="8" class="px-5 py-14 text-center text-slate-400 dark:text-slate-500">
                             <div class="flex flex-col items-center gap-3">
                                 <i class="fas fa-database text-3xl text-slate-300 dark:text-slate-600"></i>
                                 @if($search || $type || $difficulty)

@@ -102,7 +102,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ 4 + $exams->count() }}" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-inbox text-2xl"></i><span>No grade report data yet for this offering.</span></div></td></tr>
+                    <tr><td colspan="{{ 4 + $exams->count() }}" class="px-5 py-10 text-center text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-inbox text-2xl"></i><span>No grade report data yet for this offering.</span></div></td></tr>
                 @endforelse
             </tbody>
         </table>

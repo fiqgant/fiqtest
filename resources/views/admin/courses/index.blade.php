@@ -29,7 +29,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="4" class="px-5 py-10 text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-book text-2xl"></i><span>No courses yet.</span></div></td></tr>
+                    <tr><td colspan="4" class="px-5 py-10 text-center text-slate-400"><div class="flex flex-col items-center gap-1"><i class="fas fa-book text-2xl"></i><span>No courses yet.</span></div></td></tr>
                 @endforelse
             </tbody>
         </table>
