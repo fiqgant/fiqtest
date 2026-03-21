@@ -172,7 +172,7 @@
         /* ── Topbar ──────────────────────────────── */
         .admin-topbar { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226,232,240,0.8); }
         .dark .admin-topbar { background: rgba(10,15,30,0.92); border-color: #1e293b; }
-        .admin-footer { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; }
+        .admin-footer { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; position: sticky; bottom: 0; }
         .dark .admin-footer { background: rgba(15,23,42,0.7); border-color: #334155; }
 
         /* ── Nav links ───────────────────────────── */
@@ -421,8 +421,8 @@
     </header>
 
     <!-- ── Page Content ────────────────────────────────────────────── -->
-    <main class="h-[calc(100vh-3.5rem)] flex flex-col">
-        <div class="flex-1 overflow-y-auto p-4 lg:p-8 pb-12">
+    <main class="min-h-[calc(100vh-3.5rem)] flex flex-col">
+        <div class="flex-1 p-4 lg:p-8 pb-4">
             @if(session('success'))
                 <div class="alert-success mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-sm flex items-center gap-2">
                     <i class="fas fa-check-circle"></i>
