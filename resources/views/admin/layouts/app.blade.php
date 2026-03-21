@@ -169,11 +169,58 @@
         .dark .modal-header { border-color: #334155; }
         .dark .modal-footer { background: #162032; border-color: #334155; }
 
-        /* ── Topbar & Footer ─────────────────────── */
-        .admin-topbar { background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.7); }
-        .dark .admin-topbar { background: rgba(15,23,42,0.85); border-color: #334155; }
+        /* ── Topbar ──────────────────────────────── */
+        .admin-topbar { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226,232,240,0.8); }
+        .dark .admin-topbar { background: rgba(10,15,30,0.92); border-color: #1e293b; }
         .admin-footer { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; }
         .dark .admin-footer { background: rgba(15,23,42,0.7); border-color: #334155; }
+
+        /* ── Nav links ───────────────────────────── */
+        .nav-link {
+            display: inline-flex; align-items: center; gap: 0.375rem;
+            padding: 0.4rem 0.75rem; border-radius: 0.625rem;
+            font-size: 0.8rem; font-weight: 600; color: #475569;
+            text-decoration: none; transition: all 0.15s; white-space: nowrap;
+        }
+        .nav-link:hover { background: #f1f5f9; color: #1e293b; }
+        .nav-link.active { background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,0.3); }
+        .dark .nav-link { color: #94a3b8; }
+        .dark .nav-link:hover { background: #1e293b; color: #e2e8f0; }
+        .dark .nav-link.active { color: #fff; }
+
+        /* ── Nav dropdown ────────────────────────── */
+        .nav-dropdown-wrap { position: relative; }
+        .nav-dropdown {
+            display: none; position: absolute; top: calc(100% + 6px); left: 0;
+            min-width: 13rem; background: #fff; border: 1px solid #e2e8f0;
+            border-radius: 0.875rem; box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 0.375rem; z-index: 100; animation: dropIn 0.12s ease-out;
+        }
+        .nav-dropdown-wrap:hover .nav-dropdown,
+        .nav-dropdown-wrap.open .nav-dropdown { display: block; }
+        .nav-dropdown-item {
+            display: flex; align-items: center; gap: 0.625rem;
+            padding: 0.5rem 0.75rem; border-radius: 0.625rem;
+            font-size: 0.8rem; font-weight: 500; color: #475569;
+            text-decoration: none; transition: all 0.12s;
+        }
+        .nav-dropdown-item:hover { background: #f1f5f9; color: #1e293b; }
+        .nav-dropdown-item.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+        .dark .nav-dropdown { background: #1e293b; border-color: #334155; box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+        .dark .nav-dropdown-item { color: #94a3b8; }
+        .dark .nav-dropdown-item:hover { background: #293548; color: #e2e8f0; }
+        .dark .nav-dropdown-item.active { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+
+        /* ── Theme toggle ────────────────────────── */
+        .theme-toggle {
+            width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            border: 1.5px solid #e2e8f0; background: #f8fafc;
+            cursor: pointer; transition: all 0.2s; color: #64748b; font-size: 0.875rem;
+        }
+        .theme-toggle:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+        .dark .theme-toggle { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        .dark .theme-toggle:hover { background: #273549; border-color: #475569; color: #e2e8f0; }
 
         /* ── Confirm modal dark ───────────────────── */
         .dark #acm-box { background: #1e293b !important; }
@@ -186,172 +233,221 @@
         .dark .alert-success { background: rgba(16,185,129,0.1) !important; border-color: rgba(16,185,129,0.3) !important; color: #6ee7b7 !important; }
         .dark .alert-error   { background: rgba(225,29,72,0.1)  !important; border-color: rgba(225,29,72,0.3)  !important; color: #fda4af !important; }
 
-        /* ── Theme toggle button ─────────────────── */
-        .theme-toggle {
-            width: 2.25rem; height: 2.25rem; border-radius: 0.75rem;
-            display: inline-flex; align-items: center; justify-content: center;
-            border: 1.5px solid #e2e8f0; background: #f8fafc;
-            cursor: pointer; transition: all 0.2s; color: #64748b; font-size: 0.875rem;
-        }
-        .theme-toggle:hover { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
-        .dark .theme-toggle { background: #1e293b; border-color: #334155; color: #94a3b8; }
-        .dark .theme-toggle:hover { background: #273549; border-color: #475569; color: #e2e8f0; }
-
         @keyframes modalIn {
             from { opacity: 0; transform: scale(0.95) translateY(-6px); }
             to   { opacity: 1; transform: scale(1)    translateY(0); }
         }
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="app-bg text-slate-800 dark:text-slate-200 min-h-screen font-sans">
-    <div class="min-h-screen flex">
-        <!-- Mobile sidebar overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 z-40 bg-black/50 hidden lg:hidden" onclick="closeSidebar()"></div>
 
-        <!-- Sidebar -->
-        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-panel text-slate-100 flex flex-col -translate-x-full transition-transform duration-200 ease-in-out lg:static lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen">
-            <div class="p-5 border-b border-slate-700/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <span class="text-white font-bold text-xl leading-none">T</span>
+    @php
+        $isAcademic    = request()->routeIs('admin.academic-periods.*','admin.courses.*','admin.course-offerings.*','admin.students.*');
+        $isAssessment  = request()->routeIs('admin.questions.*','admin.question-tags.*','admin.exams.*','admin.reports.*');
+        $isSystem      = request()->routeIs('admin.profile.*','admin.settings.*');
+    @endphp
+
+    <!-- ── Topbar ─────────────────────────────────────────────────── -->
+    <header class="admin-topbar sticky top-0 z-50">
+        <!-- Main row -->
+        <div class="flex items-center justify-between h-14 px-4 lg:px-6 gap-3">
+
+            <!-- Left: Logo + Desktop Nav -->
+            <div class="flex items-center gap-1 min-w-0">
+                <!-- Logo -->
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 mr-2 flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shadow shadow-indigo-500/30">
+                        <span class="text-white font-bold text-sm leading-none">T</span>
                     </div>
-                    <div>
-                        <h1 class="text-lg font-bold text-white">fiqtest</h1>
-                        <p class="text-xs text-slate-400">Admin Console</p>
+                    <span class="font-bold text-slate-800 dark:text-white text-sm hidden sm:block">fiqtest</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden lg:flex items-center gap-0.5">
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                        <i class="fas fa-th-large text-xs"></i> Dashboard
+                    </a>
+
+                    {{-- Academic dropdown --}}
+                    <div class="nav-dropdown-wrap">
+                        <button class="nav-link {{ $isAcademic ? 'active' : '' }}">
+                            <i class="fas fa-graduation-cap text-xs"></i> Academic
+                            <i class="fas fa-chevron-down text-xs opacity-60"></i>
+                        </button>
+                        <div class="nav-dropdown">
+                            <a href="{{ route('admin.academic-periods.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.academic-periods.*') ? 'active' : '' }}">
+                                <i class="fas fa-calendar-alt w-4 text-center text-emerald-500"></i> Academic Periods
+                            </a>
+                            <a href="{{ route('admin.courses.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+                                <i class="fas fa-book w-4 text-center text-amber-500"></i> Courses
+                            </a>
+                            <a href="{{ route('admin.course-offerings.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.course-offerings.*') ? 'active' : '' }}">
+                                <i class="fas fa-layer-group w-4 text-center text-cyan-500"></i> Course Offerings
+                            </a>
+                            <a href="{{ route('admin.students.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.students.*') ? 'active' : '' }}">
+                                <i class="fas fa-users w-4 text-center text-rose-500"></i> Students
+                            </a>
+                        </div>
                     </div>
-                </div>
+
+                    {{-- Assessment dropdown --}}
+                    <div class="nav-dropdown-wrap">
+                        <button class="nav-link {{ $isAssessment ? 'active' : '' }}">
+                            <i class="fas fa-file-alt text-xs"></i> Assessment
+                            <i class="fas fa-chevron-down text-xs opacity-60"></i>
+                        </button>
+                        <div class="nav-dropdown">
+                            <a href="{{ route('admin.questions.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
+                                <i class="fas fa-database w-4 text-center text-orange-500"></i> Question Bank
+                            </a>
+                            <a href="{{ route('admin.question-tags.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.question-tags.*') ? 'active' : '' }}">
+                                <i class="fas fa-tags w-4 text-center text-teal-500"></i> Question Tags
+                            </a>
+                            <a href="{{ route('admin.exams.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.exams.*') ? 'active' : '' }}">
+                                <i class="fas fa-clipboard-list w-4 text-center text-purple-500"></i> Exams
+                            </a>
+                            <a href="{{ route('admin.reports.index') }}" class="nav-dropdown-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+                                <i class="fas fa-chart-bar w-4 text-center text-blue-500"></i> Reports
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- System dropdown --}}
+                    <div class="nav-dropdown-wrap">
+                        <button class="nav-link {{ $isSystem ? 'active' : '' }}">
+                            <i class="fas fa-cog text-xs"></i> System
+                            <i class="fas fa-chevron-down text-xs opacity-60"></i>
+                        </button>
+                        <div class="nav-dropdown">
+                            <a href="{{ route('admin.profile.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
+                                <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
+                            </a>
+                            <a href="{{ route('admin.settings.judge0.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                                <i class="fas fa-server w-4 text-center text-slate-400"></i> Judge0 Settings
+                            </a>
+                        </div>
+                    </div>
+                </nav>
             </div>
 
-            <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-th-large w-5 text-center {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-indigo-400' }}"></i><span>Dashboard</span>
-                </a>
-                <div class="pt-3 pb-2"><p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Academic</p></div>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.academic-periods.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.academic-periods.index') }}">
-                    <i class="fas fa-calendar-alt w-5 text-center {{ request()->routeIs('admin.academic-periods.*') ? 'text-white' : 'text-emerald-400' }}"></i><span>Academic Periods</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.courses.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.courses.index') }}">
-                    <i class="fas fa-book w-5 text-center {{ request()->routeIs('admin.courses.*') ? 'text-white' : 'text-amber-400' }}"></i><span>Courses</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.course-offerings.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.course-offerings.index') }}">
-                    <i class="fas fa-layer-group w-5 text-center {{ request()->routeIs('admin.course-offerings.*') ? 'text-white' : 'text-cyan-400' }}"></i><span>Course Offerings</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.students.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.students.index') }}">
-                    <i class="fas fa-users w-5 text-center {{ request()->routeIs('admin.students.*') ? 'text-white' : 'text-rose-400' }}"></i><span>Students</span>
-                </a>
-                <div class="pt-3 pb-2"><p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Assessment</p></div>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.questions.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.questions.index') }}">
-                    <i class="fas fa-database w-5 text-center {{ request()->routeIs('admin.questions.*') ? 'text-white' : 'text-orange-400' }}"></i><span>Question Bank</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.question-tags.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.question-tags.index') }}">
-                    <i class="fas fa-tags w-5 text-center {{ request()->routeIs('admin.question-tags.*') ? 'text-white' : 'text-teal-400' }}"></i><span>Question Tags</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.exams.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.exams.index') }}">
-                    <i class="fas fa-file-alt w-5 text-center {{ request()->routeIs('admin.exams.*') ? 'text-white' : 'text-purple-400' }}"></i><span>Exams</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.reports.index') }}">
-                    <i class="fas fa-chart-bar w-5 text-center {{ request()->routeIs('admin.reports.*') ? 'text-white' : 'text-blue-400' }}"></i><span>Reports</span>
-                </a>
-                <div class="pt-3 pb-2"><p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">System</p></div>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.profile.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.profile.edit') }}">
-                    <i class="fas fa-user w-5 text-center {{ request()->routeIs('admin.profile.*') ? 'text-white' : 'text-slate-400' }}"></i><span>My Profile</span>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 hover:bg-slate-700/50 {{ request()->routeIs('admin.settings.judge0.*') ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : '' }}" href="{{ route('admin.settings.judge0.edit') }}">
-                    <i class="fas fa-cog w-5 text-center {{ request()->routeIs('admin.settings.judge0.*') ? 'text-white' : 'text-slate-400' }}"></i><span>Judge0 Settings</span>
-                </a>
-            </nav>
+            <!-- Right: actions -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <div class="text-right mr-1 hidden xl:block">
+                    <p class="font-mono text-xs text-slate-500 dark:text-slate-400">{{ now()->format('Y-m-d H:i') }}</p>
+                </div>
 
-            <div class="p-3 border-t border-slate-700/50">
+                {{-- Theme toggle --}}
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+                    <i class="fas fa-moon" id="theme-icon-moon"></i>
+                    <i class="fas fa-sun hidden" id="theme-icon-sun"></i>
+                </button>
+
+                <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 text-sm font-medium hidden sm:flex">
+                    <div class="w-6 h-6 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-white" style="font-size:0.6rem"></i>
+                    </div>
+                    <span class="hidden md:block">{{ session('admin_name', 'Admin') }}</span>
+                </a>
+
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 w-full text-rose-400 hover:bg-rose-500/10 hover:text-rose-300">
-                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors text-rose-600 dark:text-rose-400 text-sm font-medium border border-rose-100 dark:border-rose-800">
+                        <i class="fas fa-sign-out-alt text-xs"></i>
+                        <span class="hidden sm:block">Logout</span>
                     </button>
                 </form>
+
+                <!-- Mobile hamburger -->
+                <button onclick="toggleMobileNav()" class="lg:hidden w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <i class="fas fa-bars text-sm" id="mobile-menu-icon"></i>
+                </button>
             </div>
-        </aside>
+        </div>
 
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col min-h-screen lg:h-screen lg:overflow-hidden">
-            <!-- Top Bar -->
-            <div class="admin-topbar px-4 lg:px-6 py-3 shadow-sm flex-shrink-0">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <!-- Hamburger (mobile only) -->
-                        <button onclick="openSidebar()" class="lg:hidden flex-shrink-0 w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-                            <i class="fas fa-bars text-sm"></i>
-                        </button>
-                        <div class="min-w-0">
-                            <p class="text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 font-semibold truncate">{{ $title ?? 'Admin Workspace' }}</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400 hidden sm:block">Manage coding exams, questions, students, and grading</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <div class="text-right mr-1 hidden md:block">
-                            <p class="font-mono text-sm text-slate-600 dark:text-slate-400">{{ now()->format('Y-m-d H:i') }}</p>
-                            <p class="text-xs text-slate-400 dark:text-slate-500">Asia/Jakarta</p>
-                        </div>
-                        {{-- Theme toggle --}}
-                        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode" id="theme-btn">
-                            <i class="fas fa-moon" id="theme-icon-moon"></i>
-                            <i class="fas fa-sun  hidden" id="theme-icon-sun"></i>
-                        </button>
-                        <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-700 dark:text-slate-200 text-sm font-medium">
-                            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-user text-white text-xs"></i>
-                            </div>
-                            <span>{{ session('admin_name', 'Admin') }}</span>
-                        </a>
-                        <form method="POST" action="{{ route('admin.logout') }}">
-                            @csrf
-                            <button type="submit" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors text-rose-600 dark:text-rose-400 text-sm font-medium border border-rose-100 dark:border-rose-800">
-                                <i class="fas fa-sign-out-alt text-xs"></i>
-                                <span>Logout</span>
-                            </button>
-                        </form>
-                    </div>
+        <!-- Mobile nav panel -->
+        <div id="mobile-nav" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 space-y-1">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-th-large w-4 text-center"></i> Dashboard
+            </a>
+            <p class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Academic</p>
+            <a href="{{ route('admin.academic-periods.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.academic-periods.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-calendar-alt w-4 text-center text-emerald-500"></i> Academic Periods
+            </a>
+            <a href="{{ route('admin.courses.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.courses.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-book w-4 text-center text-amber-500"></i> Courses
+            </a>
+            <a href="{{ route('admin.course-offerings.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.course-offerings.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-layer-group w-4 text-center text-cyan-500"></i> Course Offerings
+            </a>
+            <a href="{{ route('admin.students.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.students.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-users w-4 text-center text-rose-500"></i> Students
+            </a>
+            <p class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">Assessment</p>
+            <a href="{{ route('admin.questions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.questions.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-database w-4 text-center text-orange-500"></i> Question Bank
+            </a>
+            <a href="{{ route('admin.question-tags.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.question-tags.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-tags w-4 text-center text-teal-500"></i> Question Tags
+            </a>
+            <a href="{{ route('admin.exams.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.exams.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-clipboard-list w-4 text-center text-purple-500"></i> Exams
+            </a>
+            <a href="{{ route('admin.reports.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.reports.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-chart-bar w-4 text-center text-blue-500"></i> Reports
+            </a>
+            <p class="px-3 pt-2 pb-1 text-xs font-semibold text-slate-400 uppercase tracking-wider">System</p>
+            <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.profile.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
+            </a>
+            <a href="{{ route('admin.settings.judge0.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-server w-4 text-center text-slate-400"></i> Judge0 Settings
+            </a>
+        </div>
+    </header>
+
+    <!-- ── Page Content ────────────────────────────────────────────── -->
+    <main class="min-h-[calc(100vh-3.5rem)] flex flex-col">
+        <div class="flex-1 p-4 lg:p-8 pb-12">
+            @if(session('success'))
+                <div class="alert-success mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-sm flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
                 </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert-error mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700 shadow-sm">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="font-semibold">Please fix the following errors:</span>
+                    </div>
+                    <ul class="list-disc pl-6 text-sm">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div id="admin-content">
+                @yield('content')
             </div>
+        </div>
 
-            <!-- Scrollable Content -->
-            <div class="flex-1 min-h-0 overflow-y-auto p-4 lg:p-8 pb-12">
-                @if(session('success'))
-                    <div class="alert-success mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700 shadow-sm flex items-center gap-2">
-                        <i class="fas fa-check-circle"></i>
-                        {{ session('success') }}
-                    </div>
-                @endif
-
-                @if($errors->any())
-                    <div class="alert-error mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700 shadow-sm">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span class="font-semibold">Please fix the following errors:</span>
-                        </div>
-                        <ul class="list-disc pl-6 text-sm">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <div id="admin-content">
-                    @yield('content')
-                </div>
+        <footer class="admin-footer px-6 py-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-500">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-indigo-600">fiqtest</span>
+                <span>|</span>
+                <span>Coding Assessment Platform</span>
             </div>
-
-            <!-- Footer -->
-            <footer class="admin-footer flex-shrink-0 px-6 py-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-500">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-indigo-600">fiqtest</span>
-                    <span>|</span>
-                    <span>Coding Assessment Platform</span>
-                </div>
-                <span>&copy; {{ now()->year }} All rights reserved</span>
-            </footer>
-        </main>
-    </div>
+            <span>&copy; {{ now()->year }} All rights reserved</span>
+        </footer>
+    </main>
 
     {{-- Confirm Modal --}}
     <div id="admin-confirm-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center; padding:1rem;">
@@ -378,21 +474,13 @@
     </div>
 
     <script>
-        // ── Mobile sidebar ───────────────────────────────────────────
-        function openSidebar() {
-            document.getElementById('admin-sidebar').classList.remove('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
+        // ── Mobile nav toggle ────────────────────────────────────────
+        function toggleMobileNav() {
+            const nav  = document.getElementById('mobile-nav');
+            const icon = document.getElementById('mobile-menu-icon');
+            const open = nav.classList.toggle('hidden');
+            icon.className = open ? 'fas fa-bars text-sm' : 'fas fa-times text-sm';
         }
-        function closeSidebar() {
-            document.getElementById('admin-sidebar').classList.add('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.add('hidden');
-            document.body.style.overflow = '';
-        }
-        // Close sidebar on resize to desktop
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 1024) closeSidebar();
-        });
 
         // ── Dark mode ────────────────────────────────────────────────
         function updateThemeIcon() {
@@ -409,7 +497,6 @@
 
         // ── Confirm modal ────────────────────────────────────────────
         var _acmCallback = null;
-
         function adminModalOpen(title, message, okText, cb) {
             document.getElementById('acm-title').textContent   = title   || 'Confirm';
             document.getElementById('acm-message').textContent = message || 'Are you sure?';
@@ -429,7 +516,6 @@
             adminModalClose();
             if (cb) cb();
         }
-
         document.getElementById('admin-confirm-modal').addEventListener('click', function(e) {
             if (e.target === this) adminModalClose();
         });
