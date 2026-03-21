@@ -1,4 +1,3 @@
-            <div class="flex-1 flex overflow-hidden">
                 <div class="w-1/2 border-r border-neutral-800 overflow-y-auto scrollbar-thin p-6">
                     <template x-if="currentQuestion">
                         <div>

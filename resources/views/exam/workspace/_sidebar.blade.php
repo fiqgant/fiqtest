@@ -1,4 +1,3 @@
-    <div class="flex h-full">
         <aside class="w-64 bg-neutral-900 border-r border-neutral-800 flex flex-col flex-shrink-0">
             <div class="p-4 border-b border-neutral-800">
                 <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Questions</h3>

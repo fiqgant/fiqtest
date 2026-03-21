@@ -1,4 +1,3 @@
-        <main class="flex-1 flex flex-col min-w-0">
             <header class="h-16 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-6 flex-shrink-0">
                 <div class="flex items-center space-x-4 min-w-0">
                     <h1 class="text-lg font-semibold truncate">{{ $exam->title }}</h1>
