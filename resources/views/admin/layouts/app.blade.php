@@ -170,10 +170,50 @@
         .dark .modal-footer { background: #162032; border-color: #334155; }
 
         /* ── Topbar ──────────────────────────────── */
-        .admin-topbar { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(226,232,240,0.8); }
-        .dark .admin-topbar { background: rgba(10,15,30,0.92); border-color: #1e293b; }
-        .admin-footer { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; position: sticky; bottom: 0; }
-        .dark .admin-footer { background: rgba(15,23,42,0.7); border-color: #334155; }
+        /* ── Glassmorphism topbar ────────────────── */
+        .admin-topbar {
+            background: rgba(248,250,252,0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255,255,255,0.6);
+            box-shadow:
+                0 1px 0 rgba(226,232,240,0.8),
+                0 4px 24px rgba(99,102,241,0.06),
+                inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .dark .admin-topbar {
+            background: rgba(10,15,30,0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            box-shadow:
+                0 1px 0 rgba(30,41,59,0.8),
+                0 4px 24px rgba(99,102,241,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        /* ── Glassmorphism footer ────────────────── */
+        .admin-footer {
+            position: sticky; bottom: 0; z-index: 40;
+            background: rgba(248,250,252,0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.6);
+            box-shadow:
+                0 -1px 0 rgba(226,232,240,0.8),
+                0 -4px 24px rgba(99,102,241,0.04),
+                inset 0 -1px 0 rgba(255,255,255,0.9);
+        }
+        .dark .admin-footer {
+            background: rgba(10,15,30,0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            box-shadow:
+                0 -1px 0 rgba(30,41,59,0.8),
+                0 -4px 24px rgba(99,102,241,0.06),
+                inset 0 -1px 0 rgba(255,255,255,0.04);
+        }
 
         /* ── Nav links ───────────────────────────── */
         .nav-link {
