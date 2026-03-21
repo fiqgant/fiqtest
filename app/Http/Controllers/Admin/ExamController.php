@@ -90,7 +90,24 @@ class ExamController extends Controller
     {
         $exam->update(['status' => 'closed']);
 
-        return back()->with('success', 'Exam closed.');
+        // Force-submit all attempts still in progress
+        $inProgress = $exam->attempts()->where('status', 'in_progress')->get();
+
+        foreach ($inProgress as $attempt) {
+            $attempt->update([
+                'submitted_at' => now(),
+                'status'       => 'submitted',
+            ]);
+
+            app(\App\Services\GradingService::class)->gradeAllQuestions($attempt);
+        }
+
+        $count = $inProgress->count();
+        $msg = $count > 0
+            ? "Exam closed. {$count} in-progress attempt(s) were automatically submitted."
+            : 'Exam closed.';
+
+        return back()->with('success', $msg);
     }
 
     public function attempts(Exam $exam): View

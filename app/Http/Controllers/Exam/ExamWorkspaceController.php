@@ -281,6 +281,18 @@ class ExamWorkspaceController extends Controller
             abort(403, 'This exam has already been submitted.');
         }
 
+        // If admin closed the exam, auto-submit this attempt immediately
+        if ($attempt->exam->status === 'closed') {
+            $attempt->update([
+                'submitted_at' => now(),
+                'status'       => 'submitted',
+            ]);
+
+            app(GradingService::class)->gradeAllQuestions($attempt);
+
+            abort(403, 'The exam has been closed by the administrator. Your answers have been submitted.');
+        }
+
         $now = now();
         if ($now->lt($attempt->exam->opens_at) || $now->gt($attempt->exam->closes_at)) {
             $attempt->update([
