@@ -3,6 +3,8 @@
 @section('content')
     <x-admin.page-header title="Judge0 Settings" subtitle="Manage your runner configuration from the admin panel without editing .env." />
 
+    <div class="max-w-2xl flex flex-col gap-5">
+
     <form method="POST" action="{{ route('admin.settings.judge0.update') }}">
         @csrf
         @method('PUT')
@@ -49,7 +51,7 @@
     </form>
 
     <!-- Connection Test -->
-    <div class="mt-5">
+    <div>
         <div class="form-section">
             <div class="form-section-title"><i class="fas fa-plug mr-1.5"></i> Connection Test</div>
             <p class="text-sm text-slate-500 mb-4">Test whether Judge0 is reachable using the currently saved configuration.</p>
@@ -64,6 +66,8 @@
             </div>
         </div>
     </div>
+
+    </div>{{-- end max-w-2xl wrapper --}}
 
     <script>
     async function testJudge0() {

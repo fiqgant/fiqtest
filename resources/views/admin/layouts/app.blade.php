@@ -484,7 +484,7 @@
                 </div>
             @endif
 
-            <div id="admin-content">
+            <div id="admin-content" style="display:block">
                 @yield('content')
             </div>
         </div>
