@@ -14,19 +14,29 @@
 
     {{-- Anti-cheat log --}}
     @if($attempt->tab_switch_count > 0 || $attempt->is_disqualified || $attempt->ip_address)
+    @php
+        $agent = new \Jenssegers\Agent\Agent();
+        $agent->setUserAgent($attempt->user_agent);
+        $browser    = $agent->browser() ?: '—';
+        $browserVer = $agent->version($browser) ?: '';
+        $os         = $agent->platform() ?: '—';
+        $osVer      = $agent->version($os) ?: '';
+        $deviceType = $agent->isTablet() ? 'Tablet' : ($agent->isMobile() ? 'Mobile' : ($agent->isDesktop() ? 'Desktop' : '—'));
+        $deviceIcon = $agent->isTablet() ? 'fa-tablet-alt' : ($agent->isMobile() ? 'fa-mobile-alt' : 'fa-desktop');
+    @endphp
     <div class="mb-6 bg-white dark:bg-slate-800 rounded-2xl border {{ $attempt->is_disqualified ? 'border-rose-300' : 'border-amber-200' }} p-5 shadow-sm">
         <div class="flex items-center gap-2 mb-4 {{ $attempt->is_disqualified ? 'text-rose-700' : 'text-amber-700' }} font-semibold text-sm">
             <i class="fas fa-shield-alt"></i> Proctoring Log
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-                <div class="text-xs text-slate-400 mb-1">Tab Switches</div>
-                <div class="font-bold {{ $attempt->tab_switch_count >= 3 ? 'text-rose-600' : ($attempt->tab_switch_count > 0 ? 'text-amber-600' : 'text-slate-600') }}">
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">Tab Switches</div>
+                <div class="font-bold {{ $attempt->tab_switch_count >= 3 ? 'text-rose-600' : ($attempt->tab_switch_count > 0 ? 'text-amber-600' : 'text-slate-600 dark:text-slate-300') }}">
                     {{ $attempt->tab_switch_count }}×
                 </div>
             </div>
             <div>
-                <div class="text-xs text-slate-400 mb-1">Disqualified</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">Disqualified</div>
                 <div class="font-bold {{ $attempt->is_disqualified ? 'text-rose-600' : 'text-emerald-600' }}">
                     {{ $attempt->is_disqualified ? 'Yes' : 'No' }}
                 </div>
@@ -35,14 +45,38 @@
                 @endif
             </div>
             <div>
-                <div class="text-xs text-slate-400 mb-1">IP Address</div>
-                <div class="font-mono text-slate-700">{{ $attempt->ip_address ?? '—' }}</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">IP Address</div>
+                <div class="font-mono text-slate-700 dark:text-slate-300">{{ $attempt->ip_address ?? '—' }}</div>
             </div>
             <div>
-                <div class="text-xs text-slate-400 mb-1">Last Activity</div>
-                <div class="text-slate-700">{{ optional($attempt->last_activity_at)->format('d M H:i:s') ?? '—' }}</div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">Last Activity</div>
+                <div class="text-slate-700 dark:text-slate-300">{{ optional($attempt->last_activity_at)->format('d M H:i:s') ?? '—' }}</div>
             </div>
         </div>
+
+        @if($attempt->user_agent)
+        <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">Device</div>
+                <div class="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                    <i class="fas {{ $deviceIcon }} text-slate-400 dark:text-slate-500 text-xs"></i>
+                    {{ $deviceType }}
+                </div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">Browser</div>
+                <div class="text-slate-700 dark:text-slate-300">
+                    {{ $browser }}{{ $browserVer ? ' ' . $browserVer : '' }}
+                </div>
+            </div>
+            <div>
+                <div class="text-xs text-slate-400 dark:text-slate-500 mb-1">OS</div>
+                <div class="text-slate-700 dark:text-slate-300">
+                    {{ $os }}{{ $osVer ? ' ' . $osVer : '' }}
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
     @endif
 
