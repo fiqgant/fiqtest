@@ -1,91 +1,91 @@
-# fiqtest — Platform Ujian Online
+# fiqtest — Online Exam Platform
 
-Platform ujian online berbasis web untuk institusi akademik. Mendukung 6 tipe soal (termasuk coding dengan eksekusi kode nyata), proctoring otomatis, grading otomatis, dan monitoring real-time.
+A self-hosted online exam platform for academic institutions. Supports 6 question types (including coding with real code execution), automated proctoring, auto-grading, and real-time monitoring.
 
 ---
 
-## Daftar Isi
+## Table of Contents
 
 - [Tech Stack](#tech-stack)
-- [Instalasi & Setup](#instalasi--setup)
-- [Akses Admin](#akses-admin)
-- [Fitur Admin](#fitur-admin)
-  - [1. Manajemen Akademik](#1-manajemen-akademik)
-  - [2. Manajemen Mahasiswa](#2-manajemen-mahasiswa)
-  - [3. Bank Soal](#3-bank-soal)
-  - [4. Manajemen Ujian](#4-manajemen-ujian)
-  - [5. Pengaturan Ujian](#5-pengaturan-ujian)
+- [Installation & Setup](#installation--setup)
+- [Admin Access](#admin-access)
+- [Admin Features](#admin-features)
+  - [1. Academic Management](#1-academic-management)
+  - [2. Student Management](#2-student-management)
+  - [3. Question Bank](#3-question-bank)
+  - [4. Exam Management](#4-exam-management)
+  - [5. Exam Settings](#5-exam-settings)
   - [6. Live Monitor](#6-live-monitor)
-  - [7. Grading Essay](#7-grading-essay)
+  - [7. Essay Grading](#7-essay-grading)
   - [8. Reset Attempt](#8-reset-attempt)
-  - [9. Export Nilai](#9-export-nilai)
-  - [10. Laporan & Analitik](#10-laporan--analitik)
-  - [11. Pengaturan Sistem](#11-pengaturan-sistem)
-- [Fitur Mahasiswa](#fitur-mahasiswa)
-  - [1. Halaman Beranda](#1-halaman-beranda)
-  - [2. Mulai Ujian](#2-mulai-ujian)
-  - [3. Workspace Ujian](#3-workspace-ujian)
-  - [4. Tipe Soal](#4-tipe-soal)
-  - [5. Eksekusi Kode](#5-eksekusi-kode)
-  - [6. Hint / Petunjuk](#6-hint--petunjuk)
-  - [7. Hasil Ujian](#7-hasil-ujian)
-- [Sistem Proctoring & Integritas Akademik](#sistem-proctoring--integritas-akademik)
-- [Sistem Grading & Penilaian](#sistem-grading--penilaian)
+  - [9. Export Grades](#9-export-grades)
+  - [10. Reports & Analytics](#10-reports--analytics)
+  - [11. System Settings](#11-system-settings)
+- [Student Features](#student-features)
+  - [1. Home Page](#1-home-page)
+  - [2. Starting an Exam](#2-starting-an-exam)
+  - [3. Exam Workspace](#3-exam-workspace)
+  - [4. Question Types](#4-question-types)
+  - [5. Code Execution](#5-code-execution)
+  - [6. Hints](#6-hints)
+  - [7. Exam Results](#7-exam-results)
+- [Proctoring & Academic Integrity](#proctoring--academic-integrity)
+- [Grading & Scoring](#grading--scoring)
 - [Deployment (VPS + Docker)](#deployment-vps--docker)
-- [Ringkasan Semua URL](#ringkasan-semua-url)
+- [URL Reference](#url-reference)
 
 ---
 
 ## Tech Stack
 
-| Layer | Teknologi |
+| Layer | Technology |
 |---|---|
 | Backend | Laravel 13, PHP 8.4 |
 | Frontend | Tailwind CSS v4, Alpine.js, Monaco Editor |
 | Database | MySQL 8 |
-| Eksekusi Kode | Judge0 CE |
+| Code Execution | Judge0 CE |
 | PDF | Barryvdh/DomPDF |
 | Excel | PhpOffice/PhpSpreadsheet |
-| Deteksi Device | Jenssegers/Agent |
-| Animasi Welcome | Three.js |
+| Device Detection | Jenssegers/Agent |
+| Welcome Animation | Three.js |
 | Math Rendering | KaTeX |
-| Containerisasi | Docker + Docker Compose |
+| Containerization | Docker + Docker Compose |
 
 ---
 
-## Instalasi & Setup
+## Installation & Setup
 
-### Requirement
+### Requirements
 - Docker & Docker Compose
 - Git
 
-### Langkah
+### Steps
 
 ```bash
-# Clone repo
+# Clone the repo
 git clone https://github.com/fiqgant/fiqtest.git
 cd fiqtest
 
-# Salin environment file
+# Copy environment file
 cp .env.example .env
 
-# Isi variabel wajib di .env:
+# Fill in required variables in .env:
 # APP_KEY=
 # DB_PASSWORD=
-# JUDGE0_URL= (opsional, untuk eksekusi kode)
+# JUDGE0_URL= (optional, for code execution)
 
-# Build dan jalankan semua container
+# Build and start all containers
 docker compose up -d --build
 ```
 
-Container secara otomatis menjalankan:
+The entrypoint automatically runs:
 - `php artisan migrate`
 - `php artisan config:cache`
 - `php artisan storage:link`
 
-Akses aplikasi di `http://localhost` atau domain yang dikonfigurasi.
+Access the app at `http://localhost` or your configured domain.
 
-### Membuat Admin Pertama
+### Creating the First Admin
 
 ```bash
 docker compose exec app php artisan tinker
@@ -101,219 +101,219 @@ docker compose exec app php artisan tinker
 
 ---
 
-## Akses Admin
+## Admin Access
 
-| URL | Keterangan |
+| URL | Description |
 |---|---|
-| `/admin/login` | Halaman login admin |
-| `/admin/dashboard` | Dashboard utama |
+| `/admin/login` | Admin login page |
+| `/admin/dashboard` | Main dashboard |
 
 ---
 
-## Fitur Admin
+## Admin Features
 
-### 1. Manajemen Akademik
+### 1. Academic Management
 
-Hierarki data: **Academic Period → Course → Course Offering → Enrollment**
+Data hierarchy: **Academic Period → Course → Course Offering → Enrollment**
 
-#### Academic Period (Semester/Periode)
+#### Academic Periods
 **URL:** `/admin/academic-periods`
 
-- Buat, edit, hapus periode akademik (misal: Semester Genap 2025/2026)
-- Tandai satu periode sebagai **aktif**
-- Periode aktif tampil sebagai filter default di seluruh admin panel
+- Create, edit, delete academic periods (e.g. Even Semester 2025/2026)
+- Mark one period as **active**
+- Active period is used as the default filter across the admin panel
 
-#### Course (Mata Kuliah)
+#### Courses
 **URL:** `/admin/courses`
 
-- Buat, edit, hapus mata kuliah
-- Setiap mata kuliah memiliki nama dan kode (misal: `PWEB`, `ALGO`)
+- Create, edit, delete courses
+- Each course has a name and code (e.g. `PWEB`, `ALGO`)
 
-#### Course Offering (Kelas)
+#### Course Offerings (Classes)
 **URL:** `/admin/course-offerings`
 
-- Gabungkan mata kuliah + periode + nama kelas (misal: PWEB — Semester Genap 2025 — Kelas A)
-- Satu offering memiliki bank soal dan ujian sendiri
-- Kelola enrollment mahasiswa per offering
+- Combine a course + period + class name (e.g. PWEB — Even Semester 2025 — Class A)
+- Each offering has its own question bank and exams
+- Manage student enrollment per offering
 
-#### Enrollment Mahasiswa
+#### Student Enrollment
 **URL:** `/admin/course-offerings/{id}/enrollment`
 
-- Tambah/hapus mahasiswa dari kelas
-- Hanya mahasiswa yang terdaftar di offering yang bisa mengikuti ujiannya
+- Add or remove students from a class
+- Only enrolled students can take exams under that offering
 
 ---
 
-### 2. Manajemen Mahasiswa
+### 2. Student Management
 
 **URL:** `/admin/students`
 
-#### Tambah Mahasiswa Manual
-- Isi NIM, nama, dan email (opsional)
-- NIM harus unik di seluruh sistem
+#### Add Student Manually
+- Fill in NIM (student ID), name, and email (optional)
+- NIM must be unique across the system
 
-#### Import Massal
+#### Bulk Import
 **URL:** `/admin/students/bulk/import`
 
-Dua cara import:
+Two methods:
 
-1. **Upload Excel (.xlsx)** — kolom: `name`, `nim`, `email` (opsional). Baris header diabaikan.
-2. **Copy-paste CSV** — format: `nama,nim` atau `nama,nim,email` — satu baris per mahasiswa
+1. **Upload Excel (.xlsx)** — columns: `name`, `nim`, `email` (optional). Header row is ignored.
+2. **Copy-paste CSV** — format: `name,nim` or `name,nim,email` — one student per line
 
-Proses:
-1. Upload/paste data → klik Preview
-2. Cek hasil parse di halaman preview
-3. Konfirmasi → data disimpan
-4. NIM duplikat otomatis dilewati
+Process:
+1. Upload / paste data → click Preview
+2. Review the parsed results
+3. Confirm → data is saved
+4. Duplicate NIMs are automatically skipped
 
-#### Hapus Massal
-Centang beberapa mahasiswa di tabel → tombol **Bulk Delete**.
+#### Bulk Delete
+Check multiple students in the table → **Bulk Delete** button.
 
 ---
 
-### 3. Bank Soal
+### 3. Question Bank
 
 **URL:** `/admin/questions`
 
-#### Filter & Pencarian
-- Filter by: Course Offering, Tipe soal, Tingkat kesulitan
-- Pencarian teks bebas di judul soal
+#### Filters & Search
+- Filter by: Course Offering, Question Type, Difficulty
+- Free-text search by question title
 
-#### Membuat Soal
+#### Creating a Question
 **URL:** `/admin/questions/create`
 
-Pilih tipe soal:
+Available question types:
 
-| Tipe | Auto-Grade | Keterangan |
+| Type | Auto-Graded | Description |
 |---|---|---|
-| **Coding** | Ya | Kode mahasiswa dieksekusi lawan test cases |
-| **Multiple Choice** | Ya | Satu jawaban benar |
-| **Multiple Select** | Ya | Beberapa jawaban benar |
-| **True / False** | Ya | Pilihan Benar atau Salah |
-| **Fill in Blank** | Ya | Isi titik-titik |
-| **Essay** | Tidak | Dinilai manual oleh admin |
+| **Coding** | Yes | Student code is executed against test cases |
+| **Multiple Choice** | Yes | One correct answer |
+| **Multiple Select** | Yes | Multiple correct answers |
+| **True / False** | Yes | True or False |
+| **Fill in Blank** | Yes | Fill in the missing text |
+| **Essay** | No | Manually graded by admin |
 
-Field yang tersedia per soal:
-- **Judul** dan **Deskripsi** (mendukung Markdown + KaTeX untuk rumus matematika)
-- **Tingkat Kesulitan** — Easy / Medium / Hard
-- **Bobot Default** (poin)
-- **Tags** — untuk filter soal saat membuat ujian
-- **Hint** — petunjuk opsional untuk mahasiswa
-- Untuk **Coding**: bahasa pemrograman, starter code, reference solution, test cases (visible/hidden, input/output)
-- Untuk **MC/MS**: daftar opsi jawaban, tandai yang benar
-- Untuk **TF**: pilih jawaban benar (True/False)
-- Untuk **Fill Blank**: isi jawaban yang benar
+Available fields per question:
+- **Title** and **Description** (supports Markdown + KaTeX for math formulas)
+- **Difficulty** — Easy / Medium / Hard
+- **Default Weight** (points)
+- **Tags** — used to filter the question pool when creating an exam
+- **Hint** — optional hint for students
+- For **Coding**: programming language, starter code, reference solution, test cases (visible/hidden, input/output)
+- For **MC/MS**: list of answer options, mark correct ones
+- For **TF**: select the correct answer (True/False)
+- For **Fill Blank**: enter the correct answer
 
-#### Preview Soal
+#### Preview Question
 **URL:** `/admin/questions/{id}/preview`
 
-Lihat tampilan soal dari sudut pandang mahasiswa. Untuk soal coding, bisa langsung menjalankan kode.
+See the question from a student's perspective. For coding questions, you can run code directly.
 
-#### Duplikasi Soal
-Tombol **Duplicate** di halaman daftar atau detail soal → soal baru dengan data yang sama, siap diedit.
+#### Duplicate Question
+**Duplicate** button on the question list or detail page → creates a new question with the same data, ready to edit.
 
-#### Statistik Soal
+#### Question Statistics
 **URL:** `/admin/questions/{id}/stats`
 
-- Berapa kali soal digunakan di ujian
-- Rata-rata skor mahasiswa
-- Tingkat keberhasilan per test case (untuk soal coding)
+- How many times the question has been used in exams
+- Average student score
+- Pass rate per test case (for coding questions)
 
-#### Import Massal Soal
+#### Bulk Import Questions
 **URL:** `/admin/questions/bulk/import`
 
-1. Download template Excel di `/admin/questions/bulk/template`
-2. Isi soal-soal di spreadsheet sesuai format template
-3. Upload → Preview → Konfirmasi import
+1. Download the Excel template at `/admin/questions/bulk/template`
+2. Fill in questions following the template format
+3. Upload → Preview → Confirm import
 
-#### Hapus Massal Soal
-Centang beberapa soal → tombol **Bulk Delete**.
+#### Bulk Delete Questions
+Check multiple questions → **Bulk Delete** button.
 
-#### Tags Soal
+#### Question Tags
 **URL:** `/admin/question-tags`
 
-- Buat tag untuk kategorisasi soal (misal: `array`, `rekursi`, `OOP`)
-- Tag digunakan sebagai filter pool soal saat membuat ujian
+- Create tags to categorize questions (e.g. `array`, `recursion`, `OOP`)
+- Tags are used as pool filters when setting up an exam
 
 ---
 
-### 4. Manajemen Ujian
+### 4. Exam Management
 
 **URL:** `/admin/exams`
 
-#### Membuat Ujian Baru
+#### Creating a New Exam
 **URL:** `/admin/exams/create`
 
-1. Isi semua pengaturan ujian (lihat seksi [Pengaturan Ujian](#5-pengaturan-ujian))
-2. Simpan sebagai **Draft**
-3. Cek pool soal di `/admin/exams/{id}/question-pool` — pastikan jumlah soal cukup
-4. Jika soal sudah cukup, klik **Publish**
+1. Fill in all exam settings (see [Exam Settings](#5-exam-settings))
+2. Save as **Draft**
+3. Check the question pool at `/admin/exams/{id}/question-pool` — make sure there are enough questions
+4. Once ready, click **Publish**
 
-#### Status Ujian
+#### Exam Status
 
-| Status | Keterangan |
+| Status | Description |
 |---|---|
-| **Draft** | Tidak terlihat mahasiswa, bisa diedit bebas |
-| **Published** | Aktif — mahasiswa bisa akses sesuai jadwal buka/tutup |
-| **Closed** | Tidak bisa diakses lagi, semua data tetap tersimpan |
+| **Draft** | Not visible to students, can be freely edited |
+| **Published** | Active — students can access it within the open/close window |
+| **Closed** | No longer accessible, all data is preserved |
 
-#### Publish Ujian
-Sistem memvalidasi otomatis:
-- Jumlah soal easy/medium/hard yang tersedia di bank soal sudah cukup sesuai konfigurasi distribusi
-- Jika kurang, muncul pesan error dengan informasi kekurangan per kesulitan
+#### Publishing an Exam
+The system automatically validates:
+- Enough easy/medium/hard questions are available in the bank based on the configured distribution
+- If insufficient, an error message shows exactly how many are missing per difficulty
 
 #### Question Pool
 **URL:** `/admin/exams/{id}/question-pool`
 
-Lihat daftar soal yang memenuhi syarat untuk ujian ini, berdasarkan filter tag dan distribusi kesulitan yang dikonfigurasi.
+Preview all questions eligible for this exam based on the configured tag filter and difficulty distribution.
 
 ---
 
-### 5. Pengaturan Ujian
+### 5. Exam Settings
 
-Semua pengaturan tersedia di form create/edit exam.
+All settings are available in the create/edit exam form.
 
-#### Jadwal & Durasi
+#### Schedule & Duration
 
-| Pengaturan | Keterangan |
+| Setting | Description |
 |---|---|
-| **Opens At** | Tanggal & jam ujian mulai bisa diakses mahasiswa |
-| **Closes At** | Deadline — setelah lewat tidak bisa mulai ujian baru |
-| **Duration (menit)** | Batas waktu mengerjakan per mahasiswa (1–600 menit) |
-| **Show Score Immediately** | Tampilkan nilai langsung setelah mahasiswa submit |
+| **Opens At** | Date & time students can start accessing the exam |
+| **Closes At** | Deadline — no new attempts allowed after this |
+| **Duration (minutes)** | Time limit per student (1–600 minutes) |
+| **Show Score Immediately** | Show results right after the student submits |
 
-#### Distribusi & Bobot Soal
+#### Question Distribution & Weights
 
-| Pengaturan | Keterangan |
+| Setting | Description |
 |---|---|
-| **Easy Count** | Jumlah soal mudah yang diambil acak dari bank |
-| **Medium Count** | Jumlah soal sedang |
-| **Hard Count** | Jumlah soal sulit |
-| **Easy Weight** | Poin per soal mudah |
-| **Medium Weight** | Poin per soal sedang |
-| **Hard Weight** | Poin per soal sulit |
-| **Question Pool Filter (Tags)** | Filter pool berdasarkan tag (logika OR). Kosongkan = semua soal |
+| **Easy Count** | Number of easy questions randomly drawn from the bank |
+| **Medium Count** | Number of medium questions |
+| **Hard Count** | Number of hard questions |
+| **Easy Weight** | Points per easy question |
+| **Medium Weight** | Points per medium question |
+| **Hard Weight** | Points per hard question |
+| **Question Pool Filter (Tags)** | Filter the pool by tags (OR logic). Leave empty = all questions |
 
-Soal diambil **acak** dari bank sesuai distribusi saat mahasiswa memulai ujian — setiap mahasiswa bisa mendapat soal berbeda.
+Questions are drawn **randomly** from the bank at the moment a student starts — each student may receive a different set.
 
-#### Sistem Hint
+#### Hint System
 
-| Pengaturan | Keterangan |
+| Setting | Description |
 |---|---|
-| **Enable Hints** | Aktifkan tombol hint di workspace ujian |
-| **Max Hints per Question** | 0 = tidak terbatas. Berlaku untuk semua soal dalam ujian ini |
+| **Enable Hints** | Show the Hint button in the exam workspace |
+| **Max Hints per Question** | 0 = unlimited. Applies to all questions in this exam |
 
-#### Proctoring & Keamanan
+#### Proctoring & Security
 
-| Pengaturan | Keterangan |
+| Setting | Description |
 |---|---|
-| **Max Tab Switches** | Batas perpindahan tab/aplikasi. 0 = nonaktif |
-| **Warn at Switch #** | Tampilkan peringatan saat mencapai switch ke-N |
-| **Inactivity Limit (detik)** | Auto-disqualify jika tidak ada aktivitas. 0 = nonaktif |
-| **Inactivity Warning (detik)** | Tampilkan peringatan N detik sebelum batas inaktivitas |
-| **Disable DevTools & Right-Click** | Blokir F12, Ctrl+Shift+I, klik kanan, view-source selama ujian |
-| **Detect Copy-Paste Activity** | Catat semua aktivitas copy/cut/paste beserta isi teksnya |
-| **Shuffle MC/MS Options** | Acak urutan pilihan jawaban — berbeda tiap mahasiswa |
+| **Max Tab Switches** | Auto-disqualify after N tab/app switches. 0 = disabled |
+| **Warn at Switch #** | Show a warning on the Nth switch |
+| **Inactivity Limit (seconds)** | Auto-disqualify after N seconds of no activity. 0 = disabled |
+| **Inactivity Warning (seconds)** | Show a warning N seconds before the inactivity limit |
+| **Disable DevTools & Right-Click** | Block F12, Ctrl+Shift+I, right-click, and view-source during the exam |
+| **Detect Copy-Paste Activity** | Log all copy/cut/paste events including the text content |
+| **Shuffle MC/MS Options** | Randomize answer option order — different for each student |
 
 ---
 
@@ -321,49 +321,50 @@ Soal diambil **acak** dari bank sesuai distribusi saat mahasiswa memulai ujian �
 
 **URL:** `/admin/exams/{id}/monitor`
 
-Monitor real-time mahasiswa yang sedang mengerjakan ujian. Auto-refresh setiap 10 detik.
+Real-time view of students currently taking the exam. Auto-refreshes every 10 seconds.
 
 #### Stats Bar
-| Kartu | Keterangan |
-|---|---|
-| **Active Now** | Jumlah mahasiswa sedang mengerjakan |
-| **Submitted** | Jumlah yang sudah submit |
-| **Total Enrolled** | Total mahasiswa terdaftar di kelas |
-| **Last Updated** | Waktu refresh terakhir |
 
-#### Tabel Mahasiswa Aktif
-
-| Kolom | Keterangan |
+| Card | Description |
 |---|---|
-| Student | Nama dan NIM |
-| Started | Jam mulai ujian |
-| Time Remaining | Countdown (merah & berkedip jika < 5 menit) |
-| Progress | Soal terjawab / total + progress bar |
-| Tab Switches | Jumlah tab switch (kuning ≥1, merah & bold ≥3) |
-| Last Activity | Waktu aktivitas terakhir |
-| IP | Alamat IP mahasiswa |
-| Device | Tipe device, browser + versi, OS + versi |
+| **Active Now** | Number of students currently in progress |
+| **Submitted** | Number who have submitted |
+| **Total Enrolled** | Total enrolled in the class |
+| **Last Updated** | Timestamp of the last refresh |
+
+#### Active Students Table
+
+| Column | Description |
+|---|---|
+| Student | Name and NIM |
+| Started | Time the attempt started |
+| Time Remaining | Countdown (turns red and pulses if < 5 minutes) |
+| Progress | Questions answered / total + progress bar |
+| Tab Switches | Switch count (amber ≥1, red & bold ≥3) |
+| Last Activity | Timestamp of last mouse/keyboard activity |
+| IP | Student's IP address |
+| Device | Device type, browser + version, OS + version |
 | Status | In Progress / Disqualified |
 
 ---
 
-### 7. Grading Essay
+### 7. Essay Grading
 
 **URL:** `/admin/exams/{id}/attempts/{attemptId}`
 
-#### Cara Menilai Essay
-1. Buka halaman detail attempt mahasiswa
-2. Scroll ke bagian soal essay
-3. Isi kolom **Manual Score** (angka, 0 s/d bobot soal)
-4. Isi kolom **Feedback** (opsional — teks untuk mahasiswa)
-5. Klik **Save Grade**
+#### How to Grade an Essay
+1. Open the student's attempt detail page
+2. Scroll to the essay question
+3. Enter a **Manual Score** (number, 0 up to the question's weight)
+4. Enter **Feedback** (optional — shown to the student)
+5. Click **Save Grade**
 
-Total skor attempt diperbarui otomatis setelah menyimpan nilai.
+The attempt's total score is automatically recalculated after saving.
 
-#### Informasi di Halaman Attempt Detail
-- **Proctoring Log** — tab switches, status disqualified + alasan, IP, device info
-- **Copy-Paste Log** — daftar lengkap aktivitas clipboard (jika fitur aktif di ujian)
-- **Per soal** — jawaban mahasiswa, untuk coding: kode + output + test case pass/fail
+#### What's Visible on the Attempt Detail Page
+- **Proctoring Log** — tab switches, disqualification status + reason, IP, device info
+- **Copy-Paste Log** — full clipboard activity log (if the feature is enabled on the exam)
+- **Per question** — student's answer; for coding: submitted code + output + test case pass/fail
 
 ---
 
@@ -371,309 +372,309 @@ Total skor attempt diperbarui otomatis setelah menyimpan nilai.
 
 **URL:** `/admin/exams/{id}/attempts`
 
-Jika mahasiswa mengalami kendala teknis (putus koneksi, laptop mati, dll), admin bisa mereset attempt.
+If a student experiences a technical issue (connection loss, laptop crash, etc.), admin can reset their attempt.
 
-**Cara:**
-1. Buka halaman Attempts ujian
-2. Temukan mahasiswa yang ingin direset
-3. Klik tombol **Reset** (tombol merah di kolom Actions)
-4. Konfirmasi dialog
+**Steps:**
+1. Open the exam's Attempts page
+2. Find the student
+3. Click the **Reset** button (red, in the Actions column)
+4. Confirm the dialog
 
-Attempt lama dihapus beserta semua jawaban. Mahasiswa bisa memulai ujian dari awal.
+The old attempt and all its answers are permanently deleted. The student can start the exam fresh.
 
-> **Catatan:** Reset bersifat permanen — semua data attempt sebelumnya hilang.
-
----
-
-### 9. Export Nilai
-
-**URL:** `/admin/exams/{id}/export` — atau tombol **Export** di halaman Attempts.
-
-Download file Excel berisi:
-- NIM dan nama mahasiswa
-- Total skor dan persentase
-- Jumlah tab switch
-- Status disqualified + alasan
+> **Warning:** This is irreversible — all previous attempt data is lost.
 
 ---
 
-### 10. Laporan & Analitik
+### 9. Export Grades
+
+**URL:** `/admin/exams/{id}/export` — or the **Export** button on the Attempts page.
+
+Downloads an Excel file containing:
+- NIM and student name
+- Total score and percentage
+- Tab switch count
+- Disqualification status + reason
+
+---
+
+### 10. Reports & Analytics
 
 **URL:** `/admin/reports`
 
-#### Laporan per Course Offering
+#### Report by Course Offering
 **URL:** `/admin/reports/offering/{id}`
 
-- Tabel semua ujian dalam kelas beserta statistik
-- Nilai per mahasiswa di setiap ujian
-- Rata-rata nilai, jumlah peserta
-- Tombol export Excel
+- Table of all exams in the class with statistics
+- Per-student scores for each exam
+- Average scores, participant counts
+- Excel export button
 
-#### Laporan per Periode Akademik
+#### Report by Academic Period
 **URL:** `/admin/reports/period/{id}`
 
-- Overview semua kelas dalam satu semester
-- Perbandingan statistik antar kelas
+- Overview of all classes in a semester
+- Cross-class statistical comparison
 
-#### Laporan per Mahasiswa
+#### Report by Student
 **URL:** `/admin/reports/student/{id}`
 
-- Riwayat semua attempt mahasiswa
-- Detail nilai per ujian
+- Full attempt history for a student
+- Score details per exam
 
 ---
 
-### 11. Pengaturan Sistem
+### 11. System Settings
 
 #### Judge0 API
 **URL:** `/admin/settings/judge0`
 
-Konfigurasi untuk eksekusi kode mahasiswa:
-- **Judge0 URL** — URL instance Judge0 (self-hosted atau cloud)
-- **API Host** / **API Key** — Jika menggunakan RapidAPI
-- **Timeout** — Batas waktu eksekusi (detik)
-- Tombol **Test Connection** — Verifikasi koneksi ke Judge0
+Configure the code execution engine:
+- **Judge0 URL** — URL of your Judge0 instance (self-hosted or cloud)
+- **API Host** / **API Key** — If using RapidAPI
+- **Timeout** — Execution time limit (seconds)
+- **Test Connection** button — Verify the Judge0 connection
 
-#### Profil Admin
+#### Admin Profile
 **URL:** `/admin/profile`
 
-- Ubah nama dan email
-- Ganti password
+- Update name and email
+- Change password
 
 #### Dark Mode
-Toggle di sidebar admin panel. Preferensi disimpan di `localStorage` browser — persistent antar sesi.
+Toggle in the admin sidebar. Preference is saved in `localStorage` — persists across sessions.
 
 ---
 
-## Fitur Mahasiswa
+## Student Features
 
-### 1. Halaman Beranda
+### 1. Home Page
 
 **URL:** `/`
 
-- Menampilkan daftar ujian yang sedang aktif (status Published, dalam rentang waktu buka–tutup)
-- Setiap kartu ujian menampilkan: nama ujian, mata kuliah, durasi, waktu tutup
-- Animasi latar belakang Three.js
+- Lists all currently active exams (Published status, within open/close window)
+- Each exam card shows: exam name, course, duration, closing time
+- Three.js animated background
 
 ---
 
-### 2. Mulai Ujian
+### 2. Starting an Exam
 
 **URL:** `/exam/{slug}`
 
-**Langkah:**
-1. Halaman instruksi menampilkan: nama ujian, durasi, jumlah soal, aturan proctoring yang aktif
-2. Masukkan **NIM** untuk verifikasi identitas
-3. Sistem mengecek:
-   - NIM terdaftar di kelas ujian tersebut
-   - Belum ada attempt aktif (atau attempt lama sudah di-reset admin)
-   - Ujian sedang dalam rentang waktu buka–tutup
-4. Klik **Mulai Ujian** → masuk ke workspace
+**Steps:**
+1. The instructions page shows: exam name, duration, number of questions, active proctoring rules
+2. Enter **NIM** (student ID) to verify identity
+3. The system checks:
+   - NIM is enrolled in the exam's class
+   - No active attempt exists (or previous attempt was reset by admin)
+   - Exam is within its open/close window
+4. Click **Start Exam** → enters the workspace
 
 ---
 
-### 3. Workspace Ujian
+### 3. Exam Workspace
 
-Tampilan terbagi menjadi dua panel:
-- **Panel Kiri:** Navigasi soal — daftar semua soal dengan indikator terjawab/belum dan warna per kesulitan
-- **Panel Kanan/Utama:** Area jawab soal + timer di atas
+The interface is split into two panels:
+- **Left Panel:** Question navigator — lists all questions with answered/unanswered indicators and difficulty color-coding
+- **Right/Main Panel:** Answer area + timer at the top
 
 #### Timer
-- Countdown real-time di toolbar atas
-- Berubah warna merah dan berkedip jika tersisa < 5 menit
-- Auto-submit otomatis saat waktu habis
+- Real-time countdown in the top toolbar
+- Turns red and pulses when less than 5 minutes remain
+- Auto-submits when time runs out
 
 #### Autosave
-- Jawaban tersimpan otomatis secara berkala
-- Indikator "Saving..." dan "Saved ✓" di UI
+- Answers are saved automatically at regular intervals
+- "Saving..." and "Saved ✓" indicators in the UI
 
-#### Submit Ujian
-- Tombol **Submit** di toolbar — muncul dialog konfirmasi sebelum submit
-- Setelah submit, diarahkan ke halaman konfirmasi atau langsung hasil (tergantung setting)
+#### Submitting
+- **Submit** button in the toolbar — confirmation dialog appears before submitting
+- After submission, redirected to a confirmation page or directly to results (depends on settings)
 
 ---
 
-### 4. Tipe Soal
+### 4. Question Types
 
 #### Coding
-- Monaco Editor dengan syntax highlighting penuh
-- Starter code otomatis dimuat dari pengaturan soal
-- Pilihan bahasa pemrograman sesuai yang diset di soal
-- Tombol **Run** untuk menguji kode lawan visible test cases
-- Tampilkan output, pesan error, dan waktu eksekusi
+- Monaco Editor with full syntax highlighting
+- Starter code loaded automatically from the question settings
+- Programming language set per question
+- **Run** button to test code against visible test cases
+- Shows output, error messages, and execution time
 
 #### Multiple Choice
-- Pilih satu jawaban dari daftar opsi
-- Opsi bisa diacak urutan tampilannya (jika diaktifkan admin)
+- Select one answer from a list of options
+- Option order can be shuffled (if enabled by admin)
 
 #### Multiple Select
-- Centang semua jawaban yang benar
-- Opsi bisa diacak
+- Check all correct answers
+- Option order can be shuffled
 
 #### True / False
-- Dua tombol: **True** dan **False**
+- Two buttons: **True** and **False**
 
 #### Fill in Blank
-- Input teks bebas
+- Free-text input
 
 #### Essay
-- Textarea besar untuk jawaban panjang
-- Tidak ada batasan karakter
+- Large textarea for long-form answers
+- No character limit
 
 ---
 
-### 5. Eksekusi Kode
+### 5. Code Execution
 
-1. Tulis kode di Monaco Editor
-2. Klik tombol **Run**
-3. Kode dikirim ke Judge0 untuk dieksekusi
-4. Hasil tampil: output, error, waktu eksekusi
-5. Status per visible test case (pass/fail) ditampilkan
+1. Write code in the Monaco Editor
+2. Click **Run**
+3. Code is sent to Judge0 for execution
+4. Results appear: output, errors, execution time
+5. Pass/fail status is shown per visible test case
 
-> **Catatan:** Hanya *visible test cases* yang bisa dijalankan mahasiswa. *Hidden test cases* hanya digunakan untuk grading final saat submit.
-
----
-
-### 6. Hint / Petunjuk
-
-Jika admin mengaktifkan hints di ujian:
-1. Tombol **Hint** muncul di setiap soal yang memiliki hint
-2. Klik → petunjuk tampil
-3. Penggunaan hint dicatat (tidak mempengaruhi nilai)
-4. Jika ada batas (misal max 2 hint per soal), tombol terkunci setelah batas tercapai
+> **Note:** Only *visible test cases* can be run by students. *Hidden test cases* are used only for final grading on submission.
 
 ---
 
-### 7. Hasil Ujian
+### 6. Hints
 
-Jika admin mengaktifkan **Show Score Immediately**:
+If the admin has enabled hints on the exam:
+1. A **Hint** button appears on each question that has a hint configured
+2. Click it → the hint text is revealed
+3. Hint usage is recorded (does not affect the score)
+4. If a limit is set (e.g. max 2 hints per question), the button locks after the limit is reached
+
+---
+
+### 7. Exam Results
+
+If the admin enabled **Show Score Immediately**:
 
 **URL:** `/attempt/{id}/result`
 
-Menampilkan:
-- Total skor dan persentase
-- Breakdown per soal: skor diraih vs skor maksimal
-- Untuk coding: test case pass/fail detail
-- Untuk essay: feedback dari admin (jika sudah dinilai)
-- Tombol **Download PDF** untuk menyimpan hasil
+Displays:
+- Total score and percentage
+- Breakdown per question: score earned vs maximum
+- For coding: detailed test case pass/fail
+- For essay: admin feedback (if already graded)
+- **Download PDF** button to save the result
 
 ---
 
-## Sistem Proctoring & Integritas Akademik
+## Proctoring & Academic Integrity
 
 ### Tab / App Switch Detection
-- Deteksi setiap kali jendela browser kehilangan fokus
-- Peringatan muncul saat mencapai batas warning yang dikonfigurasi
-- Auto-disqualify saat mencapai batas maksimum tab switch
-- Alasan disqualifikasi dicatat beserta timestamp
-- Terlihat di: live monitor, halaman attempts, attempt detail
+- Detects every time the browser window loses focus
+- A warning popup appears when the configured warning threshold is reached
+- Auto-disqualifies when the maximum switch count is exceeded
+- Disqualification reason and timestamp are recorded
+- Visible in: live monitor, attempts list, attempt detail
 
 ### Inactivity Detection
-- Monitor aktivitas mouse dan keyboard secara real-time
-- Peringatan tampil N detik sebelum batas waktu inaktivitas
-- Auto-disqualify jika tidak ada aktivitas hingga batas waktu habis
+- Monitors mouse and keyboard activity in real-time
+- Warning appears N seconds before the inactivity limit
+- Auto-disqualifies if no activity occurs before the limit expires
 
 ### Copy-Paste Detection
-Jika diaktifkan per ujian (toggle **Detect Copy-Paste Activity**):
-- Mendeteksi: `Ctrl+C`, `Ctrl+X`, `Ctrl+V`, klik kanan copy/paste
-- Mencatat: waktu kejadian, jenis event (copy/cut/paste), **isi teks** yang di-copy/paste (max 2000 karakter)
-- Log tersimpan dan bisa dilihat admin di halaman attempt detail
-- Mahasiswa tidak mendapat notifikasi bahwa aktivitas ini dipantau
+When enabled on an exam (**Detect Copy-Paste Activity** toggle):
+- Detects: `Ctrl+C`, `Ctrl+X`, `Ctrl+V`, right-click copy/paste
+- Records: timestamp, event type (copy/cut/paste), **the actual text content** (up to 2,000 characters)
+- Logs are stored and visible to admins on the attempt detail page
+- Students receive no notification that this is being monitored
 
 ### DevTools / Inspect Block
-Jika diaktifkan (toggle **Disable DevTools & Right-Click**):
+When enabled (**Disable DevTools & Right-Click** toggle):
 
-| Diblokir | Shortcut |
+| Blocked | Shortcut |
 |---|---|
 | DevTools | F12, Ctrl+Shift+I |
 | Console | Ctrl+Shift+J |
 | Inspect Element | Ctrl+Shift+C |
-| Klik kanan | Context menu |
+| Right-click | Context menu |
 | View Source | Ctrl+U |
 | Print | Ctrl+P, Ctrl+Shift+P |
 | Save | Ctrl+S |
 
 ### Device & IP Tracking
-Otomatis dicatat saat attempt pertama kali dibuat (tidak membutuhkan konfigurasi):
-- Alamat IP mahasiswa
-- User Agent string lengkap
-- Browser + versi (parsed)
-- OS + versi (parsed)
-- Tipe device: Desktop / Mobile / Tablet
+Automatically recorded when an attempt is created (no configuration needed):
+- Student's IP address
+- Full User Agent string
+- Browser + version (parsed)
+- OS + version (parsed)
+- Device type: Desktop / Mobile / Tablet
 
-Terlihat di: attempt detail (Proctoring Log) dan live monitor (kolom Device).
+Visible in: attempt detail (Proctoring Log section) and live monitor (Device column).
 
 ### Shuffle Options
-Jika diaktifkan, urutan pilihan jawaban soal MC/MS diacak per mahasiswa — tiap mahasiswa mendapat urutan berbeda untuk soal yang sama.
+When enabled, MC/MS answer option order is randomized per student — each student sees a different order for the same question.
 
 ### Enrollment Verification
-Sebelum bisa memulai ujian, sistem memverifikasi bahwa NIM mahasiswa terdaftar di kelas (course offering) ujian tersebut.
+Before starting an exam, the system verifies the student's NIM is enrolled in the course offering the exam belongs to.
 
 ---
 
-## Sistem Grading & Penilaian
+## Grading & Scoring
 
-### Auto-Grading (Dijalankan Otomatis Saat Submit)
+### Auto-Grading (Runs Automatically on Submit)
 
-| Tipe Soal | Cara Penilaian |
+| Question Type | How It's Graded |
 |---|---|
-| **Coding** | Kode dieksekusi lawan semua test cases (termasuk hidden). Skor = (test case lulus ÷ total) × bobot |
-| **Multiple Choice** | Cocok dengan satu jawaban benar. Full poin atau 0 |
-| **Multiple Select** | Semua pilihan benar harus dipilih dan tidak ada yang salah |
-| **True / False** | Cocok dengan jawaban benar yang diset di soal |
-| **Fill in Blank** | String comparison dengan jawaban benar |
-| **Essay** | Tidak auto-graded — menunggu penilaian manual admin |
+| **Coding** | Code executed against all test cases (including hidden). Score = (passed ÷ total) × weight |
+| **Multiple Choice** | Matched against the single correct answer. Full points or 0 |
+| **Multiple Select** | All correct options must be selected, no incorrect ones |
+| **True / False** | Matched against the correct answer set in the question |
+| **Fill in Blank** | String comparison against the correct answer |
+| **Essay** | Not auto-graded — awaits manual scoring by admin |
 
 ### Manual Grading (Essay)
-- Admin bisa memberikan skor berapa saja (0 s/d bobot soal)
-- Bisa tambahkan feedback teks untuk mahasiswa
-- Total skor attempt diperbarui otomatis setelah disimpan
+- Admin can assign any score (0 up to the question's weight)
+- Optional feedback text is shown to the student
+- Attempt total score is automatically recalculated after saving
 
-### Kalkulasi Skor
+### Score Calculation
 
 ```
-Skor per soal = (nilai yang diraih ÷ nilai maks soal) × bobot kesulitan
+Per-question score = (earned ÷ max) × difficulty weight
 
-Total Skor = Σ (skor per soal)
-Persentase = (Total Skor ÷ Maks Skor) × 100
+Total Score  = Σ (per-question scores)
+Percentage   = (Total Score ÷ Max Score) × 100
 ```
 
-### Bobot per Kesulitan
-Dikonfigurasi per ujian:
-- Soal Easy → **easy_weight** poin
-- Soal Medium → **medium_weight** poin
-- Soal Hard → **hard_weight** poin
+### Difficulty Weights
+Configured per exam:
+- Easy questions → **easy_weight** points
+- Medium questions → **medium_weight** points
+- Hard questions → **hard_weight** points
 
 ---
 
 ## Deployment (VPS + Docker)
 
-### Stack Produksi
+### Production Stack
 
-| Container | Fungsi |
+| Container | Role |
 |---|---|
 | **app** | Laravel (PHP-FPM 8.4) |
 | **nginx** | Web server (port 80) |
-| **mysql** | Database utama |
-| **judge0** | Engine eksekusi kode |
-| **judge0-worker** | Worker antrian eksekusi |
-| **judge0-redis** | Queue untuk Judge0 |
-| **judge0-postgres** | Database untuk Judge0 |
+| **mysql** | Main database |
+| **judge0** | Code execution engine |
+| **judge0-worker** | Execution queue worker |
+| **judge0-redis** | Queue backend for Judge0 |
+| **judge0-postgres** | Judge0's own database |
 
-### Deploy Update
+### Deploying Updates
 
 ```bash
-# Di server VPS
+# On the VPS
 cd /root/fiqtest
 git pull
 
-# Rebuild image dan recreate container
+# Rebuild image and force recreate the container
 docker compose up -d --build --force-recreate app
 
-# Migration dijalankan otomatis oleh entrypoint.sh saat container start
+# Migrations run automatically via entrypoint.sh on container start
 ```
 
-### Konfigurasi Penting (`.env`)
+### Key Environment Variables (`.env`)
 
 ```env
 APP_KEY=base64:...
@@ -684,56 +685,56 @@ DB_USERNAME=appuser
 DB_PASSWORD=your_db_password
 DB_ROOT_PASSWORD=rootpassword
 
-# Opsional: Judge0 via RapidAPI
+# Optional: Judge0 via RapidAPI
 JUDGE0_URL=https://judge0-ce.p.rapidapi.com
 ```
 
 ---
 
-## Ringkasan Semua URL
+## URL Reference
 
 ### Admin Panel
 
-| URL | Fitur |
+| URL | Feature |
 |---|---|
-| `/admin/login` | Login admin |
-| `/admin/dashboard` | Dashboard + live feed ujian aktif |
-| `/admin/academic-periods` | Kelola periode akademik / semester |
-| `/admin/courses` | Kelola mata kuliah |
-| `/admin/course-offerings` | Kelola kelas (offering) |
-| `/admin/course-offerings/{id}/enrollment` | Kelola enrollment mahasiswa per kelas |
-| `/admin/students` | Kelola data mahasiswa |
-| `/admin/students/bulk/import` | Import massal mahasiswa (Excel/CSV) |
-| `/admin/question-tags` | Kelola tag soal |
-| `/admin/questions` | Bank soal |
-| `/admin/questions/create` | Buat soal baru |
-| `/admin/questions/bulk/import` | Import massal soal dari Excel |
-| `/admin/questions/bulk/template` | Download template Excel soal |
-| `/admin/questions/{id}` | Edit soal |
-| `/admin/questions/{id}/preview` | Preview soal sebagai mahasiswa |
-| `/admin/questions/{id}/stats` | Statistik performa soal |
-| `/admin/exams` | Daftar semua ujian |
-| `/admin/exams/create` | Buat ujian baru |
-| `/admin/exams/{id}/edit` | Edit ujian |
-| `/admin/exams/{id}/question-pool` | Lihat pool soal ujian |
-| `/admin/exams/{id}/monitor` | Live monitor ujian real-time |
-| `/admin/exams/{id}/attempts` | Daftar attempt + histogram distribusi nilai |
-| `/admin/exams/{id}/attempts/{attemptId}` | Detail attempt mahasiswa + grading essay |
-| `/admin/exams/{id}/export` | Export nilai ke Excel |
-| `/admin/reports` | Pilihan laporan |
-| `/admin/reports/offering/{id}` | Laporan per kelas |
-| `/admin/reports/period/{id}` | Laporan per semester |
-| `/admin/reports/student/{id}` | Laporan per mahasiswa |
-| `/admin/settings/judge0` | Konfigurasi Judge0 API |
-| `/admin/profile` | Profil & ganti password admin |
+| `/admin/login` | Admin login |
+| `/admin/dashboard` | Dashboard + live exam feed |
+| `/admin/academic-periods` | Manage academic periods / semesters |
+| `/admin/courses` | Manage courses |
+| `/admin/course-offerings` | Manage class offerings |
+| `/admin/course-offerings/{id}/enrollment` | Manage student enrollment per class |
+| `/admin/students` | Manage students |
+| `/admin/students/bulk/import` | Bulk import students (Excel/CSV) |
+| `/admin/question-tags` | Manage question tags |
+| `/admin/questions` | Question bank |
+| `/admin/questions/create` | Create a new question |
+| `/admin/questions/bulk/import` | Bulk import questions from Excel |
+| `/admin/questions/bulk/template` | Download question Excel template |
+| `/admin/questions/{id}` | Edit question |
+| `/admin/questions/{id}/preview` | Preview question as a student |
+| `/admin/questions/{id}/stats` | Question performance statistics |
+| `/admin/exams` | List all exams |
+| `/admin/exams/create` | Create a new exam |
+| `/admin/exams/{id}/edit` | Edit exam |
+| `/admin/exams/{id}/question-pool` | View exam question pool |
+| `/admin/exams/{id}/monitor` | Real-time exam monitor |
+| `/admin/exams/{id}/attempts` | Attempt list + score distribution histogram |
+| `/admin/exams/{id}/attempts/{attemptId}` | Attempt detail + essay grading |
+| `/admin/exams/{id}/export` | Export grades to Excel |
+| `/admin/reports` | Reports home |
+| `/admin/reports/offering/{id}` | Report by class offering |
+| `/admin/reports/period/{id}` | Report by academic period |
+| `/admin/reports/student/{id}` | Report by student |
+| `/admin/settings/judge0` | Judge0 API configuration |
+| `/admin/profile` | Admin profile & password change |
 
-### Mahasiswa
+### Student
 
-| URL | Fitur |
+| URL | Feature |
 |---|---|
-| `/` | Beranda — daftar ujian aktif |
-| `/exam/{slug}` | Halaman instruksi & verifikasi NIM |
-| `/attempt/{id}/workspace` | Workspace ujian (jawab soal) |
-| `/attempt/{id}/submitted` | Konfirmasi setelah submit |
-| `/attempt/{id}/result` | Hasil ujian (jika Show Score Immediately aktif) |
-| `/attempt/{id}/result/pdf` | Download hasil ujian sebagai PDF |
+| `/` | Home — list of active exams |
+| `/exam/{slug}` | Exam instructions & NIM verification |
+| `/attempt/{id}/workspace` | Exam workspace |
+| `/attempt/{id}/submitted` | Post-submission confirmation |
+| `/attempt/{id}/result` | Exam results (if Show Score Immediately is on) |
+| `/attempt/{id}/result/pdf` | Download result as PDF |
