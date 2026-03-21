@@ -14,7 +14,7 @@
         html, body {
             width: 100%; height: 100%;
             overflow: hidden;
-            background: #020617;
+            background: #000000;
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: #f1f5f9;
         }
@@ -145,7 +145,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(99, 102, 241, 0.2);
             border-radius: 14px;
             padding: 1rem 1.25rem;
@@ -240,7 +240,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 2rem 1.5rem;
-            background: rgba(15, 23, 42, 0.5);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(99, 102, 241, 0.1);
             border-radius: 14px;
             backdrop-filter: blur(12px);
