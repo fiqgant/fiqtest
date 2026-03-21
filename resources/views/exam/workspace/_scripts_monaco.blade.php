@@ -271,6 +271,8 @@
                 showTabWarningModal: false,
                 showInactivityWarningModal: false,
                 showDisqualificationModal: false,
+                showExamClosedModal: false,
+                examClosedCountdown: 5,
                 showHintModal: false,
                 hintLoading: false,
                 hintUsedCount: 0,
@@ -332,6 +334,22 @@
                         this.msSelected     = this.studentAnswer ? this.studentAnswer.split(',').filter(Boolean) : [];
                     }
                     this.setupActivityMonitoring();
+
+                    // Poll exam status every 5 seconds to detect if admin closes the exam
+                    this.statusPollInterval = setInterval(async () => {
+                        if (this.disqualified) return;
+                        try {
+                            const res = await fetch(String(workspaceConfig.activityUrl), {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': String(workspaceConfig.csrfToken || ''),
+                                },
+                                body: JSON.stringify({ event: 'activity' }),
+                            });
+                            if (res.status === 403) this.handleExamClosed();
+                        } catch (_) {}
+                    }, 5000);
 
 
                     // Track fullscreen state changes
@@ -640,11 +658,19 @@
                     this.showInactivityWarningModal = false;
                     clearTimeout(this.activityTimeoutHandle);
                     clearInterval(this.inactivityWarningTickHandle);
+                    clearInterval(this.statusPollInterval);
                     stopWarningLoop();
-                    // Redirect to submitted page after brief delay
-                    setTimeout(() => {
-                        window.location.href = String(workspaceConfig.submittedUrl || '/');
-                    }, 1500);
+
+                    // Show modal with countdown then redirect
+                    this.examClosedCountdown = 5;
+                    this.showExamClosedModal = true;
+                    const tick = setInterval(() => {
+                        this.examClosedCountdown--;
+                        if (this.examClosedCountdown <= 0) {
+                            clearInterval(tick);
+                            window.location.href = String(workspaceConfig.submittedUrl || '/');
+                        }
+                    }, 1000);
                 },
 
                 async reportActivityEvent(eventType) {

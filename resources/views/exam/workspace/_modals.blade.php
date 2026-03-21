@@ -1,3 +1,21 @@
+    <!-- Exam Closed Modal -->
+    <div x-show="showExamClosedModal"
+         x-cloak
+         class="fixed inset-0 bg-black/80 flex items-center justify-center z-[60]">
+        <div class="bg-neutral-900 rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl border border-red-500/60 text-center">
+            <div class="flex items-center justify-center mb-5">
+                <div class="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center">
+                    <i class="fas fa-lock text-red-400 text-4xl"></i>
+                </div>
+            </div>
+            <h3 class="text-2xl font-bold text-red-400 mb-3">Exam Closed</h3>
+            <p class="text-gray-300 mb-2">The exam has been closed by the administrator.</p>
+            <p class="text-gray-400 text-sm mb-6">Your answers have been automatically submitted.</p>
+            <div class="text-4xl font-bold text-white mb-2" x-text="examClosedCountdown"></div>
+            <p class="text-gray-500 text-xs">Redirecting...</p>
+        </div>
+    </div>
+
     <div x-show="showSubmitModal"
          x-cloak
          class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
