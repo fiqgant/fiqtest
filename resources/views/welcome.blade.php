@@ -189,9 +189,11 @@
             font-size: 0.9rem;
             font-weight: 700;
             color: #e2e8f0;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-word;
         }
 
         .exam-meta {
@@ -199,9 +201,11 @@
             color: #475569;
             font-family: 'JetBrains Mono', monospace;
             margin-top: 0.15rem;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            text-overflow: ellipsis;
+            word-break: break-word;
         }
 
         .exam-arrow {
@@ -306,7 +310,7 @@
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
                                 </svg>
                             </div>
-                            <div style="min-width:0;overflow:hidden;">
+                            <div style="min-width:0;">
                                 <div class="exam-title">{{ $exam->title }}</div>
                                 <div class="exam-meta">{{ $exam->courseOffering->course->name }} · closes {{ $exam->closes_at->diffForHumans() }}</div>
                             </div>
