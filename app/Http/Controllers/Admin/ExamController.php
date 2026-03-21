@@ -131,6 +131,13 @@ class ExamController extends Controller
         return view('admin.exams.attempt-detail', compact('exam', 'attempt'));
     }
 
+    public function resetAttempt(Exam $exam, Attempt $attempt): RedirectResponse
+    {
+        $attempt->delete();
+
+        return back()->with('success', 'Attempt has been reset. Student can retake the exam.');
+    }
+
     public function gradeEssay(Request $request, Exam $exam, Attempt $attempt, AttemptQuestion $attemptQuestion): RedirectResponse
     {
         $request->validate([

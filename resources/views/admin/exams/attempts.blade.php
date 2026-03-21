@@ -82,10 +82,18 @@
                                 <span class="text-slate-300">—</span>
                             @endif
                         </td>
-                        <td>
+                        <td class="flex items-center gap-2">
                             <a href="{{ route('admin.exams.attempts.detail', [$exam, $attempt]) }}" class="btn-secondary text-xs py-1 px-3">
                                 <i class="fas fa-eye"></i> Review
                             </a>
+                            <form action="{{ route('admin.exams.attempts.reset', [$exam, $attempt]) }}" method="POST"
+                                  onsubmit="return confirm('Reset attempt for {{ addslashes($attempt->student->name) }}? All their answers will be deleted and they can retake the exam.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-danger text-xs py-1 px-3">
+                                    <i class="fas fa-redo"></i> Reset
+                                </button>
+                            </form>
                         </td>
                     </tr>
                 @empty

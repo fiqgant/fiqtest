@@ -60,6 +60,7 @@ Route::prefix('admin')->group(function () {
         Route::post('exams/{exam}/close', [ExamController::class, 'close'])->name('admin.exams.close');
         Route::get('exams/{exam}/attempts', [ExamController::class, 'attempts'])->name('admin.exams.attempts');
         Route::get('exams/{exam}/attempts/{attempt}', [ExamController::class, 'attemptDetail'])->name('admin.exams.attempts.detail');
+        Route::delete('exams/{exam}/attempts/{attempt}/reset', [ExamController::class, 'resetAttempt'])->name('admin.exams.attempts.reset');
         Route::post('exams/{exam}/attempts/{attempt}/grade/{attemptQuestion}', [ExamController::class, 'gradeEssay'])->name('admin.exams.attempts.grade-essay');
         Route::get('exams/{exam}/export', [ExamController::class, 'exportExcel'])->name('admin.exams.export');
         Route::get('exams/{exam}/question-pool', [ExamController::class, 'questionPool'])->name('admin.exams.question-pool');
