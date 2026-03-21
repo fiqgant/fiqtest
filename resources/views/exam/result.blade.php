@@ -34,11 +34,11 @@
             box-shadow: 0 8px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
         }
         .glass-banner {
-            background: linear-gradient(135deg, rgba(99,102,241,0.4) 0%, rgba(79,70,229,0.28) 100%);
+            background: rgba(255,255,255,0.04);
             backdrop-filter: blur(24px) saturate(160%);
             -webkit-backdrop-filter: blur(24px) saturate(160%);
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 8px 40px rgba(99,102,241,0.25), inset 0 1px 0 rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
         }
         .glass-row {
             background: rgba(255,255,255,0.03);
