@@ -15,11 +15,11 @@
 
     <div class="grid grid-cols-3 gap-4 mb-6">
         @foreach($statItems as $s)
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br {{ $s['color'] }} flex items-center justify-center shadow-md mb-3">
                     <i class="fas {{ $s['icon'] }} text-white text-sm"></i>
                 </div>
-                <div class="text-2xl font-extrabold text-slate-800 leading-none">{{ $s['value'] }}</div>
+                <div class="text-2xl font-extrabold text-slate-800 dark:text-slate-100 leading-none">{{ $s['value'] }}</div>
                 <div class="text-xs font-semibold {{ $s['text'] }} uppercase tracking-wider mt-1.5">{{ $s['label'] }}</div>
             </div>
         @endforeach

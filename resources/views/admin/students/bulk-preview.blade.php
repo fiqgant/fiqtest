@@ -12,15 +12,15 @@
 
     {{-- Summary --}}
     <div class="grid grid-cols-3 gap-4 mb-6">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Rows</div>
-            <div class="text-2xl font-extrabold text-slate-800">{{ count($rows) }}</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Rows</div>
+            <div class="text-2xl font-extrabold text-slate-800 dark:text-slate-100">{{ count($rows) }}</div>
         </div>
-        <div class="bg-white rounded-2xl border border-emerald-200 p-4 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-emerald-200 dark:border-emerald-700 p-4 shadow-sm">
             <div class="text-xs font-semibold text-emerald-500 uppercase tracking-wider mb-1">Will Import</div>
             <div class="text-2xl font-extrabold text-emerald-600">{{ count($valid) }}</div>
         </div>
-        <div class="bg-white rounded-2xl border border-rose-200 p-4 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-rose-200 dark:border-rose-700 p-4 shadow-sm">
             <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-1">Will Skip</div>
             <div class="text-2xl font-extrabold text-rose-500">{{ count($invalid) }}</div>
         </div>
@@ -71,11 +71,11 @@
             </table>
         </div>
 
-        <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex items-center justify-between">
+        <div class="bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-700 rounded-2xl p-5 flex items-center justify-between">
             <div>
-                <div class="font-semibold text-indigo-800">Ready to import {{ count($valid) }} student(s)</div>
+                <div class="font-semibold text-indigo-800 dark:text-indigo-300">Ready to import {{ count($valid) }} student(s)</div>
                 @if(count($invalid) > 0)
-                    <div class="text-sm text-indigo-600 mt-0.5">{{ count($invalid) }} row(s) with errors will be skipped.</div>
+                    <div class="text-sm text-indigo-600 dark:text-indigo-400 mt-0.5">{{ count($invalid) }} row(s) with errors will be skipped.</div>
                 @endif
             </div>
             <div class="flex gap-3">

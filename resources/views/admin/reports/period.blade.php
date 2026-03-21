@@ -22,7 +22,7 @@
                 @forelse($periodReports as $report)
                     <tr>
                         <td class="font-semibold text-slate-800">{{ $report['offering']['course'] }}</td>
-                        <td><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-cyan-50 text-cyan-700 text-xs font-semibold">{{ $report['offering']['class'] }}</span></td>
+                        <td><span class="inline-flex items-center px-2 py-0.5 rounded-md bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-semibold">{{ $report['offering']['class'] }}</span></td>
                         <td class="font-semibold text-slate-700">{{ $report['statistics']['total_students'] }}</td>
                         <td>
                             <span class="inline-flex items-center gap-1 text-emerald-700 font-semibold">

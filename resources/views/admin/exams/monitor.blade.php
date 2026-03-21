@@ -11,28 +11,28 @@
 
     {{-- Stats bar --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="stats-bar">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Active Now</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Active Now</div>
             <div class="text-3xl font-extrabold text-indigo-600" id="stat-active">—</div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Submitted</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Submitted</div>
             <div class="text-3xl font-extrabold text-emerald-600" id="stat-submitted">—</div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Enrolled</div>
-            <div class="text-3xl font-extrabold text-slate-800" id="stat-enrolled">—</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Enrolled</div>
+            <div class="text-3xl font-extrabold text-slate-800 dark:text-slate-100" id="stat-enrolled">—</div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Last Updated</div>
-            <div class="text-lg font-bold text-slate-600 font-mono" id="stat-updated">—</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Last Updated</div>
+            <div class="text-lg font-bold text-slate-600 dark:text-slate-300 font-mono" id="stat-updated">—</div>
         </div>
     </div>
 
     {{-- Active students table --}}
     <div class="card overflow-x-auto">
-        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-            <span class="font-semibold text-slate-700">Active Students</span>
+        <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <span class="font-semibold text-slate-700 dark:text-slate-200">Active Students</span>
             <div class="flex items-center gap-3">
                 <span class="text-xs text-slate-400">Auto-refresh every 10s</span>
                 <span class="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-medium" id="refresh-indicator">

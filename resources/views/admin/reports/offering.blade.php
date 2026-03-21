@@ -9,7 +9,7 @@
         <a href="{{ route('admin.reports.offering.export', $courseOffering) }}" class="btn-primary"><i class="fas fa-download"></i> Export CSV</a>
     </x-admin.page-header>
 
-    <div class="mb-5 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800 flex items-start gap-2.5">
+    <div class="mb-5 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 px-4 py-3 text-sm text-indigo-800 dark:text-indigo-300 flex items-start gap-2.5">
         <i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i>
         <span>Each row is a student. Each <strong>Exam N</strong> column shows the average score (%). Click any score cell to view the full exam result detail.</span>
     </div>
@@ -24,12 +24,12 @@
 
     <div class="grid grid-cols-3 gap-4 mb-5">
         @foreach($statItems as $s)
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br {{ $s['color'] }} flex items-center justify-center shadow-md mb-3">
                     <i class="fas {{ $s['icon'] }} text-white text-sm"></i>
                 </div>
-                <div class="text-2xl font-extrabold text-slate-800 leading-none">{{ $s['value'] }}</div>
-                <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1.5">{{ $s['label'] }}</div>
+                <div class="text-2xl font-extrabold text-slate-800 dark:text-slate-100 leading-none">{{ $s['value'] }}</div>
+                <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1.5">{{ $s['label'] }}</div>
             </div>
         @endforeach
     </div>
@@ -110,18 +110,18 @@
 
     <!-- Score Detail Modal -->
     <div id="score-detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4">
-        <div class="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 bg-slate-50">
+        <div class="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white dark:bg-slate-800 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-5 py-4 bg-slate-50 dark:bg-slate-700/50">
                 <div class="flex items-center gap-2">
-                    <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
-                        <i class="fas fa-file-alt text-indigo-600 text-xs"></i>
+                    <div class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
+                        <i class="fas fa-file-alt text-indigo-600 dark:text-indigo-400 text-xs"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-800">Exam Score Detail</h3>
+                    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Exam Score Detail</h3>
                 </div>
                 <button id="score-detail-close" type="button" class="action-btn action-btn-neutral"><i class="fas fa-times"></i> Close</button>
             </div>
-            <div class="space-y-3 px-5 py-5 text-sm text-slate-700 overflow-y-auto max-h-[calc(90vh-80px)]">
-                <div class="grid grid-cols-2 gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="space-y-3 px-5 py-5 text-sm text-slate-700 dark:text-slate-200 overflow-y-auto max-h-[calc(90vh-80px)]">
+                <div class="grid grid-cols-2 gap-3 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-100 dark:border-slate-600">
                     <div><span class="text-xs text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Student</span><span id="detail-student" class="font-semibold text-slate-800"></span></div>
                     <div><span class="text-xs text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Exam</span><span id="detail-exam" class="font-semibold text-slate-800"></span></div>
                     <div><span class="text-xs text-slate-400 uppercase tracking-wider font-semibold block mb-0.5">Status</span><span id="detail-status" class="font-semibold"></span></div>

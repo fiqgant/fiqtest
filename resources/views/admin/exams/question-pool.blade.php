@@ -16,7 +16,7 @@
             $needed    = $exam->{$diff . '_count'};
             $ok        = $available >= $needed;
         @endphp
-        <div class="bg-white rounded-2xl border {{ $ok ? 'border-slate-200' : 'border-rose-300' }} p-5 shadow-sm">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border {{ $ok ? 'border-slate-200 dark:border-slate-700' : 'border-rose-300' }} p-5 shadow-sm">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-sm font-bold text-{{ $meta['color'] }}-600">{{ $meta['label'] }}</span>
                 @if($ok)
@@ -25,9 +25,9 @@
                     <span class="text-xs text-rose-600 font-medium"><i class="fas fa-exclamation-circle"></i> Insufficient</span>
                 @endif
             </div>
-            <div class="text-3xl font-extrabold text-slate-800">{{ $available }}</div>
-            <div class="text-xs text-slate-400 mt-1">available &bull; need {{ $needed }}</div>
-            <div class="mt-3 w-full bg-slate-100 rounded-full h-2">
+            <div class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">{{ $available }}</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500 mt-1">available &bull; need {{ $needed }}</div>
+            <div class="mt-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2">
                 @php $barPct = $needed > 0 ? min(100, round($available / $needed * 100)) : 100; @endphp
                 <div class="h-2 rounded-full {{ $ok ? 'bg-' . $meta['color'] . '-400' : 'bg-rose-400' }}" style="width: {{ $barPct }}%"></div>
             </div>
@@ -37,9 +37,9 @@
 
     {{-- Question list --}}
     <div class="card overflow-x-auto">
-        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
-            <span class="font-semibold text-slate-700">All Eligible Questions ({{ $questions->count() }} total)</span>
-            <span class="text-xs text-slate-400">These are the questions that may appear in this exam</span>
+        <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <span class="font-semibold text-slate-700 dark:text-slate-200">All Eligible Questions ({{ $questions->count() }} total)</span>
+            <span class="text-xs text-slate-400 dark:text-slate-500">These are the questions that may appear in this exam</span>
         </div>
         <table class="data-table" style="min-width:700px">
             <thead>

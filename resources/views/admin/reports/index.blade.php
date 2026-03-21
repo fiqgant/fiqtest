@@ -14,11 +14,11 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         @foreach($statItems as $s)
-            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-br {{ $s['color'] }} flex items-center justify-center shadow-md mb-3">
                     <i class="fas {{ $s['icon'] }} text-white text-sm"></i>
                 </div>
-                <div class="text-2xl font-extrabold text-slate-800 leading-none">{{ $s['value'] }}</div>
+                <div class="text-2xl font-extrabold text-slate-800 dark:text-slate-100 leading-none">{{ $s['value'] }}</div>
                 <div class="text-xs font-semibold {{ $s['text'] }} uppercase tracking-wider mt-1.5">{{ $s['label'] }}</div>
             </div>
         @endforeach
@@ -29,12 +29,12 @@
         <!-- Offering Report -->
         <div class="card p-5">
             <div class="flex items-center gap-2 mb-1">
-                <div class="w-7 h-7 rounded-lg bg-cyan-100 flex items-center justify-center">
-                    <i class="fas fa-layer-group text-cyan-600 text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 flex items-center justify-center">
+                    <i class="fas fa-layer-group text-cyan-600 dark:text-cyan-400 text-xs"></i>
                 </div>
-                <h3 class="font-semibold text-slate-800">Report by Offering</h3>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100">Report by Offering</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-4">See complete scores for every student in one class offering.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">See complete scores for every student in one class offering.</p>
 
             <form id="offering-report-form" class="space-y-3">
                 <div>
@@ -64,12 +64,12 @@
         <!-- Period Report -->
         <div class="card p-5">
             <div class="flex items-center gap-2 mb-1">
-                <div class="w-7 h-7 rounded-lg bg-purple-100 flex items-center justify-center">
-                    <i class="fas fa-calendar-alt text-purple-600 text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-purple-600 dark:text-purple-400 text-xs"></i>
                 </div>
-                <h3 class="font-semibold text-slate-800">Report by Period</h3>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100">Report by Period</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-4">Compare all classes and summary statistics in one period.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Compare all classes and summary statistics in one period.</p>
 
             <form id="period-report-form" class="space-y-3">
                 <div>
@@ -88,12 +88,12 @@
         <!-- Student Report -->
         <div class="card p-5">
             <div class="flex items-center gap-2 mb-1">
-                <div class="w-7 h-7 rounded-lg bg-rose-100 flex items-center justify-center">
-                    <i class="fas fa-user text-rose-600 text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center">
+                    <i class="fas fa-user text-rose-600 dark:text-rose-400 text-xs"></i>
                 </div>
-                <h3 class="font-semibold text-slate-800">Report by Student</h3>
+                <h3 class="font-semibold text-slate-800 dark:text-slate-100">Report by Student</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-4">View detailed personal exam history including status and scores.</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">View detailed personal exam history including status and scores.</p>
 
             <form id="student-report-form" class="space-y-3">
                 <div>
@@ -113,10 +113,10 @@
     <div class="card overflow-x-auto">
         <div class="card-header">
             <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg bg-indigo-100 flex items-center justify-center">
-                    <i class="fas fa-clock text-indigo-600 text-xs"></i>
+                <div class="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
+                    <i class="fas fa-clock text-indigo-600 dark:text-indigo-400 text-xs"></i>
                 </div>
-                <span class="font-semibold text-slate-700">Recent Attempt Activity</span>
+                <span class="font-semibold text-slate-700 dark:text-slate-200">Recent Attempt Activity</span>
             </div>
         </div>
         <table class="data-table" style="min-width:700px">

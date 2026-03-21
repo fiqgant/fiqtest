@@ -10,24 +10,24 @@
 
     {{-- Summary cards --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Attempts</div>
-            <div class="text-3xl font-extrabold text-slate-800">{{ $total }}</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Total Attempts</div>
+            <div class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">{{ $total }}</div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Answered Correctly</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Answered Correctly</div>
             <div class="text-3xl font-extrabold text-emerald-600">{{ $correct }}</div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">% Correct</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">% Correct</div>
             <div class="text-3xl font-extrabold {{ $pctCorrect >= 70 ? 'text-emerald-600' : ($pctCorrect >= 40 ? 'text-amber-500' : 'text-rose-500') }}">
                 {{ $pctCorrect }}%
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Avg Score</div>
-            <div class="text-3xl font-extrabold text-slate-800">{{ $avgScore }}</div>
-            <div class="text-xs text-slate-400">/ {{ $question->default_weight }} pts</div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Avg Score</div>
+            <div class="text-3xl font-extrabold text-slate-800 dark:text-slate-100">{{ $avgScore }}</div>
+            <div class="text-xs text-slate-400 dark:text-slate-500">/ {{ $question->default_weight }} pts</div>
         </div>
     </div>
 
