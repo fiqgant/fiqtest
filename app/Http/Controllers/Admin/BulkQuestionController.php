@@ -195,7 +195,7 @@ class BulkQuestionController extends Controller
 
     // ── Parser ────────────────────────────────────────────────────────
 
-    private function parseFile($file, string $defaultLanguage): array
+    private function parseFile($file, ?string $defaultLanguage): array
     {
         $spreadsheet = IOFactory::load($file->getPathname());
         $sheet       = $spreadsheet->getSheetByName('Questions') ?? $spreadsheet->getActiveSheet();
@@ -242,7 +242,7 @@ class BulkQuestionController extends Controller
             $essayModelAnswer  = trim((string) ($essayModelAnswer ?? ''));
             $rawLanguage       = trim((string) ($language ?? ''));
             $language          = $type === 'coding'
-                ? $this->normalizeLanguage($rawLanguage ?: $defaultLanguage)
+                ? $this->normalizeLanguage($rawLanguage ?: ($defaultLanguage ?? ''))
                 : '';
 
             // Validations
