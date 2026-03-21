@@ -161,8 +161,13 @@ class ExamController extends Controller
 
     public function exportExcel(Exam $exam): Response
     {
+        $withRelations = ['student', 'attemptQuestions.question'];
+        if ($exam->detect_copy_paste) {
+            $withRelations[] = 'copyPasteLogs';
+        }
+
         $attempts = $exam->attempts()
-            ->with(['student', 'attemptQuestions.question'])
+            ->with($withRelations)
             ->whereIn('status', ['submitted', 'graded'])
             ->orderBy('submitted_at')
             ->get();
@@ -173,7 +178,11 @@ class ExamController extends Controller
 
         // Header row
         $headers = ['NIM', 'Name', 'Started', 'Submitted', 'Duration (min)', 'Score', 'Max Score', '%', 'Tab Switches', 'Disqualified', 'Disqualification Reason'];
-        $cols = ['A','B','C','D','E','F','G','H','I','J','K'];
+        if ($exam->detect_copy_paste) {
+            $headers[] = 'Copy Events';
+            $headers[] = 'Paste Events';
+        }
+        $cols = range('A', 'Z');
         foreach ($headers as $i => $h) {
             $sheet->setCellValue($cols[$i] . '1', $h);
         }
@@ -198,6 +207,13 @@ class ExamController extends Controller
             $sheet->setCellValue('I' . $row, $attempt->tab_switch_count);
             $sheet->setCellValue('J' . $row, $attempt->is_disqualified ? 'Yes' : 'No');
             $sheet->setCellValue('K' . $row, $attempt->disqualification_reason ?? '');
+
+            if ($exam->detect_copy_paste) {
+                $logs = $attempt->copyPasteLogs ?? collect();
+                $sheet->setCellValue('L' . $row, $logs->whereIn('event_type', ['copy', 'cut'])->count());
+                $sheet->setCellValue('M' . $row, $logs->where('event_type', 'paste')->count());
+            }
+
             $row++;
         }
 

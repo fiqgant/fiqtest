@@ -36,6 +36,7 @@ class BulkQuestionController extends Controller
             'title', 'type', 'difficulty', 'description', 'default_weight',
             'starter_code', 'hint', 'reference_solution', 'tags',
             'test_cases', 'options', 'fill_blank_answer', 'true_false_answer', 'language',
+            'essay_model_answer',
         ];
         foreach ($headers as $col => $header) {
             $sheet->setCellValue([$col + 1, 1], $header);
@@ -84,6 +85,7 @@ class BulkQuestionController extends Controller
                 'Describe the four main principles of object-oriented programming.',
                 20, '', '', '', 'oop,concepts',
                 '', '', '', '', '',
+                'The four principles are: Encapsulation, Inheritance, Polymorphism, Abstraction. Each should be explained with examples.',
             ],
         ];
 
@@ -157,6 +159,7 @@ class BulkQuestionController extends Controller
                 'test_cases'         => $row['test_cases'] ?: null,
                 'fill_blank_answer'  => $row['fill_blank_answer'] ?: null,
                 'true_false_answer'  => $row['true_false_answer'],
+                'essay_model_answer' => $row['essay_model_answer'] ?: null,
             ]);
 
             // Tags
@@ -212,12 +215,13 @@ class BulkQuestionController extends Controller
 
             // Columns: A=title, B=type, C=difficulty, D=description, E=default_weight,
             //          F=starter_code, G=hint, H=reference_solution, I=tags,
-            //          J=test_cases, K=options, L=fill_blank_answer, M=true_false_answer, N=language
+            //          J=test_cases, K=options, L=fill_blank_answer, M=true_false_answer, N=language, O=essay_model_answer
             [
                 $title, $type, $difficulty, $description, $defaultWeight,
                 $starterCode, $hint, $referenceSolution, $tagsRaw,
                 $testCasesRaw, $optionsRaw, $fillBlankAnswer, $trueFalseRaw, $language,
-            ] = array_pad($row, 14, null);
+                $essayModelAnswer,
+            ] = array_pad($row, 15, null);
 
             $errors = [];
 
@@ -235,6 +239,7 @@ class BulkQuestionController extends Controller
             $optionsRaw        = trim((string) ($optionsRaw ?? ''));
             $fillBlankAnswer   = trim((string) ($fillBlankAnswer ?? ''));
             $trueFalseRaw      = strtolower(trim((string) ($trueFalseRaw ?? '')));
+            $essayModelAnswer  = trim((string) ($essayModelAnswer ?? ''));
             $rawLanguage       = trim((string) ($language ?? ''));
             $language          = $type === 'coding'
                 ? $this->normalizeLanguage($rawLanguage ?: $defaultLanguage)
@@ -323,9 +328,10 @@ class BulkQuestionController extends Controller
                 'language'          => $language,
                 'test_cases'        => $testCases,
                 'options'           => $options,
-                'fill_blank_answer' => $fillBlankAnswer ?: null,
-                'true_false_answer' => $trueFalseValue,
-                'errors'            => $errors,
+                'fill_blank_answer'  => $fillBlankAnswer ?: null,
+                'true_false_answer'  => $trueFalseValue,
+                'essay_model_answer' => $essayModelAnswer ?: null,
+                'errors'             => $errors,
             ];
         }
 
