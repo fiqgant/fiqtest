@@ -269,7 +269,11 @@
         .section-label {
             font-size: 0.72rem;
             font-weight: 600;
-            color: #334155;
+            color: #ffffff;
+            text-shadow:
+                0 0 6px rgba(255, 255, 255, 0.9),
+                0 0 12px rgba(255, 255, 255, 0.6),
+                0 0 24px rgba(255, 255, 255, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.08em;
             align-self: flex-start;
