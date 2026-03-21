@@ -74,32 +74,70 @@
 
         /* ── Light mode overrides ───────────────── */
         body.ws-light { background: #f8fafc !important; color: #0f172a !important; }
-        body.ws-light .bg-black { background-color: #f8fafc !important; }
+
+        /* backgrounds */
+        body.ws-light .bg-black   { background-color: #f1f5f9 !important; }
         body.ws-light .bg-neutral-900 { background-color: #ffffff !important; }
         body.ws-light .bg-neutral-800 { background-color: #f1f5f9 !important; }
         body.ws-light .bg-neutral-700 { background-color: #e2e8f0 !important; }
+
+        /* borders */
         body.ws-light .border-neutral-800 { border-color: #e2e8f0 !important; }
         body.ws-light .border-neutral-700 { border-color: #cbd5e1 !important; }
-        body.ws-light .text-white { color: #0f172a !important; }
-        body.ws-light .text-gray-400 { color: #64748b !important; }
-        body.ws-light .text-gray-500 { color: #94a3b8 !important; }
-        body.ws-light .text-gray-300 { color: #475569 !important; }
+
+        /* ALL text — nuclear override so nothing stays invisible */
+        body.ws-light * { color: inherit; }
+        body.ws-light { color: #1e293b; }
+        body.ws-light .text-white  { color: #0f172a !important; }
+        body.ws-light .text-gray-100, body.ws-light .text-gray-200 { color: #1e293b !important; }
+        body.ws-light .text-gray-300 { color: #334155 !important; }
+        body.ws-light .text-gray-400 { color: #475569 !important; }
+        body.ws-light .text-gray-500 { color: #64748b !important; }
+        body.ws-light .text-gray-600 { color: #64748b !important; }
+        body.ws-light .font-mono    { color: #0f172a !important; }
+
+        /* keep accent colors legible on light bg */
+        body.ws-light .text-green-400  { color: #16a34a !important; }
+        body.ws-light .text-yellow-400 { color: #b45309 !important; }
+        body.ws-light .text-red-400    { color: #dc2626 !important; }
+        body.ws-light .text-red-500    { color: #dc2626 !important; }
+        body.ws-light .text-rose-300   { color: #e11d48 !important; }
+        body.ws-light .text-rose-400   { color: #e11d48 !important; }
+        body.ws-light .text-rose-500   { color: #e11d48 !important; }
+        body.ws-light .text-amber-400  { color: #d97706 !important; }
+        body.ws-light .text-amber-500  { color: #b45309 !important; }
+        body.ws-light .text-indigo-400 { color: #4f46e5 !important; }
+        body.ws-light .text-blue-400   { color: #2563eb !important; }
+
+        /* timer white when not warning */
+        body.ws-light .font-mono.text-white { color: #0f172a !important; }
+
+        /* hover states */
         body.ws-light .hover\:bg-neutral-700:hover { background-color: #e2e8f0 !important; }
         body.ws-light .hover\:bg-neutral-800:hover { background-color: #f1f5f9 !important; }
         body.ws-light .hover\:bg-neutral-600:hover { background-color: #e2e8f0 !important; }
+
+        /* separator */
+        body.ws-light .text-gray-500[class*="|"] { color: #94a3b8 !important; }
+
+        /* scrollbar */
         body.ws-light .scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
         body.ws-light .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; }
-        body.ws-light .md-body { color: #334155; }
-        body.ws-light .md-body h1, body.ws-light .md-body h2, body.ws-light .md-body h3 { color: #0f172a; }
-        body.ws-light .md-body code { background: #f1f5f9; color: #0e7490; }
-        body.ws-light .md-body pre { background: #f8fafc; border-color: #e2e8f0; }
-        body.ws-light .md-body pre code { color: #334155; }
-        body.ws-light .md-body blockquote { color: #64748b; }
-        body.ws-light .md-body th { background: #f1f5f9; color: #0f172a; border-color: #e2e8f0; }
-        body.ws-light .md-body td { border-color: #e2e8f0; }
-        body.ws-light .md-body tr:nth-child(even) td { background: #f8fafc; }
-        body.ws-light .md-body strong { color: #0f172a; }
-        body.ws-light .md-body .mermaid { background: #f1f5f9; }
+
+        /* markdown */
+        body.ws-light .md-body { color: #334155 !important; }
+        body.ws-light .md-body h1, body.ws-light .md-body h2, body.ws-light .md-body h3 { color: #0f172a !important; }
+        body.ws-light .md-body p, body.ws-light .md-body li, body.ws-light .md-body span { color: #334155 !important; }
+        body.ws-light .md-body code { background: #e2e8f0 !important; color: #0e7490 !important; }
+        body.ws-light .md-body pre { background: #f1f5f9 !important; border-color: #e2e8f0 !important; }
+        body.ws-light .md-body pre code { color: #334155 !important; }
+        body.ws-light .md-body blockquote { color: #64748b !important; }
+        body.ws-light .md-body th { background: #e2e8f0 !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
+        body.ws-light .md-body td { border-color: #e2e8f0 !important; color: #334155 !important; }
+        body.ws-light .md-body tr:nth-child(even) td { background: #f8fafc !important; }
+        body.ws-light .md-body strong { color: #0f172a !important; }
+        body.ws-light .md-body a { color: #4f46e5 !important; }
+        body.ws-light .md-body .mermaid { background: #f1f5f9 !important; }
     </style>
 </head>
 <body class="bg-black text-white h-screen overflow-hidden" x-data="examApp()" @time-up.window="handleTimeUp()">
