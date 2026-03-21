@@ -57,11 +57,13 @@ A self-hosted online exam platform for academic institutions. Supports 6 questio
 
 ## Installation & Setup
 
-### Requirements
-- Docker & Docker Compose
-- Git
+Choose one of the two methods below.
 
-### Steps
+---
+
+### Option A — Docker (Recommended for Production)
+
+**Requirements:** Docker & Docker Compose, Git
 
 ```bash
 # Clone the repo
@@ -87,7 +89,7 @@ The entrypoint automatically runs:
 
 Access the app at `http://localhost` or your configured domain.
 
-### Creating the First Admin
+#### Creating the First Admin (Docker)
 
 ```bash
 docker compose exec app php artisan tinker
@@ -100,6 +102,65 @@ docker compose exec app php artisan tinker
     'password' => bcrypt('password'),
 ]);
 ```
+
+---
+
+### Option B — Manual (Local Development)
+
+**Requirements:** PHP 8.2+, Composer, Node.js 18+, MySQL 8, Git
+
+```bash
+# Clone the repo
+git clone https://github.com/fiqgant/fiqtest.git
+cd fiqtest
+
+# Install PHP dependencies
+composer install
+
+# Install Node dependencies and build assets
+npm install && npm run build
+
+# Copy and configure environment file
+cp .env.example .env
+
+# Fill in .env — key variables:
+# APP_URL=http://localhost:8000
+# DB_HOST=127.0.0.1
+# DB_DATABASE=fiqtest
+# DB_USERNAME=root
+# DB_PASSWORD=your_password
+# JUDGE0_URL= (optional)
+
+# Generate app key
+php artisan key:generate
+
+# Run database migrations
+php artisan migrate
+
+# Link storage
+php artisan storage:link
+
+# Start the development server
+php artisan serve
+```
+
+Access the app at `http://localhost:8000`.
+
+#### Creating the First Admin (Manual)
+
+```bash
+php artisan tinker
+```
+
+```php
+\App\Models\Admin::create([
+    'name'     => 'Admin',
+    'email'    => 'admin@example.com',
+    'password' => bcrypt('password'),
+]);
+```
+
+> **Note:** For code execution (coding questions), you still need a running Judge0 instance. You can run one locally with Docker: `docker compose up -d judge0 judge0-worker judge0-redis judge0-postgres`, then set `JUDGE0_URL=http://localhost:2358` in your `.env`.
 
 ---
 

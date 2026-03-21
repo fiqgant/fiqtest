@@ -55,11 +55,13 @@ Platform ujian online self-hosted untuk institusi akademik. Mendukung 6 tipe soa
 
 ## Instalasi & Setup
 
-### Kebutuhan
-- Docker & Docker Compose
-- Git
+Pilih salah satu dari dua cara di bawah ini.
 
-### Langkah-langkah
+---
+
+### Cara A — Docker (Direkomendasikan untuk Produksi)
+
+**Kebutuhan:** Docker & Docker Compose, Git
 
 ```bash
 # Clone repo
@@ -85,7 +87,7 @@ Entrypoint otomatis menjalankan:
 
 Akses aplikasi di `http://localhost` atau domain yang sudah dikonfigurasi.
 
-### Membuat Admin Pertama
+#### Membuat Admin Pertama (Docker)
 
 ```bash
 docker compose exec app php artisan tinker
@@ -98,6 +100,65 @@ docker compose exec app php artisan tinker
     'password' => bcrypt('password'),
 ]);
 ```
+
+---
+
+### Cara B — Manual (Untuk Development Lokal)
+
+**Kebutuhan:** PHP 8.2+, Composer, Node.js 18+, MySQL 8, Git
+
+```bash
+# Clone repo
+git clone https://github.com/fiqgant/fiqtest.git
+cd fiqtest
+
+# Install dependensi PHP
+composer install
+
+# Install dependensi Node dan build aset
+npm install && npm run build
+
+# Salin dan konfigurasi file environment
+cp .env.example .env
+
+# Isi .env — variabel utama:
+# APP_URL=http://localhost:8000
+# DB_HOST=127.0.0.1
+# DB_DATABASE=fiqtest
+# DB_USERNAME=root
+# DB_PASSWORD=your_password
+# JUDGE0_URL= (opsional)
+
+# Generate app key
+php artisan key:generate
+
+# Jalankan migrasi database
+php artisan migrate
+
+# Link storage
+php artisan storage:link
+
+# Jalankan server development
+php artisan serve
+```
+
+Akses aplikasi di `http://localhost:8000`.
+
+#### Membuat Admin Pertama (Manual)
+
+```bash
+php artisan tinker
+```
+
+```php
+\App\Models\Admin::create([
+    'name'     => 'Admin',
+    'email'    => 'admin@example.com',
+    'password' => bcrypt('password'),
+]);
+```
+
+> **Catatan:** Untuk fitur eksekusi kode (soal coding), kamu tetap butuh instance Judge0 yang berjalan. Bisa jalankan sebagian container dengan Docker: `docker compose up -d judge0 judge0-worker judge0-redis judge0-postgres`, lalu set `JUDGE0_URL=http://localhost:2358` di `.env`.
 
 ---
 
