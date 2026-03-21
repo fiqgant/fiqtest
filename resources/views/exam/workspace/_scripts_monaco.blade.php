@@ -632,6 +632,21 @@
                     sessionStorage.setItem('examFullscreenDismissed', 'true');
                 },
 
+                handleExamClosed() {
+                    if (this.disqualified) return;
+                    this.disqualified = true;
+                    this.showSubmitModal = false;
+                    this.showTabWarningModal = false;
+                    this.showInactivityWarningModal = false;
+                    clearTimeout(this.activityTimeoutHandle);
+                    clearInterval(this.inactivityWarningTickHandle);
+                    stopWarningLoop();
+                    // Redirect to submitted page after brief delay
+                    setTimeout(() => {
+                        window.location.href = String(workspaceConfig.submittedUrl || '/');
+                    }, 1500);
+                },
+
                 async reportActivityEvent(eventType) {
                     if (this.disqualified || !workspaceConfig.activityUrl) {
                         return;
@@ -646,6 +661,11 @@
                             },
                             body: JSON.stringify({ event: eventType }),
                         });
+
+                        if (response.status === 403) {
+                            this.handleExamClosed();
+                            return;
+                        }
 
                         const data = await response.json();
                         if (typeof data.tab_switch_count !== 'undefined') {
@@ -720,6 +740,8 @@
                             })
                         });
 
+                        if (response.status === 403) { this.handleExamClosed(); return; }
+
                         const data = await response.json();
                         this.output = data.output || '';
                         this.error = data.error || '';
@@ -764,11 +786,13 @@
                             body = { attempt_question_id: currentAttemptQuestionId, student_answer: this.studentAnswer };
                         }
 
-                        await fetch(String(workspaceConfig.autosaveUrl || ''), {
+                        const saveRes = await fetch(String(workspaceConfig.autosaveUrl || ''), {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': String(workspaceConfig.csrfToken || '') },
                             body: JSON.stringify(body),
                         });
+
+                        if (saveRes.status === 403) { this.handleExamClosed(); return; }
 
                         this.saved = true;
                         setTimeout(() => { this.saved = false; }, 2000);
