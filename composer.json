@@ -11,7 +11,8 @@
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "phpoffice/phpspreadsheet": "^5.5"
+        "phpoffice/phpspreadsheet": "^5.5",
+        "resend/resend-laravel": "dev-renovate/major-symfony"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

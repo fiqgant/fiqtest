@@ -23,33 +23,48 @@ class AppServiceProvider extends ServiceProvider
         try {
             $mailer = SystemSetting::getValue('mail.mailer');
 
-            // Only override if the admin has explicitly configured mail settings
             if (! $mailer) {
                 return;
             }
 
+            // Common: from address & name
+            config([
+                'mail.default'      => $mailer,
+                'mail.from.address' => SystemSetting::getValue('mail.from_address', config('mail.from.address')),
+                'mail.from.name'    => SystemSetting::getValue('mail.from_name', config('mail.from.name')),
+            ]);
+
+            if ($mailer === 'resend') {
+                $encKey = SystemSetting::getValue('mail.resend_api_key');
+                if ($encKey) {
+                    try {
+                        $apiKey = Crypt::decryptString($encKey);
+                    } catch (\Throwable) {
+                        $apiKey = null;
+                    }
+                    config(['resend.api_key' => $apiKey]);
+                }
+                return;
+            }
+
+            // SMTP
             $password    = null;
             $encPassword = SystemSetting::getValue('mail.password');
             if ($encPassword) {
                 try {
                     $password = Crypt::decryptString($encPassword);
-                } catch (\Throwable) {
-                    //
-                }
+                } catch (\Throwable) {}
             }
 
             config([
-                'mail.default'                      => $mailer,
-                'mail.mailers.smtp.host'            => SystemSetting::getValue('mail.host', ''),
-                'mail.mailers.smtp.port'            => (int) SystemSetting::getValue('mail.port', '587'),
-                'mail.mailers.smtp.encryption'      => SystemSetting::getValue('mail.encryption', 'tls') ?: null,
-                'mail.mailers.smtp.username'        => SystemSetting::getValue('mail.username', ''),
-                'mail.mailers.smtp.password'        => $password,
-                'mail.from.address'                 => SystemSetting::getValue('mail.from_address', config('mail.from.address')),
-                'mail.from.name'                    => SystemSetting::getValue('mail.from_name', config('mail.from.name')),
+                'mail.mailers.smtp.host'       => SystemSetting::getValue('mail.host', ''),
+                'mail.mailers.smtp.port'       => (int) SystemSetting::getValue('mail.port', '587'),
+                'mail.mailers.smtp.encryption' => SystemSetting::getValue('mail.encryption', 'tls') ?: null,
+                'mail.mailers.smtp.username'   => SystemSetting::getValue('mail.username', ''),
+                'mail.mailers.smtp.password'   => $password,
             ]);
         } catch (\Throwable) {
-            // DB not ready (e.g. during migrations) — fall back to .env config
+            // DB not ready — fall back to .env
         }
     }
 }
