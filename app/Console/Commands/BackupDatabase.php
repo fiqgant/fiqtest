@@ -22,7 +22,7 @@ class BackupDatabase extends Command
 
         $email = SystemSetting::getValue('backup.email');
         if (! $email) {
-            $this->error('No backup email configured. Go to Admin → Settings → Database Backup.');
+            $this->error('No backup recipient email configured. Set one at Admin → Settings → Database Backup.');
             return self::FAILURE;
         }
 

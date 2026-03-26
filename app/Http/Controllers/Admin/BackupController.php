@@ -64,7 +64,7 @@ class BackupController extends Controller
         $email = SystemSetting::getValue('backup.email');
         if (! $email) {
             return redirect()->route('admin.settings.backup.edit')
-                ->with('error', 'Harap isi email tujuan backup terlebih dahulu.');
+                ->with('error', 'Please configure a backup recipient email first.');
         }
 
         $db        = config('database.connections.mysql.database');
@@ -92,12 +92,16 @@ class BackupController extends Controller
                 database:    $db,
                 generatedAt: now()->format('d M Y H:i'),
             ));
-        } finally {
+        } catch (\Throwable $e) {
             @unlink($tmpPath);
+            return redirect()->route('admin.settings.backup.edit')
+                ->with('error', 'Mail delivery failed: ' . $e->getMessage());
         }
 
+        @unlink($tmpPath);
+
         return redirect()->route('admin.settings.backup.edit')
-            ->with('success', "Backup berhasil dikirim ke {$email}.");
+            ->with('success', "Backup sent successfully to {$email}.");
     }
 
     /**

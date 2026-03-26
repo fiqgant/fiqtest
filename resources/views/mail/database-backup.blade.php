@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <style>
@@ -16,17 +16,17 @@
 <body>
     <div class="card">
         <div class="badge">Database Backup</div>
-        <h2>Backup Database Berhasil</h2>
-        <p>Backup database terlampir dalam email ini. Silakan simpan file SQL tersebut di tempat yang aman.</p>
+        <h2>Backup Ready</h2>
+        <p>Your database backup is attached to this email. Please store the SQL file in a safe location.</p>
 
         <div class="meta">
             <div><b>Database:</b> {{ $database }}</div>
-            <div style="margin-top:6px"><b>Dibuat pada:</b> {{ $generatedAt }}</div>
+            <div style="margin-top:6px"><b>Generated at:</b> {{ $generatedAt }}</div>
             <div style="margin-top:6px"><b>File:</b> {{ $filename }}</div>
         </div>
 
         <p style="margin-top:20px; font-size:13px; color:#94a3b8;">
-            Email ini dikirim otomatis oleh sistem <strong>{{ config('app.name') }}</strong>.
+            This email was sent automatically by <strong>{{ config('app.name') }}</strong>.
         </p>
     </div>
     <div class="footer">{{ config('app.name') }} &copy; {{ date('Y') }}</div>
