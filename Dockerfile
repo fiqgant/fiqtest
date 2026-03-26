@@ -51,9 +51,10 @@ RUN chown -R www-data:www-data /var/www/html \
 # Copy PHP-FPM config
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
-# Copy entrypoint
+# Copy entrypoints
 COPY docker/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY docker/entrypoint.scheduler.sh /entrypoint.scheduler.sh
+RUN chmod +x /entrypoint.sh /entrypoint.scheduler.sh
 
 EXPOSE 9000
 
