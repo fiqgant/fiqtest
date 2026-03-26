@@ -9,23 +9,23 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Automatic database backup — runs hourly, checks configured day + hour from settings
+// Automatic database backup — runs every minute, fires only on the configured day + exact time
 Schedule::command('db:backup --scheduled')
-    ->hourly()
+    ->everyMinute()
     ->withoutOverlapping()
     ->when(function () {
         try {
-            $enabled = SystemSetting::getValue('backup.schedule_enabled', '0');
-            if ($enabled !== '1') {
+            if (SystemSetting::getValue('backup.schedule_enabled', '0') !== '1') {
                 return false;
             }
 
-            $day  = (int) SystemSetting::getValue('backup.schedule_day', '5');
-            $time = SystemSetting::getValue('backup.schedule_time', '08:00');
-            [$h]  = explode(':', $time);
+            $day        = (int) SystemSetting::getValue('backup.schedule_day', '5');
+            [$h, $m]    = explode(':', SystemSetting::getValue('backup.schedule_time', '08:00'));
+            $now        = now();
 
-            $now = now();
-            return $now->dayOfWeek === $day && $now->hour === (int) $h;
+            return $now->dayOfWeek === $day
+                && $now->hour   === (int) $h
+                && $now->minute === (int) $m;
         } catch (\Throwable) {
             return false;
         }

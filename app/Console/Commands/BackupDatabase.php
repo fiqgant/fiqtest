@@ -69,11 +69,13 @@ class BackupDatabase extends Command
             return false;
         }
 
-        $day = (int) SystemSetting::getValue('backup.schedule_day', '5');
-        [$h] = explode(':', SystemSetting::getValue('backup.schedule_time', '08:00'));
-        $now = now();
+        $day     = (int) SystemSetting::getValue('backup.schedule_day', '5');
+        [$h, $m] = explode(':', SystemSetting::getValue('backup.schedule_time', '08:00'));
+        $now     = now();
 
-        return $now->dayOfWeek === $day && $now->hour === (int) $h;
+        return $now->dayOfWeek === $day
+            && $now->hour   === (int) $h
+            && $now->minute === (int) $m;
     }
 
     /** @return array{0: string, 1: string|null} */
