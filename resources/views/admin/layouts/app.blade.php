@@ -376,8 +376,14 @@
                             <a href="{{ route('admin.profile.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.profile.*') ? 'active' : '' }}">
                                 <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
                             </a>
-                            <a href="{{ route('admin.settings.judge0.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                            <a href="{{ route('admin.settings.judge0.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.judge0.*') ? 'active' : '' }}">
                                 <i class="fas fa-server w-4 text-center text-slate-400"></i> Judge0 Settings
+                            </a>
+                            <a href="{{ route('admin.settings.mail.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.mail.*') ? 'active' : '' }}">
+                                <i class="fas fa-envelope w-4 text-center text-slate-400"></i> Mail Settings
+                            </a>
+                            <a href="{{ route('admin.settings.backup.edit') }}" class="nav-dropdown-item {{ request()->routeIs('admin.settings.backup.*') ? 'active' : '' }}">
+                                <i class="fas fa-database w-4 text-center text-slate-400"></i> Database Backup
                             </a>
                           </div>
                         </div>
@@ -454,8 +460,14 @@
             <a href="{{ route('admin.profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.profile.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                 <i class="fas fa-user w-4 text-center text-slate-400"></i> My Profile
             </a>
-            <a href="{{ route('admin.settings.judge0.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+            <a href="{{ route('admin.settings.judge0.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings.judge0.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
                 <i class="fas fa-server w-4 text-center text-slate-400"></i> Judge0 Settings
+            </a>
+            <a href="{{ route('admin.settings.mail.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings.mail.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-envelope w-4 text-center text-slate-400"></i> Mail Settings
+            </a>
+            <a href="{{ route('admin.settings.backup.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.settings.backup.*') ? 'bg-indigo-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }}">
+                <i class="fas fa-database w-4 text-center text-slate-400"></i> Database Backup
             </a>
         </div>
     </header>

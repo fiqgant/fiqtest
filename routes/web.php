@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionTagController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\SystemSettingController;
 use App\Http\Controllers\Exam\ExamAccessController;
 use App\Http\Controllers\Exam\ExamWorkspaceController;
@@ -87,6 +89,15 @@ Route::prefix('admin')->group(function () {
         Route::get('settings/judge0', [SystemSettingController::class, 'editJudge0'])->name('admin.settings.judge0.edit');
         Route::put('settings/judge0', [SystemSettingController::class, 'updateJudge0'])->name('admin.settings.judge0.update');
         Route::post('settings/judge0/test', [SystemSettingController::class, 'testJudge0'])->name('admin.settings.judge0.test');
+
+        Route::get('settings/mail', [MailSettingController::class, 'edit'])->name('admin.settings.mail.edit');
+        Route::put('settings/mail', [MailSettingController::class, 'update'])->name('admin.settings.mail.update');
+        Route::post('settings/mail/test', [MailSettingController::class, 'testSend'])->name('admin.settings.mail.test');
+
+        Route::get('settings/backup', [BackupController::class, 'edit'])->name('admin.settings.backup.edit');
+        Route::put('settings/backup', [BackupController::class, 'update'])->name('admin.settings.backup.update');
+        Route::get('settings/backup/download', [BackupController::class, 'download'])->name('admin.settings.backup.download');
+        Route::post('settings/backup/send', [BackupController::class, 'sendNow'])->name('admin.settings.backup.send');
 
         Route::get('reports/offering/{courseOffering}', [ReportController::class, 'offering'])->name('admin.reports.offering');
         Route::get('reports/period/{academicPeriod}', [ReportController::class, 'period'])->name('admin.reports.period');
