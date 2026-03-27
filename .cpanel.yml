@@ -1,0 +1,12 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/fiqte869/repositories/fiqtest
+    - export PUBPATH=/home/fiqte869/public_html
+    - /usr/local/cpanel/php/composer install --no-dev --optimize-autoloader --no-interaction 2>&1 || composer install --no-dev --optimize-autoloader --no-interaction 2>&1
+    - cp -R $DEPLOYPATH/public/. $PUBPATH/
+    - cp /home/fiqte869/.env $DEPLOYPATH/.env 2>/dev/null || true
+    - /usr/bin/php $DEPLOYPATH/artisan migrate --force 2>&1
+    - /usr/bin/php $DEPLOYPATH/artisan config:cache 2>&1
+    - /usr/bin/php $DEPLOYPATH/artisan route:cache 2>&1
+    - /usr/bin/php $DEPLOYPATH/artisan view:cache 2>&1
