@@ -40,6 +40,7 @@ class Exam extends Model
     protected $casts = [
         'opens_at' => 'datetime',
         'closes_at' => 'datetime',
+        'duration_minutes' => 'integer',
         'show_score_immediately' => 'boolean',
         'hints_enabled' => 'boolean',
         'max_hints_per_question' => 'integer',

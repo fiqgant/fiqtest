@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 define('LARAVEL_START', microtime(true));
 
 // Auto-detect Laravel root (works locally and on shared hosting)
-$appRoot = __DIR__ . '/..';
+$appRoot = __DIR__ . '/..';         // Standard: vendor satu level di atas public/
 if (!is_dir($appRoot . '/vendor')) {
-    $appRoot = '/home/fiqte869/repositories/fiqtest';
+    $appRoot = __DIR__;             // Shared hosting: full app ada di public_html
+    if (!is_dir($appRoot . '/vendor')) {
+        $appRoot = '/home/fiqte869/repositories/fiqtest'; // cPanel git path
+    }
 }
 
 // Determine if the application is in maintenance mode...
